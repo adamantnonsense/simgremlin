@@ -147,19 +147,23 @@
             color: var(--text-primary); /* Ensure contrast */
         }
 
-        /* Theme Toggle Button */
+        /* Theme Toggle Button (Fixed Position) */
         #themeToggle {
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--text-primary);
-            transition: color 0.2s ease;
+            transition: color 0.2s ease, background-color 0.2s ease;
             padding: 0.5rem;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: fixed; /* Fixed position */
+            top: 1rem; /* 16px from top */
+            right: 1rem; /* 16px from right */
+            z-index: 100; /* Ensure it's above other content */
         }
 
         #themeToggle:hover {
@@ -1150,6 +1154,9 @@
     </style>
 </head>
 <body class="p-4 md:p-8">
+    <button id="themeToggle" class="ml-4">
+        <i class="fas fa-sun"></i> <!-- Sun icon for light mode, will change to moon in dark mode -->
+    </button>
     <div class="main-layout-grid flex flex-col md:flex-row gap-6 max-w-7xl mx-auto">
         <div class="families-sidebar sleek-panel p-6 md:w-72 md:flex-shrink-0 flex flex-col">
             <h2 class="text-2xl font-bold mb-4 flex items-center justify-between relative z-20">
@@ -1161,11 +1168,8 @@
         </div>
         <div class="main-content-area flex flex-col gap-3 flex-grow">
             <div class="world-header p-6 rounded-lg text-center flex-shrink-0">
-                <div class="flex justify-between items-center mb-2">
+                <div class="flex justify-center items-center mb-2">
                     <h1 id="worldNameDisplay" class="flex-grow text-4xl md:text-5xl font-extrabold text-center"></h1>
-                    <button id="themeToggle" class="ml-4">
-                        <i class="fas fa-sun"></i> <!-- Sun icon for light mode, will change to moon in dark mode -->
-                    </button>
                 </div>
                 <p id="worldDescriptionDisplay" class="text-lg md:text-xl"></p>
             </div>
@@ -1461,7 +1465,7 @@
                         "children": ["Cassandra Goth"],
                         "skills": { "Charisma": 9, "Logic": 7, "Fitness": 8, "Mischief": 6 },
                         "traits": ["Outgoing", "Good", "Perfectionist"],
-                        "hobbies": ["Socializing", "Exploring new places (sometimes involuntarily)", "Playing chess"],
+                        "hobbies": ["Socializing", "Exploring new places (sometimes involuntarily);Playing chess"],
                         "notes": "Has a peculiar connection to aliens. Her memory of past events is sometimes hazy. Always carries a mysterious locket.",
                         "personality": { "sloppyNeat": 10, "shyOutgoing": 10, "lazyActive": 9, "seriousPlayful": 8, "grouchyNice": 8 }
                     },
@@ -1598,8 +1602,20 @@
             const simImageElement = document.getElementById('simImage');
             const encodedSimName = encodeURIComponent(sim.name);
             const encodedAge = encodeURIComponent(age);
-            const imageUrl = `https://placehold.co/400x225/${encodeURIComponent('DCDCDC')}/${encodeURIComponent('202122')}?text=${encodedSimName}%20-%20${encodedAge}`;
-            simImageElement.src = sim.image || imageUrl; // Use provided image or placeholder
+
+            // Prioritize specific image URLs from CSV if they exist (e.g., Image_Baby, Image_Adult)
+            // Fallback to the main 'image' URL from CSV if the requested age matches the default age
+            // Otherwise, generate a placeholder for other ages.
+            let imageUrl = '';
+            if (sim['Image_' + age.replace(' ', '')]) { // Check for "Image_YoungAdult", "Image_Teen" etc.
+                imageUrl = sim['Image_' + age.replace(' ', '')];
+            } else if (sim.image && sim.age === age) { // Use main image if it matches the current sim's age
+                imageUrl = sim.image;
+            } else { // Fallback to placeholder if no specific image or current age match
+                imageUrl = `https://placehold.co/400x225/${encodeURIComponent('DCDCDC')}/${encodeURIComponent('202122')}?text=${encodedSimName}%20-%20${encodedAge}`;
+            }
+            
+            simImageElement.src = imageUrl;
 
             const ageIcons = document.querySelectorAll('#simAgeIconsContainer .age-icon');
             ageIcons.forEach(icon => {
@@ -1625,6 +1641,7 @@
             document.getElementById('simNameDisplay').textContent = sim.name;
             document.getElementById('simTitleDisplay').textContent = sim.title || 'N/A';
             
+            // Set initial image based on the sim's default age from CSV
             updateSimImageForAge(sim, sim.age || 'Young Adult');
 
             document.getElementById('simBioText').textContent = sim.bio || 'No biography provided.';
@@ -1708,7 +1725,9 @@
                 iconSpan.onclick = () => updateSimImageForAge(sim, stage);
                 simAgeIconsContainer.appendChild(iconSpan);
             });
+            // Re-apply active state based on the current sim's age after all icons are created
             updateSimImageForAge(sim, sim.age || 'Young Adult');
+
 
             const simSkillsList = document.getElementById('simSkillsList');
             simSkillsList.innerHTML = '';
@@ -1863,7 +1882,7 @@
             document.querySelectorAll('.sortable-th').forEach(th => {
                 th.classList.remove('asc', 'desc');
                 if (th.dataset.sort === sortColumn) {
-                    th.classList.add(direction); // Use 'direction' here to reflect current sort
+                    th.classList.add(sortDirection); 
                 }
             });
         }
@@ -2199,6 +2218,15 @@
                             if (traitName && traitValue) sim.personality[traitName] = parseInt(traitValue, 10);
                         });
                     }
+
+                    // Collect other age specific images if they exist in CSV (e.g., "Image_Baby")
+                    ['Baby', 'Toddler', 'Child', 'Teen', 'Young Adult', 'Adult', 'Elder'].forEach(stage => {
+                        const colName = 'Image_' + stage.replace(' ', '');
+                        if (row[colName]) {
+                            if (!sim.images) sim.images = {}; // Initialize images object if not present
+                            sim.images[stage] = row[colName];
+                        }
+                    });
 
                     if (sim.name) {
                         if (row['Family Name'] && row['Family Name'].toLowerCase() === 'homeless') {
