@@ -52,7 +52,7 @@
             --status-dead: #e74c3c; /* Brighter red for dead */
             --sim-name-header-text: #f0f0f0; /* Light text for sim name in header */
             --sim-title-header-text: #b0b0b0; /* Muted light text for sim title in header */
-            --highlight-active: #81c784; /* A subtle highlight color for active elements */
+            --highlight-active: var(--link-color); /* Now uses the link color for consistency */
             --personality-low-color: #cc524a; /* Darker red for low end */
             --personality-high-color: #4a8ed9; /* Darker blue for high end */
             --personality-balanced-color: #556677; /* Darker grey for balanced */
@@ -1187,7 +1187,7 @@
                     </div>
                     <div class="card-content-redesign flex flex-col flex-grow">
                         <div class="card-image-section-redesign rounded-md" onclick="openImageModal(document.getElementById('simImage').src)">
-                            <img id="simImage" src="https://via.placeholder.co/400x225/3182CE/C2D0E6?text=Sim+Image" alt="Sim Image" class="w-full h-full object-cover rounded-md">
+                            <img id="simImage" src="https://via.placeholder.co/400x225/3182CE/C2D0E6?text=Sim+Image" alt="Sim Image">
                         </div>
                         <div id="simAgeIconsContainer" class="sim-age-icons-container">
                         </div>
@@ -1291,7 +1291,7 @@
                         </button>
                         <h3 id="singleStoryHeadline" class="text-2xl font-bold mb-4 text-center"></h3>
                         <div class="story-image-container" onclick="openImageModal(document.getElementById('storyImage').src)">
-                            <img id="storyImage" src="https://placehold.co/400x225/EF5350/E2E8F0?text=Story%20Image" alt="Story Image" class="w-full h-full object-cover rounded-md">
+                            <img id="storyImage" src="https://placehold.co/400x225/EF5350/E2E8F0?text=Story%20Image" alt="Story Image">
                         </div>
                         
                         <div id="storyContent" class="story-single-content-in-card p-4 rounded-md text-base leading-relaxed">
@@ -2293,14 +2293,8 @@
             });
 
             updateFamilyList();
-            // Determine initial view: if families exist, show first family overview, else show spreadsheet
-            const familyKeys = Object.keys(simData).filter(k => k !== "worldInfo" && k !== "homelessSims");
-            if (familyKeys.length > 0) {
-                currentSelectedFamily = familyKeys[0]; // Select the first family by default
-                displayFamilyOverview(currentSelectedFamily);
-            } else {
-                showSpreadsheet(); // Fallback to spreadsheet if no families are found
-            }
+            // Set Neighborhood Stories as the default section on page load
+            displayNeighborhoodStories();
         }
 
         // Call loadAllData automatically on window load
