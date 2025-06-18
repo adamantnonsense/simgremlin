@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1169,7 +1169,6 @@
                 </div>
                 <p id="worldDescriptionDisplay" class="text-lg md:text-xl"></p>
             </div>
-            <!-- Removed CSV Input Section -->
             
             <div id="staticNavBar" class="static-nav-bar">
                 <button id="showNeighborhoodStoriesBtn" class="px-5 py-2 rounded-md font-bold">Neighborhood Stories</button>
@@ -1324,21 +1323,27 @@
     </div>
     <script>
         // --- CONFIGURATION: REPLACE THESE WITH YOUR GOOGLE SHEET DETAILS ---
-        const GOOGLE_SHEET_ID = '2PACX-1vSs1l3tUbLZpKfZCUxSkdYYsRcneV_PsoF7yPLJ3YdZr_tsVSOo3qcH4idIjwmx-f4U7rMb7_nBDSuV'; // <-- IMPORTANT: Replace this with your Google Sheet ID
-        const SHEET_NAME = '522782907'; // <-- IMPORTANT: Replace this with the exact name of your sheet (e.g., 'Sheet1', 'MySims')
+        const GOOGLE_SHEET_ID = '2PACX-1vSs1l3tUbLZpKfZCUxSkdYYsRcneV_PsoF7yPLJ3YdZr_tsVSOo3qcH4idIjwmx-f4U7rMb7_nBDSuV'; // Your main Google Sheet ID
+
+        // GIDs for each specific sheet within the spreadsheet
+        const WORLD_INFO_GID = '1046330091';
+        const SIM_BIO_GID = '522782907';
+        const FAMILY_BIO_GID = '75505924';
+        const STORIES_GID = '1540825772';
         // -------------------------------------------------------------------
 
         // Default data in case CSV loading fails or no CSV is provided
+        // This structure mirrors the expected combined data after parsing all sheets
         const defaultSimData = {
             "worldInfo": {
                 name: "Newcrest (Default Data)",
-                description: "This is a demo of your Sims' notes. Replace the Google Sheet ID and Sheet Name in the script to load your own data!"
+                description: "This is a demo of your Sims' notes. Connect your Google Sheets to load your own data!"
             },
             "Landgraab": {
                 "familyBio": {
                     name: "Landgraab Family",
                     location: "Oasis Springs",
-                    memberCount: 3,
+                    memberCount: 0, // Will be dynamically updated from sim data
                     funds: "$5,000,000",
                     biography: "The illustrious Landgraab family, a pillar of the community, is known for their vast wealth and a slight tendency towards... corporate espionage. Nancy, the matriarch, rules with an iron fist, while Geoffrey tries to maintain a semblance of normalcy. Their son, Malcolm, struggles with the weight of expectation and a penchant for villainy."
                 },
@@ -1413,7 +1418,7 @@
                 "familyBio": {
                     name: "Goth Family",
                     location: "Willow Creek",
-                    memberCount: 3,
+                    memberCount: 0, // Will be dynamically updated from sim data
                     funds: "$1,500,000",
                     biography: "The enigmatic Goth family resides in their hauntingly beautiful mansion, a place steeped in mystery and dark romanticism. Mortimer, a renowned author, and Bella, the captivating socialite, live a life of quiet intrigue with their daughter Cassandra. Whispers of Bella's mysterious disappearances often circulate."
                 },
@@ -1527,8 +1532,8 @@
 
 
         // Global data store for Sims and Families (will be populated by default data first, then potentially overwritten by CSV)
-        let simData = defaultSimData;
-        let neighborhoodStories = defaultNeighborhoodStories;
+        let simData = defaultSimData; // Start with default data
+        let neighborhoodStories = defaultNeighborhoodStories; // Start with default stories
 
         let currentSelectedFamily = null;
         let currentSelectedSim = null;
@@ -1544,187 +1549,7 @@
             "Young Adult": "👩‍🎓 ", "Adult": "🧑‍💼 ", "Elder": "👵 "
         };
 
-        // --- CSV LOADING AND PARSING ---
-        async function loadCsvData() {
-            // This URL assumes the sheet is published to the web as CSV
-            const csvUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
-
-            try {
-                const response = await fetch(csvUrl);
-                if (!response.ok) {
-                    // Throw error for non-200 responses (like 404)
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const csvText = await response.text();
-                // If CSV data is successfully fetched, parse it and overwrite default data
-                parseCsvData(csvText);
-                document.getElementById('worldNameDisplay').textContent = defaultSimData.worldInfo.name; // Reset to default "Newcrest" as CSV data doesn't contain it
-                document.getElementById('worldDescriptionDisplay').textContent = "Data loaded from your Google Sheet!";
-                console.log("Successfully loaded data from Google Sheet.");
-
-            } catch (error) {
-                console.error("Error loading CSV data:", error);
-                // If CSV loading fails, revert to default data (already set globally)
-                // And display a user-friendly error message on the page
-                const contentDisplayArea = document.getElementById('contentDisplayArea');
-                contentDisplayArea.innerHTML = `<div class="sleek-panel p-6 text-center text-red-600">
-                    <h3 class="text-xl font-bold mb-2">Error Loading Data from Google Sheet</h3>
-                    <p class="mb-4">The site is currently showing <strong>default demo data</strong> because it failed to load your custom data.</p>
-                    <p>To use your own data, please ensure:</p>
-                    <ul class="list-disc list-inside text-left mx-auto max-w-sm mt-4">
-                        <li>You have replaced the <code>GOOGLE_SHEET_ID</code> and <code>SHEET_NAME</code> variables in the script with your correct values.</li>
-                        <li>Your Google Sheet is <strong class="font-bold">published to the web as a CSV</strong> (File > Share > Publish to web > Select Sheet > Format: Comma-separated values (.csv) > Publish).</li>
-                        <li>There are no network issues preventing access.</li>
-                    </ul>
-                    <p class="mt-4 text-sm text-gray-500">Error details: ${error.message}</p>
-                </div>`;
-            } finally {
-                // Always initialize display, whether from CSV or default data
-                initializeDisplay();
-            }
-        }
-
-        function parseCsvData(csvText) {
-            // Re-initialize global data containers with empty structures
-            simData = {
-                "worldInfo": {
-                    name: "Newcrest", // This will be the default world name
-                    description: "A dynamic world reflecting your Sims' stories!"
-                },
-                "homelessSims": []
-            };
-            neighborhoodStories = [];
-            collectedSimNotes = new Map(); // Clear notes map as well for fresh data
-
-            const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
-            if (lines.length <= 1) {
-                console.warn("CSV is empty or contains only headers. Using default data.");
-                // If CSV is empty, ensure default data is retained by not modifying it further
-                simData = defaultSimData;
-                neighborhoodStories = defaultNeighborhoodStories;
-                return;
-            }
-
-            const headers = lines[0].split(',').map(header => header.trim());
-            
-            const headerMap = {
-                'Name': 'name', 'Title': 'title', 'Image': 'image', 'Bio': 'bio', 'Age': 'age',
-                'Gender': 'gender', 'Status': 'status', 'Occult Status': 'occultStatus', 'Career': 'career',
-                'Career Level': 'careerLevel', 'Aspiration': 'aspiration', 'Zodiac': 'zodiac',
-                'Partners': 'partners', 'Parents': 'parents', 'Children': 'children',
-                'Skills': 'skills', 'Traits': 'traits', 'Hobbies': 'hobbies', 'Notes': 'notes',
-                'Personality': 'personality',
-                'Family Name': 'familyName', 'Family Location': 'familyLocation', 'Family Funds': 'familyFunds',
-                'Family Biography': 'familyBiography',
-                'Story Headline': 'storyHeadline', 'Story Content': 'storyContent'
-            };
-
-            for (let i = 1; i < lines.length; i++) {
-                // This regex handles commas within double quotes: /,(?=(?:(?:[^"]*"){2})*[^"]*$)/
-                const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-
-                const rowData = {};
-                headers.forEach((header, index) => {
-                    const mappedKey = headerMap[header.trim()];
-                    if (mappedKey) {
-                        // Trim value and remove surrounding double quotes if present
-                        let value = values[index] ? values[index].trim().replace(/^"|"$/g, '') : '';
-
-                        if (['partners', 'parents', 'children', 'traits', 'hobbies'].includes(mappedKey)) {
-                            rowData[mappedKey] = value ? value.split(';').map(item => item.trim()).filter(item => item !== '') : [];
-                        } else if (mappedKey === 'skills') {
-                            rowData[mappedKey] = {};
-                            if (value) {
-                                value.split(';').forEach(skillPair => {
-                                    const [skillName, skillLevel] = skillPair.split(':').map(s => s.trim());
-                                    if (skillName && skillLevel) {
-                                        rowData[mappedKey][skillName] = parseInt(skillLevel, 10);
-                                    }
-                                });
-                            }
-                        } else if (mappedKey === 'personality') {
-                            rowData[mappedKey] = {};
-                            if (value) {
-                                value.split(';').forEach(traitPair => {
-                                    const [traitName, traitValue] = traitPair.split(':').map(s => s.trim());
-                                    if (traitName && traitValue) {
-                                        rowData[mappedKey][traitName] = parseInt(traitValue, 10);
-                                    }
-                                });
-                            }
-                        } else if (mappedKey === 'careerLevel') {
-                            rowData[mappedKey] = parseInt(value, 10) || 'N/A'; // Parse as int, default to N/A
-                        }
-                        else {
-                            rowData[mappedKey] = value;
-                        }
-                    }
-                });
-
-                if (rowData.name && rowData.familyName !== undefined) {
-                    const familyNameKey = rowData.familyName.replace(/ /g, '').replace(/'/g, '');
-                    if (rowData.familyName.toLowerCase() === 'homeless') {
-                        if (!simData.homelessSims.find(s => s.name === rowData.name)) {
-                            simData.homelessSims.push(rowData);
-                        }
-                    } else {
-                        if (!simData[familyNameKey]) {
-                            simData[familyNameKey] = {
-                                familyBio: {
-                                    name: rowData.familyName,
-                                    location: rowData.familyLocation || 'Unknown',
-                                    funds: rowData.familyFunds || '$0',
-                                    biography: rowData.familyBiography || 'No biography provided.'
-                                },
-                                members: []
-                            };
-                        }
-                        simData[familyNameKey].members.push(rowData);
-                    }
-                } else if (rowData.storyHeadline && rowData.storyContent) {
-                    neighborhoodStories.push({
-                        headline: rowData.storyHeadline,
-                        content: rowData.storyContent
-                    });
-                }
-            }
-
-            for (const familyKey in simData) {
-                if (simData.hasOwnProperty(familyKey) && simData[familyKey].members) {
-                    simData[familyKey].familyBio.memberCount = simData[familyKey].members.length;
-                }
-            }
-
-            const sortedFamilyKeys = Object.keys(simData)
-                .filter(k => k !== "worldInfo" && k !== "homelessSims")
-                .sort((a, b) => simData[a].familyBio.name.localeCompare(simData[b].familyBio.name));
-
-            const orderedSimData = {
-                "worldInfo": simData.worldInfo,
-                ...sortedFamilyKeys.reduce((obj, key) => {
-                    obj[key] = simData[key];
-                    return obj;
-                }, {}),
-                "homelessSims": simData.homelessSims
-            };
-            simData = orderedSimData;
-
-            console.log("Parsed simData (from CSV):", simData);
-            console.log("Parsed neighborhoodStories (from CSV):", neighborhoodStories);
-        }
-
-        // Utility to find a sim by name across all families and homeless sims
-        function findSimByName(simName) {
-            for (const familyKey in simData) {
-                if (familyKey === "worldInfo") continue;
-                const simsCollection = simData[familyKey].members || simData[familyKey];
-                const foundSim = simsCollection.find(sim => sim.name === simName);
-                if (foundSim) {
-                    return foundSim;
-                }
-            }
-            return null;
-        }
+        // --- Helper Functions (defined before they are used in initializeDisplay and CSV parsing) ---
 
         // Function to hide all content sections
         function hideAllContentSections() {
@@ -1749,118 +1574,24 @@
             document.getElementById('notesSection').classList.remove('flex');
         }
 
-        function updateFamilyList() {
-            const familyListElement = document.getElementById('familyList');
-            familyListElement.innerHTML = '';
-
-            const familyNames = Object.keys(simData).filter(k => k !== "worldInfo" && k !== "homelessSims");
-            if (familyNames.length === 0) {
-                familyListElement.innerHTML = '<p class="text-center text-muted-dark relative z-20">No families found.</p>';
-                return;
-            }
-
-            familyNames.forEach(familyNameKey => {
-                const family = simData[familyNameKey];
-                const isSelectedFamily = familyNameKey === currentSelectedFamily;
-                const familyItemClass = isSelectedFamily ? 'family-item selected-family' : 'family-item';
-                const displayFamilyName = family.familyBio.name.replace(' Family', '');
-
-                let familyHtml = `
-                    <div class="${familyItemClass} p-2 rounded-md shadow-sm flex items-center justify-between" onclick="selectFamily('${familyNameKey}')">
-                        <h3 class="text-lg font-semibold relative z-20">${displayFamilyName}</h3>
-                        <i class="fas fa-chevron-right expand-icon text-sm relative z-20"></i>
-                    </div>
-                    <div class="sims-list ml-4 mt-1 ${isSelectedFamily ? 'expanded' : ''}">
-                `;
-
-                const aliveMembers = family.members ? family.members.filter(sim => sim.status === "Alive") : [];
-                if (aliveMembers.length === 0) {
-                    familyHtml += `<p class="px-3 py-1 text-sm text-gray-500">No living members.</p>`;
-                } else {
-                    aliveMembers.forEach(sim => {
-                        const isSelectedSim = isSelectedFamily && currentSelectedSim && sim.name === currentSelectedSim.name;
-                        const simButtonClass = isSelectedSim ? 'sim-button selected-sim' : 'sim-button';
-                        familyHtml += `<button class="${simButtonClass} px-3 py-1 rounded-full text-sm block w-full text-left" onclick="selectSim('${sim.name}')">
-                            <span class="relative z-20">${sim.name}</span>
-                        </button>`;
-                    });
-                }
-                familyHtml += `</div>`;
-                familyListElement.innerHTML += familyHtml;
-            });
-
-            const selectedFamilyElement = document.querySelector(`.family-item.selected-family`);
-            if (selectedFamilyElement) {
-                const expandIcon = selectedFamilyElement.querySelector('.expand-icon');
-                if (expandIcon) {
-                    expandIcon.style.transform = 'rotate(90deg)';
-                }
-                const simsList = selectedFamilyElement.nextElementSibling;
-                if (simsList && simsList.classList.contains('sims-list')) {
-                    simsList.style.maxHeight = simsList.scrollHeight + 'px';
-                }
-            }
-        }
-
-        function selectFamily(familyNameKey) {
-            const prevSelectedFamilyElement = document.querySelector(`.family-item.selected-family`);
-            if (prevSelectedFamilyElement) {
-                const prevSimsList = prevSelectedFamilyElement.nextElementSibling;
-                if (prevSimsList && prevSimsList.classList.contains('sims-list')) {
-                    prevSimsList.classList.remove('expanded');
-                    prevSimsList.style.maxHeight = '0';
-                    prevSelectedFamilyElement.classList.remove('selected-family');
-                    const prevExpandIcon = prevSelectedFamilyElement.querySelector('.expand-icon');
-                    if(prevExpandIcon) prevExpandIcon.style.transform = 'rotate(0deg)';
-                }
-            }
-
-            if (familyNameKey === currentSelectedFamily && document.querySelector(`.family-item[onclick="selectFamily('${familyNameKey}')"]`).classList.contains('selected-family')) {
-                currentSelectedFamily = null;
-                hideAllContentSections();
-                return;
-            }
-
-            currentSelectedFamily = familyNameKey;
-            currentSelectedSim = null;
-
-            const newSelectedFamilyElement = document.querySelector(`.family-item[onclick="selectFamily('${familyNameKey}')"]`);
-            if (newSelectedFamilyElement) {
-                const newSimsList = newSelectedFamilyElement.nextElementSibling;
-                if (newSimsList && newSimsList.classList.contains('sims-list')) {
-                    newSimsList.classList.add('expanded');
-                    newSimsList.style.maxHeight = newSimsList.scrollHeight + 'px';
-                    newSelectedFamilyElement.classList.add('selected-family');
-                    const newExpandIcon = newSelectedFamilyElement.querySelector('.expand-icon');
-                    if(newExpandIcon) newExpandIcon.style.transform = 'rotate(90deg)';
-                }
-            }
-            updateFamilyList();
-            hideAllContentSections();
-            displayFamilyOverview(familyNameKey);
-        }
-
-        function selectSim(simName) {
-            let foundSim = null;
+        // Utility to find a sim by name across all families and homeless sims
+        function findSimByName(simName) {
             for (const familyKey in simData) {
-                if (familyKey === "worldInfo") continue;
-                const simsCollection = simData[familyKey].members || simData[familyKey];
-                const sim = simsCollection.find(s => s.name === simName);
-                if (sim) {
-                    foundSim = sim;
-                    currentSelectedFamily = familyKey; 
-                    break;
+                if (familyKey === "worldInfo" || familyKey === "homelessSims") continue; // Skip worldInfo and homelessSims for family iteration
+                const familyMembers = simData[familyKey].members;
+                if (familyMembers) {
+                    const foundSim = familyMembers.find(sim => sim.name === simName);
+                    if (foundSim) {
+                        return foundSim;
+                    }
                 }
             }
-            if (!foundSim) {
-                console.error(`Sim with name '${simName}' not found.`);
-                hideAllContentSections();
-                return;
+            // Check homeless sims separately
+            const foundHomelessSim = simData.homelessSims.find(sim => sim.name === simName);
+            if (foundHomelessSim) {
+                return foundHomelessSim;
             }
-            currentSelectedSim = foundSim;
-            updateFamilyList();
-            hideAllContentSections();
-            displaySimDetails(currentSelectedSim);
+            return null;
         }
 
         function updateSimImageForAge(sim, age) {
@@ -2132,7 +1863,7 @@
             document.querySelectorAll('.sortable-th').forEach(th => {
                 th.classList.remove('asc', 'desc');
                 if (th.dataset.sort === sortColumn) {
-                    th.classList.add(sortDirection);
+                    th.classList.add(direction); // Use 'direction' here to reflect current sort
                 }
             });
         }
@@ -2332,8 +2063,302 @@
             }
         }
 
+        // --- CSV Parsing Functions for each specific sheet ---
+
+        // Generic CSV parsing helper
+        function parseCsvGeneric(csvText, expectedHeaders) {
+            const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
+            if (lines.length <= 1) {
+                return []; // Return empty array if no data beyond headers
+            }
+
+            const headers = lines[0].split(',').map(header => header.trim());
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); // Regex to handle commas in quotes
+                const rowData = {};
+                headers.forEach((header, index) => {
+                    let value = values[index] ? values[index].trim().replace(/^"|"$/g, '') : '';
+                    rowData[header.trim()] = value; // Use original header name as key
+                });
+                data.push(rowData);
+            }
+            return data;
+        }
+
+        async function fetchWorldInfoCsv() {
+            // Updated URL to use the public CSV export format provided by the user
+            const csvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEET_ID}/pub?gid=${WORLD_INFO_GID}&single=true&output=csv`;
+            try {
+                const response = await fetch(csvUrl);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for World Info Sheet (GID: ${WORLD_INFO_GID})`);
+                const csvText = await response.text();
+                const data = parseCsvGeneric(csvText, ['World Name', 'World Description']);
+                if (data.length > 0) {
+                    return {
+                        name: data[0]['World Name'] || defaultSimData.worldInfo.name,
+                        description: data[0]['World Description'] || defaultSimData.worldInfo.description
+                    };
+                }
+            } catch (error) {
+                console.error("Error loading World Information CSV:", error);
+            }
+            return defaultSimData.worldInfo; // Return default if fetch or parse fails
+        }
+
+        async function fetchFamilyBiographiesCsv() {
+            // Updated URL to use the public CSV export format provided by the user
+            const csvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEET_ID}/pub?gid=${FAMILY_BIO_GID}&single=true&output=csv`;
+            const families = {}; // Temporary object to store family bios
+            try {
+                const response = await fetch(csvUrl);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for Family Bio Sheet (GID: ${FAMILY_BIO_GID})`);
+                const csvText = await response.text();
+                const data = parseCsvGeneric(csvText, ['Family Name', 'Family Location', 'Family Funds', 'Family Biography']);
+                
+                data.forEach(row => {
+                    if (row['Family Name']) {
+                        // Sanitize family name for use as a key
+                        const familyNameKey = row['Family Name'].replace(/ /g, '').replace(/'/g, '');
+                        families[familyNameKey] = {
+                            familyBio: {
+                                name: row['Family Name'],
+                                location: row['Family Location'] || 'Unknown',
+                                funds: row['Family Funds'] || '$0',
+                                biography: row['Family Biography'] || 'No biography provided.',
+                                memberCount: 0 // Will be filled by Sim Bio sheet
+                            },
+                            members: [] // Members filled by Sim Bio sheet
+                        };
+                    }
+                });
+            } catch (error) {
+                console.error("Error loading Family Biography CSV:", error);
+            }
+            return families; // Return parsed families (can be empty)
+        }
+
+        async function fetchSimBiographiesCsv(existingFamilies) {
+            // Updated URL to use the public CSV export format provided by the user
+            const csvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEET_ID}/pub?gid=${SIM_BIO_GID}&single=true&output=csv`;
+            const sims = {}; // Temp to build full sim data structure
+            const homelessSimsList = [];
+
+            // Initialize sims object with existing family bios
+            for(const key in existingFamilies) {
+                sims[key] = { ...existingFamilies[key], members: [] }; // Deep copy existing family bios
+            }
+
+            try {
+                const response = await fetch(csvUrl);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for Sim Bio Sheet (GID: ${SIM_BIO_GID})`);
+                const csvText = await response.text();
+                const data = parseCsvGeneric(csvText, [
+                    'Name', 'Title', 'Image', 'Bio', 'Age', 'Gender', 'Status', 'Occult Status',
+                    'Career', 'Career Level', 'Aspiration', 'Zodiac', 'Partners', 'Parents',
+                    'Children', 'Skills', 'Traits', 'Hobbies', 'Notes', 'Personality', 'Family Name'
+                ]);
+
+                data.forEach(row => {
+                    const sim = {
+                        name: row['Name'],
+                        title: row['Title'],
+                        image: row['Image'],
+                        bio: row['Bio'],
+                        age: row['Age'],
+                        gender: row['Gender'],
+                        status: row['Status'],
+                        occultStatus: row['Occult Status'] || 'Human',
+                        career: row['Career'],
+                        careerLevel: parseInt(row['Career Level'], 10) || 'N/A',
+                        aspiration: row['Aspiration'],
+                        zodiac: row['Zodiac'],
+                        partners: row['Partners'] ? row['Partners'].split(';').map(s => s.trim()).filter(s => s) : [],
+                        parents: row['Parents'] ? row['Parents'].split(';').map(s => s.trim()).filter(s => s) : [],
+                        children: row['Children'] ? row['Children'].split(';').map(s => s.trim()).filter(s => s) : [],
+                        skills: {},
+                        traits: row['Traits'] ? row['Traits'].split(';').map(s => s.trim()).filter(s => s) : [],
+                        hobbies: row['Hobbies'] ? row['Hobbies'].split(';').map(s => s.trim()).filter(s => s) : [],
+                        notes: row['Notes'],
+                        personality: {}
+                    };
+
+                    // Parse Skills
+                    if (row['Skills']) {
+                        row['Skills'].split(';').forEach(skillPair => {
+                            const [skillName, skillLevel] = skillPair.split(':').map(s => s.trim());
+                            if (skillName && skillLevel) sim.skills[skillName] = parseInt(skillLevel, 10);
+                        });
+                    }
+
+                    // Parse Personality
+                    if (row['Personality']) {
+                        row['Personality'].split(';').forEach(traitPair => {
+                            const [traitName, traitValue] = traitPair.split(':').map(s => s.trim());
+                            if (traitName && traitValue) sim.personality[traitName] = parseInt(traitValue, 10);
+                        });
+                    }
+
+                    if (sim.name) {
+                        if (row['Family Name'] && row['Family Name'].toLowerCase() === 'homeless') {
+                            homelessSimsList.push(sim);
+                        } else {
+                            const familyNameKey = row['Family Name'] ? row['Family Name'].replace(/ /g, '').replace(/'/g, '') : 'UnknownFamily';
+                            if (!sims[familyNameKey]) {
+                                // If a sim belongs to a family not in Family Bio sheet, create a basic entry
+                                console.warn(`Sim '${sim.name}' belongs to family '${row['Family Name']}' not found in Family Biography Sheet. Creating a placeholder entry.`);
+                                sims[familyNameKey] = {
+                                    familyBio: {
+                                        name: row['Family Name'] || 'Unknown Family',
+                                        location: 'Unknown',
+                                        funds: '$0',
+                                        biography: 'No biography provided in Family Sheet.',
+                                        memberCount: 0
+                                    },
+                                    members: []
+                                };
+                            }
+                            sims[familyNameKey].members.push(sim);
+                        }
+                    }
+                });
+
+                // Update member counts after all sims are added
+                for (const familyKey in sims) {
+                    if (sims.hasOwnProperty(familyKey) && sims[familyKey].members) {
+                        sims[familyKey].familyBio.memberCount = sims[familyKey].members.length;
+                    }
+                }
+
+            } catch (error) {
+                console.error("Error loading Sim Biography CSV:", error);
+                // Return existing families and default homeless sims if this sheet fails
+                return { families: existingFamilies, homelessSims: defaultSimData.homelessSims };
+            }
+            return { families: sims, homelessSims: homelessSimsList };
+        }
+
+        async function fetchNeighborhoodStoriesCsv() {
+            // Updated URL to use the public CSV export format provided by the user
+            const csvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEET_ID}/pub?gid=${STORIES_GID}&single=true&output=csv`;
+            try {
+                const response = await fetch(csvUrl);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for Stories Sheet (GID: ${STORIES_GID})`);
+                const csvText = await response.text();
+                const data = parseCsvGeneric(csvText, ['Story Headline', 'Story Content']);
+                return data.map(row => ({
+                    headline: row['Story Headline'],
+                    content: row['Story Content']
+                })).filter(story => story.headline && story.content); // Filter out empty stories
+            } catch (error) {
+                console.error("Error loading Neighborhood Stories CSV:", error);
+            }
+            return defaultNeighborhoodStories; // Return default if fetch or parse fails
+        }
+
+        // --- Main Data Loading Function ---
+        async function loadAllData() {
+            let loadingError = false;
+            let errorMessage = "Errors occurred while loading data. Showing default demo data.";
+
+            // Step 1: Load World Info
+            try {
+                simData.worldInfo = await fetchWorldInfoCsv();
+                document.getElementById('worldNameDisplay').textContent = simData.worldInfo.name;
+                document.getElementById('worldDescriptionDisplay').textContent = simData.worldInfo.description;
+            } catch (e) {
+                loadingError = true;
+                errorMessage += `\n- World Info: ${e.message}`;
+            }
+
+            // Step 2: Load Family Biographies (these define the family structures first)
+            let loadedFamilies = {};
+            try {
+                loadedFamilies = await fetchFamilyBiographiesCsv();
+            } catch (e) {
+                loadingError = true;
+                errorMessage += `\n- Family Bios: ${e.message}`;
+            }
+
+            // Step 3: Load Sim Biographies (these populate the members of the families)
+            let loadedSimsAndHomeless = { families: {}, homelessSims: [] };
+            try {
+                loadedSimsAndHomeless = await fetchSimBiographiesCsv(loadedFamilies);
+                // Merge the loaded sims into the global simData, preserving any existing familyBio if not overridden
+                const finalSimsData = {};
+                const allFamilyKeys = new Set([...Object.keys(loadedFamilies), ...Object.keys(loadedSimsAndHomeless.families)]);
+                
+                for(const key of allFamilyKeys) {
+                    finalSimsData[key] = loadedSimsAndHomeless.families[key] || loadedFamilies[key];
+                }
+                
+                simData = {
+                    ...simData, // Keep worldInfo etc.
+                    ...finalSimsData,
+                    "homelessSims": loadedSimsAndHomeless.homelessSims
+                };
+
+                // Sort family keys for consistent display in the sidebar, excluding worldInfo and homelessSims
+                const sortedFamilyKeys = Object.keys(simData)
+                    .filter(k => k !== "worldInfo" && k !== "homelessSims")
+                    .sort((a, b) => {
+                        // Ensure familyBio.name exists for comparison
+                        const nameA = (simData[a] && simData[a].familyBio && simData[a].familyBio.name) ? simData[a].familyBio.name : '';
+                        const nameB = (simData[b] && simData[b].familyBio && simData[b].familyBio.name) ? simData[b].familyBio.name : '';
+                        return nameA.localeCompare(nameB);
+                    });
+
+                // Reconstruct simData with sorted families
+                const orderedSimData = {
+                    "worldInfo": simData.worldInfo,
+                    ...sortedFamilyKeys.reduce((obj, key) => {
+                        obj[key] = simData[key];
+                        return obj;
+                    }, {}),
+                    "homelessSims": simData.homelessSims
+                };
+                simData = orderedSimData;
+
+            } catch (e) {
+                loadingError = true;
+                errorMessage += `\n- Sim Bios: ${e.message}`;
+            }
+
+            // Step 4: Load Neighborhood Stories
+            try {
+                neighborhoodStories = await fetchNeighborhoodStoriesCsv();
+            } catch (e) {
+                loadingError = true;
+                errorMessage += `\n- Stories: ${e.message}`;
+            }
+
+            // Log final parsed data (for debugging)
+            console.log("Final simData after loading:", simData);
+            console.log("Final neighborhoodStories after loading:", neighborhoodStories);
+
+            if (loadingError) {
+                const contentDisplayArea = document.getElementById('contentDisplayArea');
+                contentDisplayArea.innerHTML = `<div class="sleek-panel p-6 text-center text-red-600">
+                    <h3 class="text-xl font-bold mb-2">Error Loading Some Data from Google Sheets</h3>
+                    <p class="mb-4">The site is currently showing a mix of loaded and <strong>default demo data</strong> because some sheets failed to load.</p>
+                    <p>Please ensure all your Google Sheets are:</p>
+                    <ul class="list-disc list-inside text-left mx-auto max-w-sm mt-4">
+                        <li>Correctly published to the web as CSV (File > Share > Publish to web > Select Sheet > Format: Comma-separated values (.csv) > Publish).</li>
+                        <li>The GIDs in the script's configuration match the GIDs in your sheet URLs.</li>
+                        <li>There are no typos in the sheet headers.</li>
+                    </ul>
+                    <p class="mt-4 text-sm text-gray-500">Details: ${errorMessage}</p>
+                </div>`;
+            }
+
+            // Always initialize display regardless of loading success
+            initializeDisplay();
+        }
+
         // Initialize display and event listeners
         function initializeDisplay() {
+            // Set initial world info based on loaded data (or default)
             document.getElementById('worldNameDisplay').textContent = simData.worldInfo.name;
             document.getElementById('worldDescriptionDisplay').textContent = simData.worldInfo.description;
 
@@ -2369,8 +2394,136 @@
             }
         }
 
-        // Call loadCsvData automatically on window load
-        window.onload = loadCsvData;
+        // Call loadAllData automatically on window load
+        window.onload = loadAllData;
+
+        // Function to update the family list in the sidebar (kept at the end for logical flow)
+        function updateFamilyList() {
+            const familyListElement = document.getElementById('familyList');
+            familyListElement.innerHTML = '';
+
+            const familyNames = Object.keys(simData).filter(k => k !== "worldInfo" && k !== "homelessSims");
+            if (familyNames.length === 0) {
+                familyListElement.innerHTML = '<p class="text-center text-muted-dark relative z-20">No families found.</p>';
+                return;
+            }
+
+            familyNames.forEach(familyNameKey => {
+                const family = simData[familyNameKey];
+                const isSelectedFamily = familyNameKey === currentSelectedFamily;
+                const familyItemClass = isSelectedFamily ? 'family-item selected-family' : 'family-item';
+                const displayFamilyName = family.familyBio.name.replace(' Family', '');
+
+                let familyHtml = `
+                    <div class="${familyItemClass} p-2 rounded-md shadow-sm flex items-center justify-between" onclick="selectFamily('${familyNameKey}')">
+                        <h3 class="text-lg font-semibold relative z-20">${displayFamilyName}</h3>
+                        <i class="fas fa-chevron-right expand-icon text-sm relative z-20"></i>
+                    </div>
+                    <div class="sims-list ml-4 mt-1 ${isSelectedFamily ? 'expanded' : ''}">
+                `;
+
+                if (family.members && family.members.length > 0) {
+                    // Show all members, but differentiate by status
+                    // Sort members alphabetically by name
+                    family.members.sort((a, b) => a.name.localeCompare(b.name));
+                    
+                    family.members.forEach(sim => {
+                        const isSelectedSim = isSelectedFamily && currentSelectedSim && sim.name === currentSelectedSim.name;
+                        let simButtonClass = isSelectedSim ? 'sim-button selected-sim' : 'sim-button';
+                        // Add classes for dead sims: grey out and strike-through
+                        let simStatusTextClass = (sim.status && sim.status.toLowerCase() === 'alive') ? '' : 'text-gray-500 line-through';
+                        
+                        familyHtml += `<button class="${simButtonClass} px-3 py-1 rounded-full text-sm block w-full text-left" onclick="selectSim('${sim.name}')">
+                            <span class="relative z-20 ${simStatusTextClass}">${sim.name}</span>
+                        </button>`;
+                    });
+                } else {
+                    familyHtml += `<p class="px-3 py-1 text-sm text-gray-500">No members listed.</p>`;
+                }
+                familyHtml += `</div>`;
+                familyListElement.innerHTML += familyHtml;
+            });
+
+            // Ensure the currently selected family's expand icon and max-height are correct on initial load or list update
+            const selectedFamilyElement = document.querySelector(`.family-item.selected-family`);
+            if (selectedFamilyElement) {
+                const expandIcon = selectedFamilyElement.querySelector('.expand-icon');
+                if (expandIcon) {
+                    expandIcon.style.transform = 'rotate(90deg)';
+                }
+                const simsList = selectedFamilyElement.nextElementSibling;
+                if (simsList && simsList.classList.contains('sims-list')) {
+                    simsList.style.maxHeight = simsList.scrollHeight + 'px';
+                }
+            }
+        }
+
+        function selectFamily(familyNameKey) {
+            const prevSelectedFamilyElement = document.querySelector(`.family-item.selected-family`);
+            if (prevSelectedFamilyElement) {
+                const prevSimsList = prevSelectedFamilyElement.nextElementSibling;
+                if (prevSimsList && prevSimsList.classList.contains('sims-list')) {
+                    prevSimsList.classList.remove('expanded');
+                    prevSimsList.style.maxHeight = '0';
+                    prevSelectedFamilyElement.classList.remove('selected-family');
+                    const prevExpandIcon = prevSelectedFamilyElement.querySelector('.expand-icon');
+                    if(prevExpandIcon) prevExpandIcon.style.transform = 'rotate(0deg)';
+                }
+            }
+
+            if (familyNameKey === currentSelectedFamily && document.querySelector(`.family-item[onclick="selectFamily('${familyNameKey}')"]`).classList.contains('selected-family')) {
+                currentSelectedFamily = null;
+                hideAllContentSections();
+                return;
+            }
+
+            currentSelectedFamily = familyNameKey;
+            currentSelectedSim = null;
+
+            const newSelectedFamilyElement = document.querySelector(`.family-item[onclick="selectFamily('${familyNameKey}')"]`);
+            if (newSelectedFamilyElement) {
+                const newSimsList = newSelectedFamilyElement.nextElementSibling;
+                if (newSimsList && newSimsList.classList.contains('sims-list')) {
+                    newSimsList.classList.add('expanded');
+                    newSimsList.style.maxHeight = newSimsList.scrollHeight + 'px';
+                    newSelectedFamilyElement.classList.add('selected-family');
+                    const newExpandIcon = newSelectedFamilyElement.querySelector('.expand-icon');
+                    if(newExpandIcon) newExpandIcon.style.transform = 'rotate(90deg)';
+                }
+            }
+            updateFamilyList();
+            hideAllContentSections();
+            displayFamilyOverview(familyNameKey);
+        }
+
+        function selectSim(simName) {
+            let foundSim = findSimByName(simName); // Use the utility function
+            
+            if (!foundSim) {
+                console.error(`Sim with name '${simName}' not found.`);
+                hideAllContentSections();
+                return;
+            }
+            
+            currentSelectedSim = foundSim;
+            // Determine the familyKey for the selected sim for sidebar highlighting
+            for (const familyKey in simData) {
+                if (familyKey === "worldInfo") continue;
+                if (familyKey === "homelessSims") {
+                    if (simData[familyKey].find(s => s.name === simName)) {
+                        currentSelectedFamily = familyKey;
+                        break;
+                    }
+                } else if (simData[familyKey].members && simData[familyKey].members.find(s => s.name === simName)) {
+                    currentSelectedFamily = familyKey;
+                    break;
+                }
+            }
+
+            updateFamilyList();
+            hideAllContentSections();
+            displaySimDetails(currentSelectedSim);
+        }
     </script>
 </body>
 </html>
