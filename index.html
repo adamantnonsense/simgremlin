@@ -147,7 +147,7 @@
             color: var(--text-primary); /* Ensure contrast */
         }
 
-        /* Theme Toggle Button (Fixed Position) */
+        /* Theme Toggle Button */
         #themeToggle {
             background: none;
             border: none;
@@ -349,19 +349,19 @@
         }
 
         .card-header-redesign h2 {
-            color: var(--sim-name-header-text); /* Ensure good contrast */
-            font-weight: 700; /* Make it bold */
+            color: var(--sim-name-header-text);
+            font-weight: 700;
         }
 
         .card-header-redesign .sim-name-display-redesign {
-            color: var(--sim-name-header-text); /* Ensure good contrast */
-            font-size: 2.2rem; /* Adjusted font size */
+            color: var(--sim-name-header-text);
+            font-size: 2.2rem;
             font-weight: 700;
         }
 
         .card-header-redesign .sim-title-display {
-            color: var(--sim-title-header-text); /* Ensure good contrast */
-            font-style: normal; /* No italics */
+            color: var(--sim-title-header-text);
+            font-style: normal;
             font-size: 1.1rem;
             font-weight: 500;
         }
@@ -372,14 +372,14 @@
         }
 
         .card-image-section-redesign {
-            border: 1px solid var(--border-color); /* Simple border */
+            border: 1px solid var(--border-color);
             border-radius: 4px;
             padding-bottom: 56.25%; /* 16:9 Aspect Ratio (height / width * 100) */
             margin-bottom: 1.2rem;
-            box-shadow: none; /* No shadow */
-            transform: none; /* No rotation */
-            overflow: hidden; /* Ensure image doesn't break rounded corners */
-            position: relative; /* Needed for absolute positioning of img */
+            box-shadow: none;
+            transform: none;
+            overflow: hidden;
+            position: relative;
         }
 
         .card-image-section-redesign img {
@@ -388,20 +388,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Fill the container, cropping if necessary */
-            object-position: center; /* Center the image within the container */
+            object-fit: cover;
+            object-position: center;
             border-radius: 2px;
         }
 
         .section-block-style {
-            background-color: var(--bg-primary); /* Use primary background for sections */
+            background-color: var(--bg-primary);
             border: 1px solid var(--border-color);
             margin-top: 1.2rem;
             border-radius: 4px;
             padding: 1rem;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); /* Subtle inner shadow */
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
@@ -418,7 +418,7 @@
         }
 
         .section-block-style h4 .sim-stat-icon {
-            color: var(--link-color); /* Wikipedia blue for icons */
+            color: var(--link-color);
             margin-right: 0.5rem;
         }
 
@@ -510,7 +510,7 @@
 
         .sim-skills-list-item-value {
             font-weight: 600;
-            color: var(--link-color); /* Use link color for emphasis */
+            color: var(--link-color);
         }
 
         .sim-trait-item-redesign {
@@ -527,12 +527,12 @@
         .hobbies-list li {
             color: var(--text-primary);
             font-size: 1rem;
-            list-style: disc; /* Standard disc bullet */
-            margin-left: 1.25rem; /* Indent for bullet */
+            list-style: disc;
+            margin-left: 1.25rem;
         }
 
         .hobbies-list li::before {
-            content: none; /* Remove custom bullet */
+            content: none;
         }
 
         /* Age Icons Container */
@@ -544,7 +544,7 @@
             margin-bottom: 1.2rem;
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
-            background-color: var(--header-bg); /* Use header background */
+            background-color: var(--header-bg);
             border-radius: 4px;
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
@@ -553,15 +553,15 @@
             font-size: 1.5rem;
             padding: 0;
             border-radius: 50%;
-            background-color: var(--button-bg); /* Button background */
+            background-color: var(--button-bg);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            box-shadow: none; /* No shadow */
+            box-shadow: none;
             width: 2em;
             height: 2em;
-            display: flex; /* Center emoji */
-            align-items: center; /* Center emoji */
-            justify-content: center; /* Center emoji */
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
         }
 
@@ -572,12 +572,12 @@
         }
 
         .age-icon.active-age-icon {
-            background-color: var(--highlight-active); /* Highlight active age */
+            background-color: var(--highlight-active);
             color: var(--text-primary);
             border-color: var(--link-color);
             box-shadow: 0 1px 4px rgba(0,0,0,0.1);
             transform: scale(1.1);
-            animation: none; /* Remove pulse animation */
+            animation: none;
         }
 
         /* Personality Display */
@@ -591,16 +591,16 @@
 
         /* Adjustments for the new format */
         .personality-item-label {
-            flex-grow: 1; /* Allows it to take up available space */
+            flex-grow: 1;
             text-align: left;
             color: var(--text-primary);
-            font-weight: 500; /* Regular weight for the combined label */
+            font-weight: 500;
         }
 
         .personality-item-value {
             font-weight: bold;
-            padding-left: 0.5rem; /* Space between label and value */
-            color: var(--link-color); /* Link color for the value itself */
+            padding-left: 0.5rem;
+            color: var(--link-color);
         }
 
         /* Highlight for personality traits on the value */
@@ -644,7 +644,7 @@
         }
 
         .family-overview-section .family-bio-detail .detail-value {
-            color: var(--text-primary); /* Consistent text color */
+            color: var(--text-primary);
             font-weight: 500;
             display: inline-block;
             margin-left: 0.25rem;
@@ -671,7 +671,7 @@
         /* Spreadsheet */
         .spreadsheet-container {
             padding-top: 1rem;
-            transform: none; /* No rotation */
+            transform: none;
         }
 
         .spreadsheet-container:hover {
@@ -679,7 +679,7 @@
         }
 
         .sims-table th, .sims-table td {
-            border: 1px solid var(--border-color); /* Solid borders for table */
+            border: 1px solid var(--border-color);
             color: var(--text-primary);
             font-weight: normal;
         }
@@ -687,12 +687,12 @@
         .sims-table th {
             background-color: var(--table-header-bg);
             color: var(--text-primary);
-            border-bottom: 2px solid var(--link-color); /* Accent border */
+            border-bottom: 2px solid var(--link-color);
             font-weight: 600;
-            font-size: 0.9rem; /* Smaller font for headers */
+            font-size: 0.9rem;
             padding: 0.6rem 0.8rem;
             white-space: nowrap;
-            text-align: left; /* Default text align */
+            text-align: left;
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
@@ -705,16 +705,16 @@
         }
 
         .sims-table tbody tr:hover {
-            background-color: var(--button-hover-bg); /* Hover background for rows */
+            background-color: var(--button-hover-bg);
         }
 
         .sims-table td strong {
-            color: var(--status-alive); /* Use status green for strong */
+            color: var(--status-alive);
         }
 
         .sims-table .clickable-sim-name {
             color: var(--link-color);
-            font-weight: normal; /* Regular weight */
+            font-weight: normal;
             text-decoration: underline;
         }
 
@@ -726,7 +726,7 @@
         .sortable-th {
             cursor: pointer;
             position: relative;
-            padding-right: 20px; /* Space for arrow icon */
+            padding-right: 20px;
         }
 
         .sortable-th .sort-icon {
@@ -744,22 +744,22 @@
         }
 
         .sortable-th.asc .sort-icon::before {
-            content: "\f0d8"; /* fa-caret-up */
+            content: "\f0d8";
         }
 
         .sortable-th.desc .sort-icon::before {
-            content: "\f0d7"; /* fa-caret-down */
+            content: "\f0d7";
         }
 
         .sortable-th:not(.asc):not(.desc) .sort-icon::before {
-            content: "\f0dc"; /* fa-sort */
+            content: "\f0dc";
             opacity: 0.5;
         }
 
         /* Stories */
         #storyDisplayContent {
             padding: 1.5rem;
-            transform: none; /* No rotation */
+            transform: none;
         }
 
         #storyDisplayContent:hover {
@@ -782,7 +782,7 @@
         }
 
         .story-list-item {
-            background-color: var(--card-bg); /* Card background */
+            background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             font-size: 1rem;
             border-radius: 4px;
@@ -790,13 +790,13 @@
             transition: all 0.2s ease-in-out;
             padding: 0.6rem 1rem;
             cursor: pointer;
-            transform: none; /* No rotation */
+            transform: none;
         }
 
         .story-list-item:hover {
             background-color: var(--button-hover-bg);
             box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-            transform: none; /* No translation or tilt */
+            transform: none;
         }
 
         .story-list-item.selected-story-in-card {
@@ -804,7 +804,7 @@
             border-color: var(--link-color);
             color: var(--text-primary);
             font-weight: 600;
-            transform: none; /* No tilt */
+            transform: none;
         }
 
         .story-list-item span {
@@ -819,7 +819,7 @@
             padding: 1.5rem;
             position: relative;
             overflow: visible;
-            transform: none; /* No rotation */
+            transform: none;
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
 
@@ -842,7 +842,7 @@
 
         .story-back-button:hover {
             background-color: var(--button-hover-bg);
-            filter: none; /* No brightness change */
+            filter: none;
             transform: translateY(-1px);
             box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
@@ -851,11 +851,11 @@
             border: 1px solid var(--border-color);
             border-radius: 4px;
             margin-bottom: 1rem;
-            box-shadow: none; /* No shadow */
-            transform: none; /* No rotation */
+            box-shadow: none;
+            transform: none;
             overflow: hidden;
-            position: relative; /* Needed for absolute positioning of img */
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            position: relative;
+            padding-bottom: 56.25%;
         }
 
         .story-image-container img {
@@ -864,8 +864,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Fill the container, cropping if necessary */
-            object-position: center; /* Center the image within the container */
+            object-fit: cover;
+            object-position: center;
         }
 
         #storyContent {
@@ -877,7 +877,7 @@
         /* Graveyard Specific Styling */
         .graveyard-section {
             padding: 1.5rem;
-            transform: none; /* No rotation */
+            transform: none;
         }
 
         .graveyard-section:hover {
@@ -893,7 +893,7 @@
 
         .graveyard-section h3 .sim-stat-icon {
             margin-right: 0.6rem;
-            color: var(--status-dead); /* Red for graveyard icon */
+            color: var(--status-dead);
         }
 
         .graveyard-section p {
@@ -910,7 +910,7 @@
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease;
             padding: 0.7rem 1rem;
             cursor: pointer;
-            transform: none; /* No rotation */
+            transform: none;
         }
 
         .graveyard-item:hover {
@@ -957,7 +957,7 @@
 
         .homeless-sims-section h3 .sim-stat-icon {
             margin-right: 0.6rem;
-            color: var(--link-color); /* Use link color for homeless icon */
+            color: var(--link-color);
         }
 
         .homeless-sim-item {
@@ -1023,7 +1023,7 @@
             margin-top: 0;
             margin-bottom: 0;
             flex-wrap: wrap;
-            transform: none; /* No rotation */
+            transform: none;
         }
 
         .static-nav-bar button {
@@ -1084,20 +1084,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+            background-color: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             transition: opacity 0.3s ease, visibility 0.3s ease;
-            opacity: 0; /* Start hidden */
-            visibility: hidden; /* Start hidden for accessibility */
+            opacity: 0;
+            visibility: hidden;
         }
 
         .image-modal-overlay.visible {
             opacity: 1;
             visibility: visible;
-            pointer-events: auto; /* Enable interactions when visible */
+            pointer-events: auto;
         }
 
         /* Ensure pointer-events are off when hidden */
@@ -1109,11 +1109,11 @@
             position: relative;
             max-width: 90%;
             max-height: 90%;
-            background-color: var(--card-bg); /* Match card background */
+            background-color: var(--card-bg);
             padding: 1rem;
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            display: flex; /* For centering the image if needed */
+            display: flex;
             justify-content: center;
             align-items: center;
         }
@@ -1121,9 +1121,9 @@
         .image-modal-content img {
             max-width: 100%;
             max-height: 100%;
-            display: block; /* Remove extra space below image */
-            object-fit: contain; /* Ensure entire image is visible, might letterbox */
-            border-radius: 4px; /* Match panel border-radius */
+            display: block;
+            object-fit: contain;
+            border-radius: 4px;
             transition: background-color 0.3s ease;
         }
 
@@ -1143,18 +1143,18 @@
             font-size: 1.2rem;
             cursor: pointer;
             transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
-            z-index: 1001; /* Ensure close button is on top */
+            z-index: 1001;
         }
 
         .image-modal-close:hover {
-            background-color: var(--status-dead); /* Red for close button */
+            background-color: var(--status-dead);
             color: white;
             transform: scale(1.1);
         }
     </style>
 </head>
 <body class="p-4 md:p-8">
-    <button id="themeToggle" class="ml-4">
+    <button id="themeToggle" class="fixed top-4 right-4 z-100">
         <i class="fas fa-sun"></i> <!-- Sun icon for light mode, will change to moon in dark mode -->
     </button>
     <div class="main-layout-grid flex flex-col md:flex-row gap-6 max-w-7xl mx-auto">
@@ -1168,9 +1168,7 @@
         </div>
         <div class="main-content-area flex flex-col gap-3 flex-grow">
             <div class="world-header p-6 rounded-lg text-center flex-shrink-0">
-                <div class="flex justify-center items-center mb-2">
-                    <h1 id="worldNameDisplay" class="flex-grow text-4xl md:text-5xl font-extrabold text-center"></h1>
-                </div>
+                <h1 id="worldNameDisplay" class="text-4xl md:text-5xl font-extrabold text-center mb-2"></h1>
                 <p id="worldDescriptionDisplay" class="text-lg md:text-xl"></p>
             </div>
             
@@ -1343,197 +1341,11 @@
                 name: "Newcrest (Default Data)",
                 description: "This is a demo of your Sims' notes. Connect your Google Sheets to load your own data!"
             },
-            "Landgraab": {
-                "familyBio": {
-                    name: "Landgraab Family",
-                    location: "Oasis Springs",
-                    memberCount: 0, // Will be dynamically updated from sim data
-                    funds: "$5,000,000",
-                    biography: "The illustrious Landgraab family, a pillar of the community, is known for their vast wealth and a slight tendency towards... corporate espionage. Nancy, the matriarch, rules with an iron fist, while Geoffrey tries to maintain a semblance of normalcy. Their son, Malcolm, struggles with the weight of expectation and a penchant for villainy."
-                },
-                "members": [
-                    {
-                        "name": "Nancy Landgraab",
-                        "title": "Corporate Mogul",
-                        "image": "https://simscommunity.info/wp-content/uploads/2014/09/nancy.jpg",
-                        "bio": "Nancy Landgraab is a formidable businesswoman, known for her sharp wit and even sharper business practices. She demands excellence and often gets it through sheer force of will (and a little bit of backroom dealing). Her home is a testament to her success, but her family life is... complicated.",
-                        "age": "Adult",
-                        "gender": "Female",
-                        "status": "Alive",
-                        "occultStatus": "Human",
-                        "career": "Criminal",
-                        "careerLevel": 9,
-                        "aspiration": "Mansion Baron",
-                        "zodiac": "Leo",
-                        "partners": ["Geoffrey Landgraab"],
-                        "children": ["Malcolm Landgraab"],
-                        "skills": { "Logic": 8, "Charisma": 10, "Mischief": 7, "Finance": 9, "Gourmet Cooking": 5 },
-                        "traits": ["Snob", "Materialistic", "Mean", "Business Savvy"],
-                        "hobbies": ["Counting money", "Making questionable business deals", "Ordering around her butler"],
-                        "notes": "Rumored to have a hidden vault in her basement. Obsessed with achieving ultimate wealth. Keeps a close eye on Malcolm's 'business ventures'.",
-                        "personality": { "sloppyNeat": 9, "shyOutgoing": 3, "lazyActive": 3, "seriousPlayful": 1, "grouchyNice": 6 }
-                    },
-                    {
-                        "name": "Geoffrey Landgraab",
-                        "title": "Good Guy",
-                        "image": "https://simscommunity.info/wp-content/uploads/2014/09/geoffrey.jpg",
-                        "bio": "Geoffrey Landgraab is Nancy's kind-hearted husband, often trying to be the moral compass of the family. He works as a Secret Agent but secretly wishes for a simpler life, away from the corporate schemes. He loves his family deeply, despite their quirks.",
-                        "age": "Adult",
-                        "gender": "Male",
-                        "status": "Alive",
-                        "occultStatus": "Human",
-                        "career": "Secret Agent",
-                        "careerLevel": 5,
-                        "aspiration": "Good Guy",
-                        "zodiac": "Cancer",
-                        "partners": ["Nancy Landgraab"],
-                        "children": ["Malcolm Landgraab"],
-                        "skills": { "Charisma": 7, "Fitness": 6, "Logic": 5, "Parenting": 8 },
-                        "traits": ["Good", "Family-Oriented", "Clumsy"],
-                        "hobbies": ["Gardening", "Playing with Malcolm (when he's not being evil)"],
-                        "notes": "Always tries to mediate family arguments. Wishes Malcolm would pursue a more wholesome career.",
-                        "personality": { "sloppyNeat": 6, "shyOutgoing": 8, "lazyActive": 4, "seriousPlayful": 5, "grouchyNice": 10 }
-                    },
-                    {
-                        "name": "Malcolm Landgraab",
-                        "title": "Aspiring Villain",
-                        "image": "https://simscommunity.info/wp-content/uploads/2014/09/malcolm.jpg",
-                        "bio": "Malcolm Landgraab, heir to the Landgraab fortune, has a mischievous streak a mile wide. While his mother wants him to follow in her legitimate business footsteps, Malcolm prefers a darker path, often dabbling in villainy and petty crime. He dreams of becoming a master villain, much to his father's dismay.",
-                        "age": "Young Adult",
-                        "gender": "Male",
-                        "status": "Dead",
-                        "occultStatus": "Human",
-                        "career": "Criminal",
-                        "careerLevel": 3,
-                        "aspiration": "Public Enemy",
-                        "zodiac": "Scorpio",
-                        "partners": [],
-                        "parents": ["Nancy Landgraab", "Geoffrey Landgraab"],
-                        "children": [],
-                        "skills": { "Mischief": 8, "Programming": 6, "Logic": 5, "Fitness": 4 },
-                        "traits": ["Evil", "Genius", "Loves Outdoors"],
-                        "hobbies": ["Hacking computers", "Pranking unsuspecting Sims", "Mooching off his parents' wealth"],
-                        "notes": "Frequently tries to prank his mother, usually with disastrous results for himself. Has a secret lair in the attic he thinks no one knows about. Developing a super-secret evil laugh.",
-                        "personality": { "sloppyNeat": 1, "shyOutgoing": 3, "lazyActive": 5, "seriousPlayful": 10, "grouchyNice": 1 }
-                    }
-                ]
-            },
-            "Goth": {
-                "familyBio": {
-                    name: "Goth Family",
-                    location: "Willow Creek",
-                    memberCount: 0, // Will be dynamically updated from sim data
-                    funds: "$1,500,000",
-                    biography: "The enigmatic Goth family resides in their hauntingly beautiful mansion, a place steeped in mystery and dark romanticism. Mortimer, a renowned author, and Bella, the captivating socialite, live a life of quiet intrigue with their daughter Cassandra. Whispers of Bella's mysterious disappearances often circulate."
-                },
-                "members": [
-                    {
-                        "name": "Mortimer Goth",
-                        "title": "Distinguished Author",
-                        "image": "https://simscommunity.info/wp-content/uploads/2014/09/mortimer.jpg",
-                        "bio": "Mortimer Goth is a highly respected author, known for his chilling tales and gothic sensibilities. He is a devoted husband and father, though often lost in his own thoughts and the world of his imagination. He cherishes his family and the quiet solitude of his mansion.",
-                        "age": "Adult",
-                        "gender": "Male",
-                        "status": "Alive",
-                        "occultStatus": "Human",
-                        "career": "Writer",
-                        "careerLevel": 7,
-                        "aspiration": "Knowledge",
-                        "zodiac": "Virgo",
-                        "partners": ["Bella Goth"],
-                        "children": ["Cassandra Goth"],
-                        "skills": { "Writing": 10, "Charisma": 8, "Painting": 6, "Gourmet Cooking": 5 },
-                        "traits": ["Genius", "Bookworm", "Family-Oriented"],
-                        "hobbies": ["Reading", "Writing in his study", "Stargazing"],
-                        "notes": "Always carries a small notebook for ideas. Fascinated by the occult, but too sensible to dabble himself. Secretly fears Bella's unexplained absences.",
-                        "personality": { "sloppyNeat": 9, "shyOutgoing": 2, "lazyActive": 3, "seriousPlayful": 1, "grouchyNice": 6 }
-                    },
-                    {
-                        "name": "Bella Goth",
-                        "title": "Mysterious Socialite",
-                        "image": "https://simscommunity.info/wp-content/uploads/2014/09/bella.jpg",
-                        "bio": "Bella Goth is the captivating and elegant matriarch of the Goth family. Known for her striking red dress and mysterious aura, she's a beloved figure in Willow Creek, despite her frequent and unexplained disappearances. Some say she's been abducted by aliens, others that she's merely exploring the far corners of the world.",
-                        "age": "Adult",
-                        "gender": "Female",
-                        "status": "Dead",
-                        "occultStatus": "Human",
-                        "career": "Secret Agent",
-                        "careerLevel": 10,
-                        "aspiration": "Popularity",
-                        "zodiac": "Libra",
-                        "partners": ["Mortimer Goth"],
-                        "children": ["Cassandra Goth"],
-                        "skills": { "Charisma": 9, "Logic": 7, "Fitness": 8, "Mischief": 6 },
-                        "traits": ["Outgoing", "Good", "Perfectionist"],
-                        "hobbies": ["Socializing", "Exploring new places (sometimes involuntarily);Playing chess"],
-                        "notes": "Has a peculiar connection to aliens. Her memory of past events is sometimes hazy. Always carries a mysterious locket.",
-                        "personality": { "sloppyNeat": 10, "shyOutgoing": 10, "lazyActive": 9, "seriousPlayful": 8, "grouchyNice": 8 }
-                    },
-                    {
-                        "name": "Cassandra Goth",
-                        "title": "Teen Prodigy",
-                        "image": "https://simscommunity.info/wp-content/uploads/2014/09/cassandra.jpg",
-                        "bio": "Cassandra Goth is the intelligent and artistic daughter of Mortimer and Bella. She's a bit of a loner, preferring her music and books to social gatherings, but she deeply cares for her family. She dreams of becoming a world-renowned musician.",
-                        "age": "Teen",
-                        "gender": "Female",
-                        "status": "Alive",
-                        "occultStatus": "Human",
-                        "career": "High School",
-                        "careerLevel": 1,
-                        "aspiration": "Music Lover",
-                        "zodiac": "Pisces",
-                        "partners": [],
-                        "parents": ["Mortimer Goth", "Bella Goth"],
-                        "children": [],
-                        "skills": { "Violin": 9, "Piano": 7, "Painting": 6, "Logic": 5 },
-                        "traits": ["Music Lover", "Bookworm", "Loner"],
-                        "hobbies": ["Playing violin for hours", "Reading gothic novels", "Composing sad melodies"],
-                        "notes": "Often found practicing violin in her room. Has a dark, poetic soul. Sometimes feels overshadowed by her mother's mysterious adventures.",
-                        "personality": { "sloppyNeat": 5, "shyOutgoing": 1, "lazyActive": 6, "seriousPlayful": 2, "grouchyNice": 4 }
-                    }
-                ]
-            },
-            "homelessSims": [
-                {
-                    "name": "Kyle Kyleson",
-                    "title": "Homeless Townie",
-                    "image": "https://simscommunity.info/wp-content/uploads/2022/07/Kyle_Kyleson.webp",
-                    "bio": "Kyle Kyleson is a friendly, but somewhat hapless townie, often found wandering the streets of Willow Creek and Oasis Springs. He's always looking for a good conversation and a warm place to sleep.",
-                    "age": "Young Adult",
-                    "gender": "Male",
-                    "status": "Alive",
-                    "occultStatus": "Human",
-                    "career": "Unemployed",
-                    "careerLevel": "N/A",
-                    "aspiration": "Friend of the World",
-                    "zodiac": "Gemini",
-                    "partners": [],
-                    "parents": [],
-                    "children": [],
-                    "skills": { "Charisma": 4, "Cooking": 3 },
-                    "traits": ["Good", "Lazy", "Goofball"],
-                    "hobbies": ["Napping on park benches", "Chatting with strangers", "Eating leftovers"],
-                    "notes": "Always smells faintly of pizza. Has a surprisingly optimistic outlook despite his circumstances.",
-                    "personality": { "sloppyNeat": 2, "shyOutgoing": 7, "lazyActive": 8, "seriousPlayful": 9, "grouchyNice": 7 }
-                }
-            ]
+            // Landgraab and Goth default data removed. These will now ONLY come from your spreadsheets.
+            "homelessSims": [] // Default to empty, will be populated by CSV if any homeless sims exist there.
         };
 
-        const defaultNeighborhoodStories = [
-            {
-                headline: "The Mysterious Disappearance of Bella Goth",
-                content: "Bella Goth has once again vanished without a trace, leaving Mortimer distraught and Cassandra worried. Is it alien abduction, a secret mission, or simply a spontaneous vacation? The neighborhood is abuzz with theories, but no one truly knows where Bella goes when she disappears."
-            },
-            {
-                headline: "Malcolm Landgraab's Failed Prank",
-                content: "Young Malcolm Landgraab's latest attempt at a nefarious prank backfired spectacularly. His plan to dye the neighborhood's fountain green resulted in him falling in, turning himself (and his expensive suit) an embarrassing shade of chartreuse. The incident provided much amusement for the town, much to Malcolm's chagrin."
-            },
-            {
-                headline: "Kyle Kyleson Finds a Slightly Less Uncomfortable Bench",
-                content: "In a heartwarming turn of events, local homeless Sim, Kyle Kyleson, discovered a new park bench that offers superior lumbar support. He was overheard exclaiming, 'This is a game-changer for my afternoon naps!' The community celebrated this small victory for the perpetually positive Kyle."
-            }
-        ];
-
+        const defaultNeighborhoodStories = []; // Default to empty, will be populated by CSV
 
         // Global data store for Sims and Families (will be populated by default data first, then potentially overwritten by CSV)
         let simData = defaultSimData; // Start with default data
@@ -1581,7 +1393,7 @@
         // Utility to find a sim by name across all families and homeless sims
         function findSimByName(simName) {
             for (const familyKey in simData) {
-                if (familyKey === "worldInfo" || familyKey === "homelessSims") continue; // Skip worldInfo and homelessSims for family iteration
+                if (familyKey === "worldInfo" || familyKey === "homelessSims") continue; // Skip worldInfo
                 const familyMembers = simData[familyKey].members;
                 if (familyMembers) {
                     const foundSim = familyMembers.find(sim => sim.name === simName);
@@ -1591,9 +1403,11 @@
                 }
             }
             // Check homeless sims separately
-            const foundHomelessSim = simData.homelessSims.find(sim => sim.name === simName);
-            if (foundHomelessSim) {
-                return foundHomelessSim;
+            if (simData.homelessSims) {
+                const foundHomelessSim = simData.homelessSims.find(sim => sim.name === simName);
+                if (foundHomelessSim) {
+                    return foundHomelessSim;
+                }
             }
             return null;
         }
@@ -1602,20 +1416,24 @@
             const simImageElement = document.getElementById('simImage');
             const encodedSimName = encodeURIComponent(sim.name);
             const encodedAge = encodeURIComponent(age);
+            let selectedImageUrl = '';
 
-            // Prioritize specific image URLs from CSV if they exist (e.g., Image_Baby, Image_Adult)
-            // Fallback to the main 'image' URL from CSV if the requested age matches the default age
-            // Otherwise, generate a placeholder for other ages.
-            let imageUrl = '';
-            if (sim['Image_' + age.replace(' ', '')]) { // Check for "Image_YoungAdult", "Image_Teen" etc.
-                imageUrl = sim['Image_' + age.replace(' ', '')];
-            } else if (sim.image && sim.age === age) { // Use main image if it matches the current sim's age
-                imageUrl = sim.image;
-            } else { // Fallback to placeholder if no specific image or current age match
-                imageUrl = `https://placehold.co/400x225/${encodeURIComponent('DCDCDC')}/${encodeURIComponent('202122')}?text=${encodedSimName}%20-%20${encodedAge}`;
+            // 1. Check if there's a specific image URL for this age stage in sim.images (from CSV columns like Image_Baby)
+            // The sim.images object stores these if parsed from CSV.
+            if (sim.images && sim.images[age]) {
+                selectedImageUrl = sim.images[age];
+            }
+            // 2. Fallback to the primary 'image' URL from CSV (the 'Image' column) if no specific age image is found
+            // This is useful if you only provide one image for the Sim, regardless of age.
+            if (!selectedImageUrl && sim.image) {
+                selectedImageUrl = sim.image;
+            }
+            // 3. Fallback to a placeholder image if no image URL is found at all for the sim or specific age
+            if (!selectedImageUrl) {
+                selectedImageUrl = `https://placehold.co/400x225/${encodeURIComponent('DCDCDC')}/${encodeURIComponent('202122')}?text=${encodedSimName}%20-%20${encodedAge}`;
             }
             
-            simImageElement.src = imageUrl;
+            simImageElement.src = selectedImageUrl;
 
             const ageIcons = document.querySelectorAll('#simAgeIconsContainer .age-icon');
             ageIcons.forEach(icon => {
@@ -1806,11 +1624,13 @@
         function getAllSims() {
             let allSims = [];
             for (const familyKey in simData) {
-                if (familyKey === "worldInfo") continue;
+                if (familyKey === "worldInfo") continue; // Skip worldInfo
                 if (familyKey === "homelessSims") {
-                    simData[familyKey].forEach(sim => {
-                        allSims.push({ ...sim, family: 'Homeless' });
-                    });
+                    if (simData[familyKey]) { // Ensure homelessSims array exists
+                        simData[familyKey].forEach(sim => {
+                            allSims.push({ ...sim, family: 'Homeless' });
+                        });
+                    }
                 } else {
                     const family = simData[familyKey];
                     if (family && family.members) {
@@ -1882,7 +1702,7 @@
             document.querySelectorAll('.sortable-th').forEach(th => {
                 th.classList.remove('asc', 'desc');
                 if (th.dataset.sort === sortColumn) {
-                    th.classList.add(sortDirection); 
+                    th.classList.add(sortDirection);
                 }
             });
         }
@@ -2088,18 +1908,18 @@
         function parseCsvGeneric(csvText, expectedHeaders) {
             const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
             if (lines.length <= 1) {
-                return []; // Return empty array if no data beyond headers
+                return [];
             }
 
             const headers = lines[0].split(',').map(header => header.trim());
             const data = [];
 
             for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); // Regex to handle commas in quotes
+                const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 const rowData = {};
                 headers.forEach((header, index) => {
                     let value = values[index] ? values[index].trim().replace(/^"|"$/g, '') : '';
-                    rowData[header.trim()] = value; // Use original header name as key
+                    rowData[header.trim()] = value;
                 });
                 data.push(rowData);
             }
@@ -2107,7 +1927,6 @@
         }
 
         async function fetchWorldInfoCsv() {
-            // Updated URL to use the public CSV export format provided by the user
             const csvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEET_ID}/pub?gid=${WORLD_INFO_GID}&single=true&output=csv`;
             try {
                 const response = await fetch(csvUrl);
@@ -2123,13 +1942,12 @@
             } catch (error) {
                 console.error("Error loading World Information CSV:", error);
             }
-            return defaultSimData.worldInfo; // Return default if fetch or parse fails
+            return defaultSimData.worldInfo;
         }
 
         async function fetchFamilyBiographiesCsv() {
-            // Updated URL to use the public CSV export format provided by the user
             const csvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEET_ID}/pub?gid=${FAMILY_BIO_GID}&single=true&output=csv`;
-            const families = {}; // Temporary object to store family bios
+            const families = {};
             try {
                 const response = await fetch(csvUrl);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for Family Bio Sheet (GID: ${FAMILY_BIO_GID})`);
@@ -2138,7 +1956,6 @@
                 
                 data.forEach(row => {
                     if (row['Family Name']) {
-                        // Sanitize family name for use as a key
                         const familyNameKey = row['Family Name'].replace(/ /g, '').replace(/'/g, '');
                         families[familyNameKey] = {
                             familyBio: {
@@ -2146,27 +1963,25 @@
                                 location: row['Family Location'] || 'Unknown',
                                 funds: row['Family Funds'] || '$0',
                                 biography: row['Family Biography'] || 'No biography provided.',
-                                memberCount: 0 // Will be filled by Sim Bio sheet
+                                memberCount: 0
                             },
-                            members: [] // Members filled by Sim Bio sheet
+                            members: []
                         };
                     }
                 });
             } catch (error) {
                 console.error("Error loading Family Biography CSV:", error);
             }
-            return families; // Return parsed families (can be empty)
+            return families;
         }
 
         async function fetchSimBiographiesCsv(existingFamilies) {
-            // Updated URL to use the public CSV export format provided by the user
             const csvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEET_ID}/pub?gid=${SIM_BIO_GID}&single=true&output=csv`;
-            const sims = {}; // Temp to build full sim data structure
+            const sims = {};
             const homelessSimsList = [];
 
-            // Initialize sims object with existing family bios
             for(const key in existingFamilies) {
-                sims[key] = { ...existingFamilies[key], members: [] }; // Deep copy existing family bios
+                sims[key] = { ...existingFamilies[key], members: [] };
             }
 
             try {
@@ -2203,7 +2018,6 @@
                         personality: {}
                     };
 
-                    // Parse Skills
                     if (row['Skills']) {
                         row['Skills'].split(';').forEach(skillPair => {
                             const [skillName, skillLevel] = skillPair.split(':').map(s => s.trim());
@@ -2211,7 +2025,6 @@
                         });
                     }
 
-                    // Parse Personality
                     if (row['Personality']) {
                         row['Personality'].split(';').forEach(traitPair => {
                             const [traitName, traitValue] = traitPair.split(':').map(s => s.trim());
@@ -2220,10 +2033,10 @@
                     }
 
                     // Collect other age specific images if they exist in CSV (e.g., "Image_Baby")
+                    sim.images = sim.images || {}; // Ensure sim.images object exists
                     ['Baby', 'Toddler', 'Child', 'Teen', 'Young Adult', 'Adult', 'Elder'].forEach(stage => {
-                        const colName = 'Image_' + stage.replace(' ', '');
+                        const colName = 'Image_' + stage.replace(' ', ''); // e.g., 'Image_YoungAdult'
                         if (row[colName]) {
-                            if (!sim.images) sim.images = {}; // Initialize images object if not present
                             sim.images[stage] = row[colName];
                         }
                     });
@@ -2234,7 +2047,6 @@
                         } else {
                             const familyNameKey = row['Family Name'] ? row['Family Name'].replace(/ /g, '').replace(/'/g, '') : 'UnknownFamily';
                             if (!sims[familyNameKey]) {
-                                // If a sim belongs to a family not in Family Bio sheet, create a basic entry
                                 console.warn(`Sim '${sim.name}' belongs to family '${row['Family Name']}' not found in Family Biography Sheet. Creating a placeholder entry.`);
                                 sims[familyNameKey] = {
                                     familyBio: {
@@ -2252,7 +2064,6 @@
                     }
                 });
 
-                // Update member counts after all sims are added
                 for (const familyKey in sims) {
                     if (sims.hasOwnProperty(familyKey) && sims[familyKey].members) {
                         sims[familyKey].familyBio.memberCount = sims[familyKey].members.length;
@@ -2261,14 +2072,12 @@
 
             } catch (error) {
                 console.error("Error loading Sim Biography CSV:", error);
-                // Return existing families and default homeless sims if this sheet fails
                 return { families: existingFamilies, homelessSims: defaultSimData.homelessSims };
             }
             return { families: sims, homelessSims: homelessSimsList };
         }
 
         async function fetchNeighborhoodStoriesCsv() {
-            // Updated URL to use the public CSV export format provided by the user
             const csvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEET_ID}/pub?gid=${STORIES_GID}&single=true&output=csv`;
             try {
                 const response = await fetch(csvUrl);
@@ -2278,11 +2087,11 @@
                 return data.map(row => ({
                     headline: row['Story Headline'],
                     content: row['Story Content']
-                })).filter(story => story.headline && story.content); // Filter out empty stories
+                })).filter(story => story.headline && story.content);
             } catch (error) {
                 console.error("Error loading Neighborhood Stories CSV:", error);
             }
-            return defaultNeighborhoodStories; // Return default if fetch or parse fails
+            return defaultNeighborhoodStories;
         }
 
         // --- Main Data Loading Function ---
@@ -2290,7 +2099,6 @@
             let loadingError = false;
             let errorMessage = "Errors occurred while loading data. Showing default demo data.";
 
-            // Step 1: Load World Info
             try {
                 simData.worldInfo = await fetchWorldInfoCsv();
                 document.getElementById('worldNameDisplay').textContent = simData.worldInfo.name;
@@ -2300,7 +2108,6 @@
                 errorMessage += `\n- World Info: ${e.message}`;
             }
 
-            // Step 2: Load Family Biographies (these define the family structures first)
             let loadedFamilies = {};
             try {
                 loadedFamilies = await fetchFamilyBiographiesCsv();
@@ -2309,11 +2116,9 @@
                 errorMessage += `\n- Family Bios: ${e.message}`;
             }
 
-            // Step 3: Load Sim Biographies (these populate the members of the families)
             let loadedSimsAndHomeless = { families: {}, homelessSims: [] };
             try {
                 loadedSimsAndHomeless = await fetchSimBiographiesCsv(loadedFamilies);
-                // Merge the loaded sims into the global simData, preserving any existing familyBio if not overridden
                 const finalSimsData = {};
                 const allFamilyKeys = new Set([...Object.keys(loadedFamilies), ...Object.keys(loadedSimsAndHomeless.families)]);
                 
@@ -2322,22 +2127,19 @@
                 }
                 
                 simData = {
-                    ...simData, // Keep worldInfo etc.
+                    ...defaultSimData, // Start with only worldInfo
                     ...finalSimsData,
                     "homelessSims": loadedSimsAndHomeless.homelessSims
                 };
 
-                // Sort family keys for consistent display in the sidebar, excluding worldInfo and homelessSims
                 const sortedFamilyKeys = Object.keys(simData)
                     .filter(k => k !== "worldInfo" && k !== "homelessSims")
                     .sort((a, b) => {
-                        // Ensure familyBio.name exists for comparison
                         const nameA = (simData[a] && simData[a].familyBio && simData[a].familyBio.name) ? simData[a].familyBio.name : '';
                         const nameB = (simData[b] && simData[b].familyBio && simData[b].familyBio.name) ? simData[b].familyBio.name : '';
                         return nameA.localeCompare(nameB);
                     });
 
-                // Reconstruct simData with sorted families
                 const orderedSimData = {
                     "worldInfo": simData.worldInfo,
                     ...sortedFamilyKeys.reduce((obj, key) => {
@@ -2353,7 +2155,6 @@
                 errorMessage += `\n- Sim Bios: ${e.message}`;
             }
 
-            // Step 4: Load Neighborhood Stories
             try {
                 neighborhoodStories = await fetchNeighborhoodStoriesCsv();
             } catch (e) {
@@ -2361,7 +2162,6 @@
                 errorMessage += `\n- Stories: ${e.message}`;
             }
 
-            // Log final parsed data (for debugging)
             console.log("Final simData after loading:", simData);
             console.log("Final neighborhoodStories after loading:", neighborhoodStories);
 
@@ -2380,13 +2180,10 @@
                 </div>`;
             }
 
-            // Always initialize display regardless of loading success
             initializeDisplay();
         }
 
-        // Initialize display and event listeners
         function initializeDisplay() {
-            // Set initial world info based on loaded data (or default)
             document.getElementById('worldNameDisplay').textContent = simData.worldInfo.name;
             document.getElementById('worldDescriptionDisplay').textContent = simData.worldInfo.description;
 
@@ -2412,20 +2209,17 @@
             });
 
             updateFamilyList();
-            // Determine initial view: if families exist, show first family overview, else show spreadsheet
             const familyKeys = Object.keys(simData).filter(k => k !== "worldInfo" && k !== "homelessSims");
             if (familyKeys.length > 0) {
-                currentSelectedFamily = familyKeys[0]; // Select the first family by default
+                currentSelectedFamily = familyKeys[0];
                 displayFamilyOverview(currentSelectedFamily);
             } else {
-                showSpreadsheet(); // Fallback to spreadsheet if no families are found
+                showSpreadsheet();
             }
         }
 
-        // Call loadAllData automatically on window load
         window.onload = loadAllData;
 
-        // Function to update the family list in the sidebar (kept at the end for logical flow)
         function updateFamilyList() {
             const familyListElement = document.getElementById('familyList');
             familyListElement.innerHTML = '';
@@ -2451,14 +2245,11 @@
                 `;
 
                 if (family.members && family.members.length > 0) {
-                    // Show all members, but differentiate by status
-                    // Sort members alphabetically by name
                     family.members.sort((a, b) => a.name.localeCompare(b.name));
                     
                     family.members.forEach(sim => {
                         const isSelectedSim = isSelectedFamily && currentSelectedSim && sim.name === currentSelectedSim.name;
                         let simButtonClass = isSelectedSim ? 'sim-button selected-sim' : 'sim-button';
-                        // Add classes for dead sims: grey out and strike-through
                         let simStatusTextClass = (sim.status && sim.status.toLowerCase() === 'alive') ? '' : 'text-gray-500 line-through';
                         
                         familyHtml += `<button class="${simButtonClass} px-3 py-1 rounded-full text-sm block w-full text-left" onclick="selectSim('${sim.name}')">
@@ -2472,7 +2263,6 @@
                 familyListElement.innerHTML += familyHtml;
             });
 
-            // Ensure the currently selected family's expand icon and max-height are correct on initial load or list update
             const selectedFamilyElement = document.querySelector(`.family-item.selected-family`);
             if (selectedFamilyElement) {
                 const expandIcon = selectedFamilyElement.querySelector('.expand-icon');
@@ -2525,7 +2315,7 @@
         }
 
         function selectSim(simName) {
-            let foundSim = findSimByName(simName); // Use the utility function
+            let foundSim = findSimByName(simName);
             
             if (!foundSim) {
                 console.error(`Sim with name '${simName}' not found.`);
@@ -2534,11 +2324,10 @@
             }
             
             currentSelectedSim = foundSim;
-            // Determine the familyKey for the selected sim for sidebar highlighting
             for (const familyKey in simData) {
                 if (familyKey === "worldInfo") continue;
                 if (familyKey === "homelessSims") {
-                    if (simData[familyKey].find(s => s.name === simName)) {
+                    if (simData[familyKey] && simData[familyKey].find(s => s.name === simName)) {
                         currentSelectedFamily = familyKey;
                         break;
                     }
