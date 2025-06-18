@@ -1157,7 +1157,7 @@
     <button id="themeToggle" class="fixed top-4 right-4 z-100">
         <i class="fas fa-sun"></i> <!-- Sun icon for light mode, will change to moon in dark mode -->
     </button>
-    <div class="main-layout-grid flex flex-col md:flex-row gap-6 max-w-7xl mx-auto">
+    <div class="main-layout-grid flex flex-col md:flex-row gap-6 max-w-5xl mx-auto">
         <div class="families-sidebar sleek-panel p-6 md:w-72 md:flex-shrink-0 flex flex-col">
             <h2 class="text-2xl font-bold mb-4 flex items-center justify-between relative z-20">
                 Families <i class="fas fa-users"></i>
@@ -1334,22 +1334,21 @@
         const STORIES_GID = '1540825772';
         // -------------------------------------------------------------------
 
-        // Default data in case CSV loading fails or no CSV is provided
-        // This structure mirrors the expected combined data after parsing all sheets
+        // Default data: Used only as fallback if CSV loading fails for a specific sheet.
+        // All primary data for families and sims will now come ONLY from the Google Sheets.
         const defaultSimData = {
             "worldInfo": {
                 name: "Newcrest (Default Data)",
                 description: "This is a demo of your Sims' notes. Connect your Google Sheets to load your own data!"
             },
-            // Landgraab and Goth default data removed. These will now ONLY come from your spreadsheets.
-            "homelessSims": [] // Default to empty, will be populated by CSV if any homeless sims exist there.
+            "homelessSims": [] // This will be populated from Sim Bio CSV or remain empty
         };
 
-        const defaultNeighborhoodStories = []; // Default to empty, will be populated by CSV
+        const defaultNeighborhoodStories = []; // This will be populated from Stories CSV
 
-        // Global data store for Sims and Families (will be populated by default data first, then potentially overwritten by CSV)
-        let simData = defaultSimData; // Start with default data
-        let neighborhoodStories = defaultNeighborhoodStories; // Start with default stories
+        // Global data store for Sims and Families (will be populated by CSV)
+        let simData = {}; // Initialize as empty, will be populated by loadAllData
+        let neighborhoodStories = [];
 
         let currentSelectedFamily = null;
         let currentSelectedSim = null;
@@ -1393,7 +1392,7 @@
         // Utility to find a sim by name across all families and homeless sims
         function findSimByName(simName) {
             for (const familyKey in simData) {
-                if (familyKey === "worldInfo" || familyKey === "homelessSims") continue; // Skip worldInfo
+                if (familyKey === "worldInfo" || familyKey === "homelessSims") continue; // Skip worldInfo and homelessSims for family iteration
                 const familyMembers = simData[familyKey].members;
                 if (familyMembers) {
                     const foundSim = familyMembers.find(sim => sim.name === simName);
@@ -1424,7 +1423,6 @@
                 selectedImageUrl = sim.images[age];
             }
             // 2. Fallback to the primary 'image' URL from CSV (the 'Image' column) if no specific age image is found
-            // This is useful if you only provide one image for the Sim, regardless of age.
             if (!selectedImageUrl && sim.image) {
                 selectedImageUrl = sim.image;
             }
@@ -1435,6 +1433,7 @@
             
             simImageElement.src = selectedImageUrl;
 
+            // Update active state for age icons
             const ageIcons = document.querySelectorAll('#simAgeIconsContainer .age-icon');
             ageIcons.forEach(icon => {
                 if (icon.dataset.age === age) {
@@ -1980,8 +1979,9 @@
             const sims = {};
             const homelessSimsList = [];
 
+            // Initialize sims object with existing family bios structure
             for(const key in existingFamilies) {
-                sims[key] = { ...existingFamilies[key], members: [] };
+                sims[key] = { ...existingFamilies[key], members: [] }; // Deep copy existing family bios
             }
 
             try {
@@ -2047,6 +2047,8 @@
                         } else {
                             const familyNameKey = row['Family Name'] ? row['Family Name'].replace(/ /g, '').replace(/'/g, '') : 'UnknownFamily';
                             if (!sims[familyNameKey]) {
+                                // This case should ideally be handled by fetchFamilyBiographiesCsv first.
+                                // If a sim lists a family not defined in the family sheet, create a basic placeholder.
                                 console.warn(`Sim '${sim.name}' belongs to family '${row['Family Name']}' not found in Family Biography Sheet. Creating a placeholder entry.`);
                                 sims[familyNameKey] = {
                                     familyBio: {
@@ -2064,6 +2066,7 @@
                     }
                 });
 
+                // Update member counts after all sims are added
                 for (const familyKey in sims) {
                     if (sims.hasOwnProperty(familyKey) && sims[familyKey].members) {
                         sims[familyKey].familyBio.memberCount = sims[familyKey].members.length;
@@ -2072,6 +2075,7 @@
 
             } catch (error) {
                 console.error("Error loading Sim Biography CSV:", error);
+                // Return existing families and default homeless sims if this sheet fails
                 return { families: existingFamilies, homelessSims: defaultSimData.homelessSims };
             }
             return { families: sims, homelessSims: homelessSimsList };
@@ -2087,11 +2091,11 @@
                 return data.map(row => ({
                     headline: row['Story Headline'],
                     content: row['Story Content']
-                })).filter(story => story.headline && story.content);
+                })).filter(story => story.headline && story.content); // Filter out empty stories
             } catch (error) {
                 console.error("Error loading Neighborhood Stories CSV:", error);
             }
-            return defaultNeighborhoodStories;
+            return defaultNeighborhoodStories; // Return default if fetch or parse fails
         }
 
         // --- Main Data Loading Function ---
@@ -2099,6 +2103,10 @@
             let loadingError = false;
             let errorMessage = "Errors occurred while loading data. Showing default demo data.";
 
+            // Step 1: Initialize global simData based on default structure (empty families)
+            simData = { ...defaultSimData };
+
+            // Step 2: Load World Info
             try {
                 simData.worldInfo = await fetchWorldInfoCsv();
                 document.getElementById('worldNameDisplay').textContent = simData.worldInfo.name;
@@ -2108,6 +2116,7 @@
                 errorMessage += `\n- World Info: ${e.message}`;
             }
 
+            // Step 3: Load Family Biographies (these define the family structures)
             let loadedFamilies = {};
             try {
                 loadedFamilies = await fetchFamilyBiographiesCsv();
@@ -2116,30 +2125,31 @@
                 errorMessage += `\n- Family Bios: ${e.message}`;
             }
 
+            // Step 4: Load Sim Biographies (these populate the members of the families)
             let loadedSimsAndHomeless = { families: {}, homelessSims: [] };
             try {
+                // Pass loadedFamilies to ensure sims are added to existing family structures
                 loadedSimsAndHomeless = await fetchSimBiographiesCsv(loadedFamilies);
-                const finalSimsData = {};
-                const allFamilyKeys = new Set([...Object.keys(loadedFamilies), ...Object.keys(loadedSimsAndHomeless.families)]);
                 
-                for(const key of allFamilyKeys) {
-                    finalSimsData[key] = loadedSimsAndHomeless.families[key] || loadedFamilies[key];
-                }
-                
+                // Now, merge the loaded sim data into the global simData structure
+                // This ensures that simData only contains families explicitly defined in the CSVs
                 simData = {
-                    ...defaultSimData, // Start with only worldInfo
-                    ...finalSimsData,
-                    "homelessSims": loadedSimsAndHomeless.homelessSims
+                    "worldInfo": simData.worldInfo, // Keep worldInfo
+                    ...loadedSimsAndHomeless.families, // Add all families with their members
+                    "homelessSims": loadedSimsAndHomeless.homelessSims // Add homeless sims
                 };
 
+                // Sort family keys for consistent display in the sidebar
                 const sortedFamilyKeys = Object.keys(simData)
                     .filter(k => k !== "worldInfo" && k !== "homelessSims")
                     .sort((a, b) => {
+                        // Ensure familyBio.name exists for comparison
                         const nameA = (simData[a] && simData[a].familyBio && simData[a].familyBio.name) ? simData[a].familyBio.name : '';
                         const nameB = (simData[b] && simData[b].familyBio && simData[b].familyBio.name) ? simData[b].familyBio.name : '';
                         return nameA.localeCompare(nameB);
                     });
 
+                // Reconstruct simData with sorted families and homeless sims at the end
                 const orderedSimData = {
                     "worldInfo": simData.worldInfo,
                     ...sortedFamilyKeys.reduce((obj, key) => {
@@ -2155,6 +2165,7 @@
                 errorMessage += `\n- Sim Bios: ${e.message}`;
             }
 
+            // Step 5: Load Neighborhood Stories
             try {
                 neighborhoodStories = await fetchNeighborhoodStoriesCsv();
             } catch (e) {
@@ -2162,6 +2173,7 @@
                 errorMessage += `\n- Stories: ${e.message}`;
             }
 
+            // Log final parsed data (for debugging)
             console.log("Final simData after loading:", simData);
             console.log("Final neighborhoodStories after loading:", neighborhoodStories);
 
@@ -2169,7 +2181,7 @@
                 const contentDisplayArea = document.getElementById('contentDisplayArea');
                 contentDisplayArea.innerHTML = `<div class="sleek-panel p-6 text-center text-red-600">
                     <h3 class="text-xl font-bold mb-2">Error Loading Some Data from Google Sheets</h3>
-                    <p class="mb-4">The site is currently showing a mix of loaded and <strong>default demo data</strong> because some sheets failed to load.</p>
+                    <p class="mb-4">The site is currently showing default demo data or incomplete data because some sheets failed to load.</p>
                     <p>Please ensure all your Google Sheets are:</p>
                     <ul class="list-disc list-inside text-left mx-auto max-w-sm mt-4">
                         <li>Correctly published to the web as CSV (File > Share > Publish to web > Select Sheet > Format: Comma-separated values (.csv) > Publish).</li>
@@ -2180,10 +2192,13 @@
                 </div>`;
             }
 
+            // Always initialize display regardless of loading success
             initializeDisplay();
         }
 
+        // Initialize display and event listeners
         function initializeDisplay() {
+            // Set initial world info based on loaded data (or default)
             document.getElementById('worldNameDisplay').textContent = simData.worldInfo.name;
             document.getElementById('worldDescriptionDisplay').textContent = simData.worldInfo.description;
 
@@ -2209,17 +2224,20 @@
             });
 
             updateFamilyList();
+            // Determine initial view: if families exist, show first family overview, else show spreadsheet
             const familyKeys = Object.keys(simData).filter(k => k !== "worldInfo" && k !== "homelessSims");
             if (familyKeys.length > 0) {
-                currentSelectedFamily = familyKeys[0];
+                currentSelectedFamily = familyKeys[0]; // Select the first family by default
                 displayFamilyOverview(currentSelectedFamily);
             } else {
-                showSpreadsheet();
+                showSpreadsheet(); // Fallback to spreadsheet if no families are found
             }
         }
 
+        // Call loadAllData automatically on window load
         window.onload = loadAllData;
 
+        // Function to update the family list in the sidebar (kept at the end for logical flow)
         function updateFamilyList() {
             const familyListElement = document.getElementById('familyList');
             familyListElement.innerHTML = '';
@@ -2245,11 +2263,14 @@
                 `;
 
                 if (family.members && family.members.length > 0) {
+                    // Show all members, but differentiate by status
+                    // Sort members alphabetically by name
                     family.members.sort((a, b) => a.name.localeCompare(b.name));
                     
                     family.members.forEach(sim => {
                         const isSelectedSim = isSelectedFamily && currentSelectedSim && sim.name === currentSelectedSim.name;
                         let simButtonClass = isSelectedSim ? 'sim-button selected-sim' : 'sim-button';
+                        // Add classes for dead sims: grey out and strike-through
                         let simStatusTextClass = (sim.status && sim.status.toLowerCase() === 'alive') ? '' : 'text-gray-500 line-through';
                         
                         familyHtml += `<button class="${simButtonClass} px-3 py-1 rounded-full text-sm block w-full text-left" onclick="selectSim('${sim.name}')">
@@ -2263,6 +2284,7 @@
                 familyListElement.innerHTML += familyHtml;
             });
 
+            // Ensure the currently selected family's expand icon and max-height are correct on initial load or list update
             const selectedFamilyElement = document.querySelector(`.family-item.selected-family`);
             if (selectedFamilyElement) {
                 const expandIcon = selectedFamilyElement.querySelector('.expand-icon');
@@ -2324,11 +2346,12 @@
             }
             
             currentSelectedSim = foundSim;
+            // Find the family key of the selected sim to ensure correct highlighting in the sidebar
             for (const familyKey in simData) {
                 if (familyKey === "worldInfo") continue;
                 if (familyKey === "homelessSims") {
                     if (simData[familyKey] && simData[familyKey].find(s => s.name === simName)) {
-                        currentSelectedFamily = familyKey;
+                        currentSelectedFamily = "homelessSims"; // Special key for homeless
                         break;
                     }
                 } else if (simData[familyKey].members && simData[familyKey].members.find(s => s.name === simName)) {
@@ -2337,7 +2360,7 @@
                 }
             }
 
-            updateFamilyList();
+            updateFamilyList(); // Re-render the family list to apply selected states
             hideAllContentSections();
             displaySimDetails(currentSelectedSim);
         }
