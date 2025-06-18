@@ -599,7 +599,7 @@
 
         .personality-item-value {
             font-weight: bold;
-            padding-left: 0.5rem;
+            padding-left: 0.25rem; /* Adjusted space between label and value */
             color: var(--link-color);
         }
 
@@ -1234,7 +1234,7 @@
                         </div>
                         <div class="notes-section section-block-style">
                             <h4 class="text-xl font-semibold mb-3 flex items-center"><i class="fas fa-clipboard sim-stat-icon"></i> Notes</h4>
-                            <p id="simNotes" class="text-base leading-relaxed"></p>
+                            <div id="simNotesContent" class="text-base leading-relaxed"></div>
                         </div>
                     </div>
                 </div>
@@ -1242,6 +1242,7 @@
                     <h4 class="mb-4 flex items-center relative z-20">
                         <i class="fas fa-home mr-2"></i> <span id="familyOverviewTitleName" class="family-name-in-header"></span>
                     </h4>
+                    <img id="familyPhoto" src="" alt="Family Photo" class="w-full h-auto rounded-md mb-4 hidden">
                     <p class="family-bio-detail mb-3 relative z-20">
                         <span class="font-normal">Location:<br></span> <span id="familyLocation" class="detail-value"></span>
                     </p>
@@ -1292,8 +1293,6 @@
                         <div class="story-image-container" onclick="openImageModal(document.getElementById('storyImage').src)">
                             <img id="storyImage" src="https://placehold.co/400x225/EF5350/E2E8F0?text=Story%20Image" alt="Story Image" class="w-full h-full object-cover rounded-md">
                         </div>
-                        <!-- New link for 16:9 photo -->
-                        <a id="storyImageLink" href="#" target="_blank" class="block text-center text-link-color underline mt-2 mb-4 hidden">View Full Size Image</a>
                         
                         <div id="storyContent" class="story-single-content-in-card p-4 rounded-md text-base leading-relaxed">
                         </div>
@@ -1364,8 +1363,13 @@
 
         // Define lifeStagesIcons for the age icons
         const lifeStagesIcons = {
-            "Baby": "👶 ", "Toddler": "🧒 ", "Child": "👧 ", "Teen": "🧑‍🎤 ",
-            "Young Adult": "👩‍🎓 ", "Adult": "🧑‍💼 ", "Elder": "👵 "
+            "Baby": "🍼",
+            "Toddler": "🧸",
+            "Child": "🎨",
+            "Teen": "📱",
+            "Young Adult": "🎓",
+            "Adult": "💼",
+            "Elder": "🌳"
         };
 
         // --- Helper Functions (defined before they are used in initializeDisplay and CSV parsing) ---
@@ -1529,10 +1533,27 @@
                 hobbiesList.innerHTML = '<li class="text-gray-500">No hobbies listed.</li>';
             }
             
-            document.getElementById('simNotes').textContent = sim.notes || 'No specific notes yet.';
+            // Notes section with split functionality
+            const simNotesContentDiv = document.getElementById('simNotesContent');
+            simNotesContentDiv.innerHTML = ''; // Clear previous notes
 
             if (sim.notes && sim.notes.trim() !== '') {
-                collectedSimNotes.set(sim.name, sim.notes);
+                const notesArray = sim.notes.split('---').map(note => note.trim()).filter(note => note.length > 0);
+                if (notesArray.length > 0) {
+                    notesArray.forEach(note => {
+                        const noteP = document.createElement('p');
+                        noteP.classList.add('text-base', 'leading-relaxed', 'mb-2'); // Add some spacing between notes
+                        noteP.textContent = note;
+                        simNotesContentDiv.appendChild(noteP);
+                    });
+                    document.querySelector('#simDetailsCard .notes-section').classList.remove('hidden');
+                } else {
+                    simNotesContentDiv.innerHTML = '<p class="text-base leading-relaxed">No specific notes yet.</p>';
+                    document.querySelector('#simDetailsCard .notes-section').classList.add('hidden');
+                }
+            } else {
+                simNotesContentDiv.innerHTML = '<p class="text-base leading-relaxed">No specific notes yet.</p>';
+                document.querySelector('#simDetailsCard .notes-section').classList.add('hidden');
             }
 
             const simAgeIconsContainer = document.getElementById('simAgeIconsContainer');
@@ -1618,6 +1639,16 @@
                 document.getElementById('familyMemberCount').textContent = family.members ? family.members.length : 0;
                 document.getElementById('familyFunds').textContent = family.familyBio.funds || '$0';
                 document.getElementById('familyBiography').textContent = family.familyBio.biography || 'No biography provided.';
+
+                const familyPhotoElement = document.getElementById('familyPhoto');
+                if (family.familyBio.familyImageUrl) { // Check for the new column 'familyImageUrl'
+                    familyPhotoElement.src = family.familyBio.familyImageUrl;
+                    familyPhotoElement.classList.remove('hidden');
+                } else {
+                    familyPhotoElement.classList.add('hidden');
+                    familyPhotoElement.src = ''; // Clear src if no image
+                }
+
             } else {
                 document.getElementById('familyOverviewContent').classList.add('hidden');
                 document.getElementById('familyOverviewContent').classList.remove('flex');
@@ -1767,7 +1798,6 @@
             const storyImageContainer = document.querySelector('#singleStoryContainer .story-image-container');
             storyImageContainer.onclick = () => openImageModal(document.getElementById('storyImage').src);
             const storyImageElement = document.getElementById('storyImage');
-            const storyImageLink = document.getElementById('storyImageLink');
             
             let imageUrlToDisplay = '';
             if (story.imageUrl169) {
@@ -1782,13 +1812,7 @@
             storyImageElement.alt = story.headline;
             storyImageElement.classList.remove('hidden');
 
-            // Set up the "View Full Size Image" link
-            if (imageUrlToDisplay) {
-                storyImageLink.href = imageUrlToDisplay;
-                storyImageLink.classList.remove('hidden');
-            } else {
-                storyImageLink.classList.add('hidden');
-            }
+            // Removed the "View Full Size Image" link completely as requested.
             
             document.getElementById('storyContent').textContent = story.content;
             
@@ -1801,7 +1825,8 @@
             document.getElementById('storyListHeader').textContent = "Neighborhood Stories"; // Revert to general list header
             document.getElementById('storyListHeader').classList.remove('hidden');
             document.getElementById('singleStoryHeadline').classList.add('hidden'); // Hide single story headline
-            document.getElementById('storyImageLink').classList.add('hidden'); // Hide the image link
+            // Also hide the image link if it was ever shown
+            // document.getElementById('storyImageLink').classList.add('hidden'); // This line is now effectively removed with the element
 
             document.getElementById('storyList').classList.add('max-h-96', 'scrollable-list');
         }
@@ -1886,10 +1911,13 @@
                 collectedSimNotes.forEach((note, simName) => {
                     const noteEntry = document.createElement('div');
                     noteEntry.classList.add('section-block-style', 'relative', 'z-20', 'mb-4');
-                    noteEntry.innerHTML = `
-                        <h5 class="text-xl font-semibold mb-2 text-accent-brown relative z-20">${simName}'s Notes:</h5>
-                        <p class="text-base leading-relaxed relative z-20">${note}</p>
-                    `;
+                    // This section already correctly splits notes by '---' based on previous logic.
+                    const notesArray = note.split('---').map(n => n.trim()).filter(n => n.length > 0);
+                    let noteHtml = `<h5 class="text-xl font-semibold mb-2 relative z-20">${simName}'s Notes:</h5>`;
+                    notesArray.forEach(singleNote => {
+                        noteHtml += `<p class="text-base leading-relaxed relative z-20 mb-2">${singleNote}</p>`;
+                    });
+                    noteEntry.innerHTML = noteHtml;
                     notesContentDiv.appendChild(noteEntry);
                 });
             }
@@ -1988,7 +2016,8 @@
                 const response = await fetch(csvUrl);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for Family Bio Sheet (GID: ${FAMILY_BIO_GID})`);
                 const csvText = await response.text();
-                const data = parseCsvGeneric(csvText, ['Family Name', 'Family Location', 'Family Funds', 'Family Biography']);
+                // Added 'Family Image URL' to the expected headers
+                const data = parseCsvGeneric(csvText, ['Family Name', 'Family Location', 'Family Funds', 'Family Biography', 'Family Image URL']);
                 
                 data.forEach(row => {
                     if (row['Family Name']) {
@@ -1999,6 +2028,7 @@
                                 location: row['Family Location'] || 'Unknown',
                                 funds: row['Family Funds'] || '$0',
                                 biography: row['Family Biography'] || 'No biography provided.',
+                                familyImageUrl: row['Family Image URL'] || '', // Store the new image URL
                                 memberCount: 0
                             },
                             members: []
