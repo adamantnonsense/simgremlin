@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Digital Gazette</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* Newspaper Theme Variables */
+        :root {
+            --bg-primary: #f8f9fa; /* Light paper background */
+            --text-primary: #202122; /* Black text */
+            --link-color: #a50000; /* Deep Red for accents */
+            --link-hover-color: #7a0000; /* Darker Red on hover */
+            --border-color: #b0b0b0; /* Light gray for borders, mimicking aged paper */
+            --card-bg: #ffffff; /* White card background */
+            --header-bg: #e0e0e0; /* Slightly darker gray for headers */
+            --button-bg: #e9e9e9;
+            --button-text: #202122;
+            --button-hover-bg: #d0d0d0;
+            --table-header-bg: #e0e0e0;
+            --table-row-odd-bg: #fdfdfd;
+            --table-row-even-bg: #ffffff;
+            --status-alive: #28a745;
+            --status-dead: #a50000; /* Deep Red for dead status */
+            --sim-name-header-text: #202122;
+            --sim-title-header-text: #4d5156;
+            --highlight-active: #a50000; /* Deep Red for active elements */
+            --personality-low-color: #a50000;
+            --personality-high-color: #000080; /* Navy for high end */
+            --personality-balanced-color: #778899;
+        }
+
+        /* Dark Mode for Newspaper Theme */
+        body.dark-theme {
+            --bg-primary: #1a1a1a; /* Dark gray background */
+            --text-primary: #f0f0f0; /* Light text */
+            --link-color: #ff5252; /* Brighter Red for dark mode */
+            --link-hover-color: #ff1a1a;
+            --border-color: #444444;
+            --card-bg: #2d2d2d;
+            --header-bg: #3c3c3c;
+            --button-bg: #3c3c3c;
+            --button-text: #f0f0f0;
+            --button-hover-bg: #4f4f4f;
+            --table-header-bg: #3c3c3c;
+            --table-row-odd-bg: #2d2d2d;
+            --table-row-even-bg: #2a2a2a;
+            --status-alive: #2ecc71;
+            --status-dead: #ff5252;
+            --sim-name-header-text: #f0f0f0;
+            --sim-title-header-text: #b0b0b0;
+            --highlight-active: var(--link-color);
+            --personality-low-color: #ff5252;
+            --personality-high-color: #64b5f6; /* Lighter blue for dark mode */
+            --personality-balanced-color: #556677;
+        }
+
+        /* General Body and Text Styles */
+        body {
+            font-family: 'Spectral', serif; /* Serif font for body */
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 1.5rem;
+            line-height: 1.7; /* Increased line height for readability */
+            box-sizing: border-box;
+            min-height: 100vh;
+            font-size: 1.1rem; /* Slightly larger base font size */
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJnIj48ZmVIb3Jpem9udGFsTGlnaHRpbmcgZGlzdGFuY2U9IjEwIiBzcGVjdXRhckV4cG9uZW50PSIzIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0icmdiYSgyNDgsIDI0OSwgMjUwLCAwLjIpIiBmaWx0ZXI9InVybCgjZykiLz48L3N2Z34='); /* Subtle grain effect */
+            background-blend-mode: multiply;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif; /* Serif font for headings (more decorative) */
+            color: var(--text-primary);
+            font-weight: 700; /* Bolder headings */
+            margin-bottom: 0.8rem;
+            text-transform: uppercase; /* Newspaper-style headlines */
+        }
+
+        h1 { font-size: 3.5rem; border-bottom: 2px solid var(--link-color); padding-bottom: 0.5rem; }
+        h2 { font-size: 2.8rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 0.3rem; }
+        h3 { font-size: 2.2rem; }
+        h4 { font-size: 1.8rem; }
+        h5 { font-size: 1.4rem; }
+
+        @media (min-width: 768px) {
+            h1 { font-size: 4.5rem; }
+            h2 { font-size: 3.2rem; }
+        }
+
+        /* Link Styling */
+        a {
+            color: var(--link-color);
+            text-decoration: underline;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--link-hover-color);
+        }
+
+        /* Panels and Cards - Minimalist, newspaper-like */
+        .sleek-panel, .trading-card-redesign, .family-overview-section, .spreadsheet-container, .graveyard-section, .homeless-sims-section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: none; /* Removed shadows */
+            border-radius: 0; /* Sharp corners */
+            padding: 1.8rem;
+            margin-bottom: 1.5rem; /* Increased spacing between sections */
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .sleek-panel:hover, .trading-card-redesign:hover, .family-overview-section:hover, .spreadsheet-container:hover, .graveyard-section:hover, .homeless-sims-section:hover {
+            transform: none; /* No lift on hover */
+            box-shadow: none;
+        }
+
+        /* Specific header colors for sections */
+        .sleek-panel h2, .sleek-panel h3, .sleek-panel h4, .sleek-panel h5,
+        .family-overview-section h4,
+        .graveyard-section h3,
+        .homeless-sims-section h3,
+        .notes-section h2, .notes-section h5 {
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* World Header - Print-style */
+        .world-header {
+            background-color: var(--header-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+            padding: 2rem 1.5rem;
+            border-radius: 0;
+            margin-bottom: 1.5rem;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            text-align: center; /* Center world header */
+        }
+
+        .world-header h1 {
+            font-size: 4rem;
+            font-weight: 900; /* Extra bold */
+            border-bottom: 3px double var(--link-color); /* Double line for main title */
+            padding-bottom: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .world-header h1 {
+                font-size: 5.5rem;
+            }
+        }
+
+        .world-header p {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            font-style: italic;
+        }
+
+        /* Theme Toggle Button - Newspaper style */
+        #themeToggle {
+            background-color: var(--button-bg);
+            border: 1px solid var(--border-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--button-text);
+            transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+            padding: 0.5rem 0.8rem;
+            border-radius: 0; /* Sharp corners */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 100;
+            text-transform: uppercase;
+        }
+
+        #themeToggle:hover {
+            background-color: var(--button-hover-bg);
+            color: var(--link-color);
+        }
+
+        /* Scrollbar - Minimal */
+        .scrollable-list {
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) var(--card-bg);
+        }
+
+        .scrollable-list::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 0;
+            border: 1px solid var(--card-bg);
+        }
+
+        .scrollable-list::-webkit-scrollbar-track {
+            background: var(--card-bg);
+            border-radius: 0;
+        }
+
+        /* Families Sidebar and its content */
+        .families-sidebar {
+            flex-grow: 1;
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color); /* Separator for sidebar */
+            padding-right: 1.5rem;
+        }
+
+        /* Family Item (unselected family rectangle) */
+        .family-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+            border-radius: 0;
+        }
+
+        /* Dark mode override for unselected family item */
+        body.dark-theme .family-item {
+            background-color: var(--header-bg);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .family-item h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            border-bottom: none; /* Remove border from these internal headers */
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .family-item:hover {
+            background-color: var(--button-hover-bg);
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Selected Family Item - Highlighted with accent color */
+        .family-item.selected-family {
+            background-color: var(--highlight-active);
+            border-color: var(--link-hover-color);
+            color: #ffffff;
+            box-shadow: none;
+            transform: none;
+        }
+
+        body.dark-theme .family-item.selected-family {
+            background-color: var(--highlight-active);
+            color: white;
+            border-color: var(--link-color);
+            font-weight: 700;
+        }
+
+        /* Sims List */
+        .sims-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-top: 0.5rem;
+            border-left: 1px solid var(--border-color); /* Indent and border for sub-list */
+            padding-left: 1rem;
+        }
+
+        .sims-list.expanded {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+
+        /* Sim Button (individual sim button - unselected) */
+        .sim-button {
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            padding: 0.6rem 1rem;
+            margin-bottom: 0.6rem;
+            border-radius: 0;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 500;
+            box-shadow: none;
+        }
+
+        /* Dark mode override for unselected sim button */
+        body.dark-theme .sim-button {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .sim-button:last-child {
+            margin-bottom: 0;
+        }
+
+        .sim-button:hover {
+            background-color: var(--button-hover-bg);
+            color: var(--text-primary);
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Selected Sim Button - Accent colored */
+        .sim-button.selected-sim {
+            background-color: var(--highlight-active);
+            font-weight: 600;
+            color: #ffffff;
+            border-color: var(--link-hover-color);
+            box-shadow: none;
+            transform: none;
+        }
+
+        body.dark-theme .sim-button.selected-sim {
+            background-color: var(--highlight-active);
+            color: var(--text-primary);
+            font-weight: 600;
+            border-color: var(--link-color);
+        }
+
+        /* Sim Details Card */
+        .trading-card-redesign {
+            padding: 1.8rem;
+            transform: none;
+        }
+
+        .trading-card-redesign:hover {
+            transform: none;
+        }
+
+        .card-header-redesign {
+            background-color: var(--header-bg);
+            color: var(--sim-name-header-text);
+            box-shadow: none;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            padding: 1.5rem 1.8rem;
+            margin: -1.8rem -1.8rem 1.5rem -1.8rem;
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card-header-redesign h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-bottom: none;
+            margin-bottom: 0.2rem;
+            padding-bottom: 0;
+        }
+
+        .card-header-redesign .sim-name-display-redesign {
+            color: var(--sim-name-header-text);
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .card-header-redesign .sim-title-display {
+            color: var(--sim-title-header-text);
+            font-style: italic;
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+
+        .card-content-redesign {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .card-image-section-redesign {
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            padding-bottom: 56.25%;
+            margin-bottom: 1.2rem;
+            box-shadow: none;
+            transform: none;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-image-section-redesign img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            border-radius: 0;
+        }
+
+        .section-block-style {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            margin-top: 1.5rem;
+            border-radius: 0;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: none;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .section-block-style:first-of-type {
+            margin-top: 0;
+        }
+
+        .section-block-style h4 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 1px dotted var(--border-color); /* Dotted separator */
+            padding-bottom: 0.5rem;
+        }
+
+        .section-block-style h5 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 1px dotted var(--border-color);
+            padding-bottom: 0.4rem;
+        }
+
+        .section-block-style h4 .sim-stat-icon {
+            color: var(--link-color);
+            margin-right: 0.5rem;
+        }
+
+        .sim-bio-box-redesign p, .notes-section p {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        /* Drop Cap for first paragraph in bio/notes */
+        .sim-bio-box-redesign p:first-of-type::first-letter, .notes-section p:first-of-type::first-letter {
+            float: left;
+            font-size: 4em; /* Large initial letter */
+            line-height: 0.7;
+            font-family: 'Playfair Display', serif;
+            margin-right: 0.1em;
+            color: var(--link-color); /* Accent color for drop cap */
+            font-weight: bold;
+        }
+
+        .sim-quote-box {
+            border-left: 3px solid var(--link-color);
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+        }
+
+        .sim-quote-box p {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .sim-quote-box span {
+            color: var(--text-primary);
+            display: block;
+            margin-top: 0.5rem;
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        .sim-stat-icon {
+            color: var(--link-color);
+        }
+
+        .sim-stat-label-redesign {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .sim-stat-value-redesign {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            display: inline-block;
+            max-width: calc(100% - 60px);
+            vertical-align: top;
+            line-height: 1.3;
+        }
+
+        .sim-stat-item {
+            margin-bottom: 0.6rem;
+        }
+
+        /* Spacing for Key Details and Bio */
+        .details-and-skills-grid {
+            margin-top: 1.8rem;
+            /* Use CSS Grid for column layout if applicable to content */
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .details-and-skills-grid {
+                grid-template-columns: 1fr 1fr; /* Two columns for larger screens */
+            }
+        }
+
+        /* Style for clickable partner names */
+        .partner-link {
+            cursor: pointer;
+            color: var(--link-color);
+            text-decoration: underline;
+            font-weight: normal;
+        }
+
+        .partner-link:hover {
+            color: var(--link-hover-color);
+        }
+
+        .status-alive { color: var(--status-alive); font-weight: bold; }
+        .status-dead { color: var(--status-dead); font-weight: bold; }
+
+        /* New styles for the skills list */
+        .sim-skills-list {
+            gap: 0.8rem;
+            padding: 0.5rem;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+        }
+
+        .sim-skills-list-item {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            padding: 0.3rem 0.6rem;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            box-shadow: none;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .sim-skills-list-item-label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .sim-skills-list-item-value {
+            font-weight: 600;
+            color: var(--link-color);
+        }
+
+        .sim-trait-item-redesign {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            font-size: 1.1rem;
+            border-radius: 0;
+            padding: 0.4rem 0.8rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .hobbies-list li {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            list-style: disc;
+            margin-left: 1.5rem;
+        }
+
+        .hobbies-list li::before {
+            content: none;
+        }
+
+        /* Age Icons Container */
+        .sim-age-icons-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            margin-bottom: 1.5rem;
+            border-top: 1px dotted var(--border-color);
+            border-bottom: 1px dotted var(--border-color);
+            background-color: var(--header-bg);
+            border-radius: 0;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .age-icon {
+            font-size: 1.8rem;
+            padding: 0;
+            border-radius: 0; /* Square icons */
+            background-color: var(--button-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            box-shadow: none;
+            width: 2.2em;
+            height: 2.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .age-icon:hover {
+            background-color: var(--button-hover-bg);
+            border-color: var(--link-color);
+            transform: none;
+        }
+
+        .age-icon.active-age-icon {
+            background-color: var(--highlight-active);
+            color: var(--text-primary);
+            border-color: var(--link-color);
+            box-shadow: none;
+            transform: none;
+            animation: none;
+        }
+
+        /* Personality Display */
+        .personality-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            font-size: 1.1rem;
+            border-bottom: 1px dotted var(--border-color); /* Separator for each trait */
+        }
+        .personality-item:last-child {
+            border-bottom: none;
+        }
+
+        .personality-item-label {
+            flex-grow: 1;
+            text-align: left;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .personality-item-value {
+            font-weight: bold;
+            padding-left: 0.5rem;
+            color: var(--link-color);
+        }
+
+        /* Highlight for personality traits on the value */
+        .personality-item-value.low {
+            color: var(--personality-low-color);
+        }
+
+        .personality-item-value.high {
+            color: var(--personality-high-color);
+        }
+
+        .personality-item-value.balanced {
+            color: var(--personality-balanced-color);
+        }
+
+        /* Family Overview Section */
+        .family-overview-section h4 {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            border-bottom: 1px dotted var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .family-overview-section h4 .fas.fa-home {
+            margin-right: 0.6rem;
+            color: var(--link-color);
+        }
+
+        .family-overview-section h4 .family-name-in-header {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+        }
+        @media (min-width: 768px) {
+            .family-overview-section h4 .family-name-in-header {
+                font-size: 2.8rem;
+            }
+        }
+
+        .family-overview-section .family-bio-detail, .family-overview-section .family-bio-text-content {
+            color: var(--text-primary);
+        }
+
+        .family-overview-section .family-bio-detail {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .family-overview-section .family-bio-detail .detail-value {
+            color: var(--text-primary);
+            font-weight: 500;
+            display: inline-block;
+            margin-left: 0.25rem;
+        }
+
+        .family-overview-section .family-bio-text-content {
+            margin-top: 1.5rem;
+        }
+
+        .family-overview-section .family-bio-text-content h5 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 1px dotted var(--border-color);
+            padding-bottom: 0.3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .family-overview-section .family-bio-text-content p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        /* Spreadsheet */
+        .spreadsheet-container {
+            padding-top: 1.5rem;
+            transform: none;
+        }
+
+        .spreadsheet-container:hover {
+            transform: none;
+        }
+
+        .sims-table th, .sims-table td {
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-weight: normal;
+        }
+
+        .sims-table th {
+            background-color: var(--table-header-bg);
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--link-color);
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 0.8rem 1rem;
+            white-space: nowrap;
+            text-align: left;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .sims-table tbody tr:nth-child(odd) {
+            background-color: var(--table-row-odd-bg);
+        }
+
+        .sims-table tbody tr:nth-child(even) {
+            background-color: var(--table-row-even-bg);
+        }
+
+        .sims-table tbody tr:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        .sims-table td strong {
+            color: var(--status-alive);
+        }
+
+        .sims-table .clickable-sim-name {
+            color: var(--link-color);
+            font-weight: normal;
+            text-decoration: underline;
+        }
+
+        .sims-table .clickable-sim-name:hover {
+            color: var(--link-hover-color);
+        }
+
+        /* Sortable table headers */
+        .sortable-th {
+            cursor: pointer;
+            position: relative;
+            padding-right: 25px;
+        }
+
+        .sortable-th .sort-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8em;
+            color: var(--text-primary);
+            transition: color 0.2s ease;
+        }
+
+        .sortable-th:hover .sort-icon {
+            color: var(--link-color);
+        }
+
+        .sortable-th.asc .sort-icon::before {
+            content: "\f0d8";
+        }
+
+        .sortable-th.desc .sort-icon::before {
+            content: "\f0d7";
+        }
+
+        .sortable-th:not(.asc):not(.desc) .sort-icon::before {
+            content: "\f0dc";
+            opacity: 0.5;
+        }
+
+        /* Stories */
+        #storyDisplayContent {
+            padding: 1.5rem;
+            transform: none;
+        }
+
+        #storyDisplayContent:hover {
+            transform: none;
+        }
+
+        #storyDisplayContent h2 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        #storyDisplayContent h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        #storyDisplayContent p {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .story-list-in-card {
+            gap: 1rem;
+        }
+
+        .story-list-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            font-size: 1.1rem;
+            border-radius: 0;
+            box-shadow: none;
+            transition: all 0.2s ease-in-out;
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            transform: none;
+        }
+
+        .story-list-item:hover {
+            background-color: var(--button-hover-bg);
+            box-shadow: none;
+            transform: none;
+        }
+
+        .story-list-item.selected-story-in-card {
+            background-color: var(--highlight-active);
+            border-color: var(--link-color);
+            color: #ffffff;
+            font-weight: 600;
+            transform: none;
+        }
+
+        .story-list-item span {
+            font-weight: 500;
+        }
+
+        /* Single Story Content */
+        .story-single-content-in-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            padding: 1.8rem;
+            position: relative;
+            overflow: visible;
+            transform: none;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .story-single-content-in-card:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .story-image-container {
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            margin-bottom: 1.5rem;
+            box-shadow: none;
+            transform: none;
+            overflow: hidden;
+            position: relative;
+            padding-bottom: 56.25%;
+        }
+
+        .story-image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        #storyContent {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+        }
+
+        /* Graveyard Specific Styling */
+        .graveyard-section {
+            padding: 1.8rem;
+            transform: none;
+        }
+
+        .graveyard-section:hover {
+            transform: none;
+        }
+
+        .graveyard-section h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            border-bottom: 1px dotted var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .graveyard-section h3 .sim-stat-icon {
+            margin-right: 0.6rem;
+            color: var(--status-dead);
+        }
+
+        .graveyard-section p {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .graveyard-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            box-shadow: none;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease;
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            transform: none;
+        }
+
+        .graveyard-item:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: var(--button-hover-bg);
+        }
+
+        .graveyard-item .graveyard-icon {
+            font-size: 2.5rem;
+            color: var(--status-dead);
+        }
+
+        .graveyard-item h5 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .graveyard-item p {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        /* Homeless Sims Section */
+        .homeless-sims-section {
+            padding: 1.8rem;
+            transform: none;
+        }
+
+        .homeless-sims-section:hover {
+            transform: none;
+        }
+
+        .homeless-sims-section h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            border-bottom: 1px dotted var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .homeless-sims-section h3 .sim-stat-icon {
+            margin-right: 0.6rem;
+            color: var(--link-color);
+        }
+
+        .homeless-sim-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            box-shadow: none;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease;
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            transform: none;
+        }
+
+        .homeless-sim-item:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: var(--button-hover-bg);
+        }
+
+        .homeless-sim-item h5 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .homeless-sim-item p {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .main-layout-grid {
+                display: grid; /* Use grid for column layout */
+                grid-template-columns: 280px 1fr; /* Fixed sidebar, fluid content */
+                gap: 2rem;
+            }
+
+            .families-sidebar {
+                flex-basis: auto; /* Override flex-basis */
+                flex-shrink: 0;
+                flex-grow: 0;
+                padding-right: 0; /* Remove padding for border-right on grid */
+            }
+
+            .main-content-area {
+                flex-grow: 1;
+                display: grid;
+                grid-template-columns: 1fr; /* Default to single column for content sections */
+                gap: 1.5rem; /* Gap between content sections */
+            }
+
+            /* Main content area can be multi-column if needed, e.g., for stories */
+            .stories-grid { /* Assuming you have a container for stories */
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns for stories */
+                gap: 1.5rem;
+            }
+        }
+
+        /* Static Navigation Bar - Flat, tab-like buttons */
+        .static-nav-bar {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            transform: none;
+        }
+
+        .static-nav-bar button {
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .static-nav-bar button:hover {
+            background-color: var(--button-hover-bg);
+            color: var(--link-color);
+            border-color: var(--link-color);
+        }
+
+        .static-nav-bar button.active-nav-button {
+            background-color: var(--highlight-active);
+            color: white;
+            border-color: var(--link-color);
+            font-weight: 700;
+        }
+
+        body.dark-theme .static-nav-bar button.active-nav-button {
+            background-color: var(--highlight-active);
+            color: var(--text-primary);
+            border-color: var(--link-color);
+        }
+
+    </style>
+</head>
+<body class="light-theme">
+    <button id="themeToggle" class="font-bold text-sm">
+        <i class="fas fa-moon" id="themeIcon"></i>
+        <span class="ml-2" id="themeText">Dark Mode</span>
+    </button>
+
+    <div class="container mx-auto">
+        <header class="world-header">
+            <h1 class="font-black text-center">THE DIGITAL GAZETTE</h1>
+            <p class="text-center">Your Daily Dose of Sims News & Affairs</p>
+        </header>
+
+        <nav class="static-nav-bar" id="staticNavBar">
+            <button class="active-nav-button" data-section="families">Families</button>
+            <button data-section="stories">Stories</button>
+            <button data-section="spreadsheet">Spreadsheet</button>
+            <button data-section="graveyard">Graveyard</button>
+            <button data-section="homelessSims">Homeless</button>
+            <button data-section="notes">Notes</button>
+        </nav>
+
+        <div class="main-layout-grid">
+            <aside class="families-sidebar sleek-panel" id="familiesSidebar">
+                <h2 class="text-xl font-bold mb-4">Family Directory</h2>
+                <div id="familyList" class="scrollable-list h-full">
+                    </div>
+            </aside>
+
+            <main class="main-content-area">
+                <section id="familyOverviewSection" class="family-overview-section sleek-panel hidden">
+                    <h4 class="text-2xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-home mr-2"></i>Family Details: <span class="family-name-in-header ml-2"></span>
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="family-bio-detail"><strong class="detail-label">Location:</strong> <span class="detail-value" id="familyLocation"></span></p>
+                            <p class="family-bio-detail"><strong class="detail-label">Net Worth:</strong> <span class="detail-value" id="familyNetWorth"></span></p>
+                            <p class="family-bio-detail"><strong class="detail-label">Members:</strong> <span class="detail-value" id="familyMemberCount"></span></p>
+                        </div>
+                    </div>
+                    <div class="family-bio-text-content mt-6">
+                        <h5>Family History:</h5>
+                        <p id="familyBio"></p>
+                    </div>
+                </section>
+
+                <section id="simDetailsSection" class="trading-card-redesign sleek-panel hidden">
+                    <div class="card-header-redesign">
+                        <h2 class="sim-name-display-redesign" id="simNameDisplay"></h2>
+                        <p class="sim-title-display" id="simTitleDisplay"></p>
+                    </div>
+                    <div class="card-content-redesign">
+                        <div class="card-image-section-redesign" id="simImageSection">
+                            <img id="simImage" src="" alt="Sim Image" class="w-full h-full object-cover rounded-md">
+                        </div>
+
+                        <div class="sim-age-icons-container" id="simAgeIcons">
+                            </div>
+
+                        <div class="section-block-style sim-bio-box-redesign mt-4">
+                            <h4><i class="fas fa-book-open sim-stat-icon"></i>Biography</h4>
+                            <p id="simBio"></p>
+                            <div class="sim-quote-box mt-4 hidden" id="simQuoteBox">
+                                <p id="simQuote"></p>
+                                <span id="simQuoteSource"></span>
+                            </div>
+                        </div>
+
+                        <div class="details-and-skills-grid mt-6">
+                            <div class="section-block-style">
+                                <h4><i class="fas fa-info-circle sim-stat-icon"></i>Key Details</h4>
+                                <ul class="list-none p-0 m-0">
+                                    <li class="sim-stat-item flex justify-between items-center"><span class="sim-stat-label-redesign">Status:</span> <span class="sim-stat-value-redesign" id="simStatus"></span></li>
+                                    <li class="sim-stat-item flex justify-between items-center"><span class="sim-stat-label-redesign">Gender:</span> <span class="sim-stat-value-redesign" id="simGender"></span></li>
+                                    <li class="sim-stat-item flex justify-between items-center"><span class="sim-stat-label-redesign">Voice:</span> <span class="sim-stat-value-redesign" id="simVoice"></span></li>
+                                    <li class="sim-stat-item flex justify-between items-center"><span class="sim-stat-label-redesign">Walk Style:</span> <span class="sim-stat-value-redesign" id="simWalkStyle"></span></li>
+                                    <li class="sim-stat-item flex justify-between items-center"><span class="sim-stat-label-redesign">Profession:</span> <span class="sim-stat-value-redesign" id="simProfession"></span></li>
+                                    <li class="sim-stat-item flex justify-between items-center"><span class="sim-stat-label-redesign">Employer:</span> <span class="sim-stat-value-redesign" id="simEmployer"></span></li>
+                                    <li class="sim-stat-item flex justify-between items-center"><span class="sim-stat-label-redesign">Salary:</span> <span class="sim-stat-value-redesign" id="simSalary"></span></li>
+                                    <li class="sim-stat-item flex justify-between items-center"><span class="sim-stat-label-redesign">Aspiration:</span> <span class="sim-stat-value-redesign" id="simAspiration"></span></li>
+                                    <li class="sim-stat-item flex justify-between items-center"><span class="sim-stat-label-redesign">Family:</span> <span class="sim-stat-value-redesign" id="simFamily"></span></li>
+                                    <li class="sim-stat-item flex justify-between items-center"><span class="sim-stat-label-redesign">Partner:</span> <span class="sim-stat-value-redesign" id="simPartner"></span></li>
+                                </ul>
+                            </div>
+
+                            <div class="section-block-style">
+                                <h4><i class="fas fa-star sim-stat-icon"></i>Skills</h4>
+                                <div id="simSkills" class="sim-skills-list flex flex-wrap gap-2 justify-start">
+                                    </div>
+                            </div>
+
+                            <div class="section-block-style">
+                                <h4><i class="fas fa-user sim-stat-icon"></i>Traits</h4>
+                                <div id="simTraits" class="flex flex-wrap gap-2">
+                                    </div>
+                            </div>
+
+                            <div class="section-block-style">
+                                <h4><i class="fas fa-heart sim-stat-icon"></i>Hobbies</h4>
+                                <ul id="simHobbies" class="hobbies-list list-disc ml-5">
+                                    </ul>
+                            </div>
+
+                            <div class="section-block-style">
+                                <h4><i class="fas fa-brain sim-stat-icon"></i>Personality</h4>
+                                <div id="simPersonality" class="flex flex-col">
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="storiesSection" class="sleek-panel hidden">
+                    <h2 class="text-2xl font-bold mb-4">Stories</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 stories-grid">
+                        </div>
+
+                    <div id="storyDisplayContent" class="hidden sleek-panel mt-6">
+                        <button id="storyBackButton" class="text-link-color underline mb-4"><i class="fas fa-arrow-left mr-2"></i>Back to Stories</button>
+                        <h3 id="storyHeadline" class="text-2xl font-bold mb-3"></h3>
+                        <div class="story-image-container" id="storyImageContainer">
+                            <img id="storyImage" src="" alt="Story Image">
+                        </div>
+                        <p id="storyContent"></p>
+                    </div>
+                </section>
+
+                <section id="spreadsheetSection" class="spreadsheet-container sleek-panel hidden">
+                    <h2 class="text-2xl font-bold mb-4">Sims Spreadsheet</h2>
+                    <div class="overflow-x-auto">
+                        <table id="simsTable" class="min-w-full bg-white border border-border-color">
+                            <thead>
+                                <tr>
+                                    <th class="py-2 px-4 border-b sortable-th" data-sort="name">Name <span class="sort-icon fas"></span></th>
+                                    <th class="py-2 px-4 border-b sortable-th" data-sort="family">Family <span class="sort-icon fas"></span></th>
+                                    <th class="py-2 px-4 border-b sortable-th" data-sort="age">Age <span class="sort-icon fas"></span></th>
+                                    <th class="py-2 px-4 border-b sortable-th" data-sort="status">Status <span class="sort-icon fas"></span></th>
+                                    <th class="py-2 px-4 border-b sortable-th" data-sort="profession">Profession <span class="sort-icon fas"></span></th>
+                                    <th class="py-2 px-4 border-b sortable-th" data-sort="skills">Skills <span class="sort-icon fas"></span></th>
+                                    <th class="py-2 px-4 border-b sortable-th" data-sort="traits">Traits <span class="sort-icon fas"></span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="simsTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="graveyardSection" class="graveyard-section sleek-panel hidden">
+                    <h3 class="text-2xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-cross sim-stat-icon"></i>The Graveyard
+                    </h3>
+                    <p class="mb-4">Here lie the departed Sims. May they rest in pixels.</p>
+                    <div id="graveyardList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        </div>
+                </section>
+
+                <section id="homelessSimsSection" class="homeless-sims-section sleek-panel hidden">
+                    <h3 class="text-2xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-house-damage sim-stat-icon"></i>Homeless Sims
+                    </h3>
+                    <p class="mb-4">These Sims are currently without a home, seeking shelter or a new family.</p>
+                    <div id="homelessSimsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        </div>
+                </section>
+
+                <section id="notesSection" class="notes-section sleek-panel hidden">
+                    <h2 class="text-2xl font-bold mb-4">Additional Notes</h2>
+                    <div id="notesContent">
+                        <p>This section is for miscellaneous notes and observations about the world or specific Sims that don't fit into other categories.</p>
+                        <p>It can be used for lore, future plans, or reminders.</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Placeholder for simData - in a real app, this would come from a data source
+        const simData = {
+            "worldInfo": {
+                "name": "Willow Creek",
+                "netWorth": "$1,234,567",
+                "description": "A quaint, tree-lined town known for its Southern charm and friendly residents. It's the perfect place to settle down and raise a family."
+            },
+            "families": {
+                "Goth": {
+                    "members": [
+                        { "name": "Mortimer Goth", "age": "Adult", "status": "Alive", "gender": "Male", "voice": "Deep", "walkStyle": "Confident", "profession": "Writer", "employer": "Self-Employed", "salary": "$500/day", "aspiration": "Knowledge", "family": "Goth", "partner": "Bella Goth", "bio": "Mortimer is a reclusive, intellectual man with a passion for the macabre and an extensive library. He enjoys spending his evenings reading by the fireplace.", "quote": "The truth is out there, in the shadows.", "quoteSource": "Mortimer Goth", "image": "https://simscommunity.info/wp-content/uploads/2014/08/Mortimer-Goth.png", "skills": { "Writing": 10, "Logic": 8, "Charisma": 5 }, "traits": ["Bookworm", "Genius", "Gloomy"], "hobbies": ["Reading", "Chess", "Stargazing"], "personality": { "Neat": "Low", "Outgoing": "Low", "Active": "Low", "Responsible": "High", "Creative": "High" } },
+                        { "name": "Bella Goth", "age": "Adult", "status": "Alive", "gender": "Female", "voice": "Sweet", "walkStyle": "Sultry", "profession": "Scientist", "employer": "Labs", "salary": "$600/day", "aspiration": "Popularity", "family": "Goth", "partner": "Mortimer Goth", "bio": "Bella is an enigmatic and fashionable woman, known for her mysterious past and striking red dress. She loves exploring new things and meeting interesting Sims.", "quote": "Life is an adventure, embrace the unknown.", "quoteSource": "Bella Goth", "image": "https://simscommunity.info/wp-content/uploads/2014/08/Bella-Goth.png", "skills": { "Logic": 9, "Charisma": 7, "Fitness": 6 }, "traits": ["Outgoing", "Loves Outdoors", "Good"], "hobbies": ["Gardening", "Dancing", "Photography"], "personality": { "Neat": "High", "Outgoing": "High", "Active": "High", "Responsible": "Balanced", "Creative": "Balanced" } }
+                    ],
+                    "bio": "The Goth family, with their mysterious mansion and penchant for the darker side of life, are a cornerstone of Willow Creek's history. Mortimer and Bella, along with their children, maintain a fascinating and somewhat reclusive existence.",
+                    "location": "Willow Creek",
+                    "netWorth": "$850,000"
+                },
+                "NewcrestNewbies": {
+                    "members": [
+                        { "name": "Bob Pancakes", "age": "Adult", "status": "Alive", "gender": "Male", "voice": "Mellow", "walkStyle": "Slacker", "profession": "Culinary", "employer": "Restaurant", "salary": "$350/day", "aspiration": "Food", "family": "NewcrestNewbies", "partner": "Eliza Pancakes", "bio": "Bob Pancakes is a lovable slovenly chef, more interested in eating his creations than cooking them. He dreams of mastering the art of gourmet cooking, despite his lazy tendencies.", "quote": "Why cook, when you can just eat?", "quoteSource": "Bob Pancakes", "image": "https://simscommunity.info/wp-content/uploads/2014/08/Bob-Pancakes.png", "skills": { "Cooking": 7, "Comedy": 3 }, "traits": ["Lazy", "Glutton", "Good"], "hobbies": ["Video Games", "Eating"], "personality": { "Neat": "Low", "Outgoing": "Balanced", "Active": "Low", "Responsible": "Balanced", "Creative": "High" } },
+                        { "name": "Eliza Pancakes", "age": "Adult", "status": "Alive", "gender": "Female", "voice": "Perky", "walkStyle": "Proper", "profession": "Business", "employer": "Tech Startup", "salary": "$400/day", "aspiration": "Fortune", "family": "NewcrestNewbies", "partner": "Bob Pancakes", "bio": "Eliza Pancakes is a meticulous and organized woman, often frustrated by her husband Bob's slovenly ways. She dreams of a perfectly ordered life and a thriving career.", "quote": "A clean home is a happy home.", "quoteSource": "Eliza Pancakes", "image": "https://simscommunity.info/wp-content/uploads/2014/08/Eliza-Pancakes.png", "skills": { "Logic": 6, "Charisma": 5, "Fitness": 4 }, "traits": ["Neat", "Ambitious", "Perfectionist"], "hobbies": ["Cleaning", "Organizing"], "personality": { "Neat": "High", "Outgoing": "Low", "Active": "Balanced", "Responsible": "High", "Creative": "Low" } }
+                    ],
+                    "bio": "The Pancakes family, consisting of the perpetually unmotivated Bob and the meticulously organized Eliza, navigate their suburban life with contrasting personalities. Their daily routines are a comedic clash of order and chaos.",
+                    "location": "Newcrest",
+                    "netWorth": "$120,000"
+                }
+            },
+            "stories": [
+                {
+                    "headline": "Mystery of the Missing Llama",
+                    "content": "A prized llama, 'Fluffykins', belonging to the Landgraab family, has mysteriously vanished from their sprawling estate. Police are baffled, and suspicions run high among the town's elite.",
+                    "image": "https://i.pinimg.com/originals/91/92/79/9192797b5e40e89f78f8b3d6a3c6d67e.jpg"
+                },
+                {
+                    "headline": "Willow Creek Bake-Off Crowns New Champion",
+                    "content": "After a fierce culinary battle, a new champion has emerged from Willow Creek's annual bake-off. Local baker, Penny Pizzazz, wowed the judges with her controversial 'Broccoli and Salmon' cupcake.",
+                    "image": "https://i.ytimg.com/vi/bYd7r-B6s2s/maxresdefault.jpg"
+                }
+            ],
+            "graveyard": [
+                {
+                    "name": "Agnes Crumplebottom",
+                    "causeOfDeath": "Old Age",
+                    "bio": "A stern and traditional Sim, Agnes Crumplebottom was known for her disdain for public displays of affection and her love for gardening. She passed peacefully in her sleep."
+                },
+                {
+                    "name": "Vladislaus Straud",
+                    "causeOfDeath": "Sunlight Exposure",
+                    "bio": "Count Vladislaus Straud, the enigmatic vampire of Forgotten Hollow, met his untimely end after an unfortunate encounter with direct sunlight during a morning stroll. He will be remembered for his dramatic flair and eternal thirst."
+                }
+            ],
+            "homelessSims": [
+                { "name": "Katrina Caliente", "age": "Adult", "status": "Alive", "gender": "Female", "voice": "Sultry", "walkStyle": "Sultry", "profession": "Entertainer", "employer": "Nightclub", "salary": "$300/day", "aspiration": "Romance", "family": "Homeless", "partner": "None", "bio": "Katrina Caliente, a dazzling entertainer, found herself without a home after a series of unfortunate events. She's looking for a new start and a place to call her own.", "quote": "The show must go on, even without a roof over my head.", "quoteSource": "Katrina Caliente", "image": "https://i.pinimg.com/originals/c9/7c/4f/c97c4f1c9c7c4b4d6e9f1e1b1d8f1e1d.jpg", "skills": { "Singing": 5, "Charisma": 7, "Dancing": 6 }, "traits": ["Romantic", "Outgoing", "Creative"], "hobbies": ["Singing", "Dancing", "Partying"], "personality": { "Neat": "Balanced", "Outgoing": "High", "Active": "Balanced", "Responsible": "Low", "Creative": "High" } }
+            ],
+            "notes": "This is a placeholder for additional general notes about the Sims world or gameplay. For example, specific challenges, ongoing narratives, or personal observations about the game progression. It offers a flexible space for any information that doesn't fit neatly into specific Sim or family profiles. This could include long-term goals for the save file, interesting anecdotes, or reminders about specific events or relationships."
+        };
+
+        let currentSelectedSim = null;
+        let currentSelectedFamily = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFamilies();
+            displaySection('families'); // Default to showing families section
+
+            // Theme Toggle
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeText.textContent = 'Light Mode';
+            } else {
+                document.body.classList.remove('dark-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeText.textContent = 'Dark Mode';
+            }
+
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-theme');
+                if (document.body.classList.contains('dark-theme')) {
+                    localStorage.setItem('theme', 'dark');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                    themeText.textContent = 'Light Mode';
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                    themeText.textContent = 'Dark Mode';
+                }
+            });
+
+            // Navigation Bar
+            const staticNavBar = document.getElementById('staticNavBar');
+            staticNavBar.addEventListener('click', (event) => {
+                if (event.target.tagName === 'BUTTON') {
+                    const section = event.target.dataset.section;
+                    displaySection(section);
+
+                    // Update active button state
+                    staticNavBar.querySelectorAll('button').forEach(btn => {
+                        btn.classList.remove('active-nav-button');
+                    });
+                    event.target.classList.add('active-nav-button');
+                }
+            });
+
+            // Back button for story display
+            const storyBackButton = document.getElementById('storyBackButton');
+            storyBackButton.addEventListener('click', () => {
+                document.getElementById('storyDisplayContent').classList.add('hidden');
+                document.getElementById('storiesSection').classList.remove('hidden');
+            });
+        });
+
+        function displaySection(sectionId) {
+            hideAllContentSections();
+            document.getElementById('familyOverviewSection').classList.add('hidden');
+            document.getElementById('simDetailsSection').classList.add('hidden');
+
+            switch (sectionId) {
+                case 'families':
+                    document.getElementById('familyOverviewSection').classList.remove('hidden');
+                    if (currentSelectedFamily) {
+                        displayFamilyOverview(currentSelectedFamily);
+                    } else {
+                        // Optionally display a default family or a "select a family" message
+                    }
+                    break;
+                case 'stories':
+                    document.getElementById('storiesSection').classList.remove('hidden');
+                    renderStories();
+                    break;
+                case 'spreadsheet':
+                    document.getElementById('spreadsheetSection').classList.remove('hidden');
+                    renderSpreadsheet();
+                    break;
+                case 'graveyard':
+                    document.getElementById('graveyardSection').classList.remove('hidden');
+                    renderGraveyard();
+                    break;
+                case 'homelessSims':
+                    document.getElementById('homelessSimsSection').classList.remove('hidden');
+                    renderHomelessSims();
+                    break;
+                case 'notes':
+                    document.getElementById('notesSection').classList.remove('hidden');
+                    renderNotes();
+                    break;
+                default:
+                    // Handle unknown section or default view
+                    console.warn(`Attempted to display unknown section: ${sectionId}`);
+            }
+        }
+
+        function hideAllContentSections() {
+            document.querySelectorAll('main section').forEach(section => {
+                section.classList.add('hidden');
+            });
+        }
+
+        function renderFamilies() {
+            const familyListContainer = document.getElementById('familyList');
+            familyListContainer.innerHTML = ''; // Clear previous list
+
+            for (const familyKey in simData.families) {
+                const family = simData.families[familyKey];
+                const familyDiv = document.createElement('div');
+                familyDiv.classList.add('family-item', 'p-4', 'mb-2', 'rounded-md', 'cursor-pointer', 'flex', 'justify-between', 'items-center');
+                familyDiv.dataset.family = familyKey;
+
+                const familyName = document.createElement('h3');
+                familyName.classList.add('text-lg', 'font-semibold');
+                familyName.textContent = familyKey;
+
+                const expandIcon = document.createElement('i');
+                expandIcon.classList.add('fas', 'fa-chevron-right', 'expand-icon', 'text-gray-500');
+
+                familyDiv.appendChild(familyName);
+                familyDiv.appendChild(expandIcon);
+
+                const simsListDiv = document.createElement('div');
+                simsListDiv.classList.add('sims-list', 'transition-all', 'ease-in-out', 'duration-300');
+                simsListDiv.id = `sims-list-${familyKey}`;
+
+                family.members.forEach(sim => {
+                    const simButton = document.createElement('button');
+                    simButton.classList.add('sim-button', 'block', 'w-full', 'py-2', 'px-3', 'mb-1', 'text-left', 'rounded-md', 'transition-colors');
+                    simButton.textContent = sim.name;
+                    simButton.dataset.simName = sim.name;
+                    simButton.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent familyDiv click
+                        selectSim(sim.name);
+                    });
+                    simsListDiv.appendChild(simButton);
+                });
+
+                familyDiv.addEventListener('click', () => {
+                    toggleFamilyExpansion(familyKey);
+                });
+
+                familyListContainer.appendChild(familyDiv);
+                familyListContainer.appendChild(simsListDiv);
+            }
+
+            // Add Homeless Sims section separately
+            if (simData.homelessSims && simData.homelessSims.length > 0) {
+                const homelessDiv = document.createElement('div');
+                homelessDiv.classList.add('family-item', 'p-4', 'mb-2', 'rounded-md', 'cursor-pointer', 'flex', 'justify-between', 'items-center');
+                homelessDiv.dataset.family = "homelessSims";
+
+                const homelessName = document.createElement('h3');
+                homelessName.classList.add('text-lg', 'font-semibold');
+                homelessName.textContent = "Homeless Sims";
+
+                const expandIcon = document.createElement('i');
+                expandIcon.classList.add('fas', 'fa-chevron-right', 'expand-icon', 'text-gray-500');
+
+                homelessDiv.appendChild(homelessName);
+                homelessDiv.appendChild(expandIcon);
+
+                const homelessSimsListDiv = document.createElement('div');
+                homelessSimsListDiv.classList.add('sims-list', 'transition-all', 'ease-in-out', 'duration-300');
+                homelessSimsListDiv.id = `sims-list-homelessSims`;
+
+                simData.homelessSims.forEach(sim => {
+                    const simButton = document.createElement('button');
+                    simButton.classList.add('sim-button', 'block', 'w-full', 'py-2', 'px-3', 'mb-1', 'text-left', 'rounded-md', 'transition-colors');
+                    simButton.textContent = sim.name;
+                    simButton.dataset.simName = sim.name;
+                    simButton.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        selectSim(sim.name);
+                    });
+                    homelessSimsListDiv.appendChild(simButton);
+                });
+
+                homelessDiv.addEventListener('click', () => {
+                    toggleFamilyExpansion("homelessSims");
+                });
+
+                familyListContainer.appendChild(homelessDiv);
+                familyListContainer.appendChild(homelessSimsListDiv);
+            }
+
+            updateFamilyList();
+        }
+
+        function toggleFamilyExpansion(familyNameKey) {
+            const simsListDiv = document.getElementById(`sims-list-${familyNameKey}`);
+            const familyDiv = document.querySelector(`.family-item[data-family="${familyNameKey}"]`);
+            const expandIcon = familyDiv.querySelector('.expand-icon');
+
+            if (simsListDiv.classList.contains('expanded')) {
+                simsListDiv.classList.remove('expanded');
+                simsListDiv.style.maxHeight = '0';
+                expandIcon.style.transform = 'rotate(0deg)';
+                familyDiv.classList.remove('selected-family'); // Deselect when collapsing
+            } else {
+                // Collapse all other families
+                document.querySelectorAll('.sims-list.expanded').forEach(list => {
+                    list.classList.remove('expanded');
+                    list.style.maxHeight = '0';
+                    const parentFamilyDiv = list.previousElementSibling;
+                    if (parentFamilyDiv) {
+                        parentFamilyDiv.classList.remove('selected-family');
+                        parentFamilyDiv.querySelector('.expand-icon').style.transform = 'rotate(0deg)';
+                    }
+                });
+
+                simsListDiv.classList.add('expanded');
+                simsListDiv.style.maxHeight = simsListDiv.scrollHeight + 'px'; // Set max-height to scrollHeight
+                expandIcon.style.transform = 'rotate(90deg)';
+                familyDiv.classList.add('selected-family');
+            }
+        }
+
+        function updateFamilyList() {
+            document.querySelectorAll('.family-item').forEach(item => item.classList.remove('selected-family'));
+            document.querySelectorAll('.sim-button').forEach(button => button.classList.remove('selected-sim'));
+
+            if (currentSelectedFamily) {
+                const familyDiv = document.querySelector(`.family-item[data-family="${currentSelectedFamily}"]`);
+                if (familyDiv) {
+                    familyDiv.classList.add('selected-family');
+                    const simsListDiv = document.getElementById(`sims-list-${currentSelectedFamily}`);
+                    if (simsListDiv && !simsListDiv.classList.contains('expanded')) {
+                        simsListDiv.classList.add('expanded');
+                        simsListDiv.style.maxHeight = simsListDiv.scrollHeight + 'px';
+                        const newExpandIcon = familyDiv.querySelector('.expand-icon');
+                        if (newExpandIcon) newExpandIcon.style.transform = 'rotate(90deg)';
+                    }
+                }
+            }
+            if (currentSelectedSim) {
+                const simButton = document.querySelector(`.sim-button[data-sim-name="${currentSelectedSim.name}"]`);
+                if (simButton) {
+                    simButton.classList.add('selected-sim');
+                }
+            }
+        }
+
+        function findSimByName(simName) {
+            for (const familyKey in simData.families) {
+                if (simData.families[familyKey].members) {
+                    const found = simData.families[familyKey].members.find(s => s.name === simName);
+                    if (found) return found;
+                }
+            }
+            if (simData.homelessSims) {
+                const found = simData.homelessSims.find(s => s.name === simName);
+                if (found) return found;
+            }
+            return null;
+        }
+
+        function selectSim(simName) {
+            let foundSim = findSimByName(simName);
+
+            if (!foundSim) {
+                console.error(`Sim with name '${simName}' not found.`);
+                hideAllContentSections();
+                return;
+            }
+
+            currentSelectedSim = foundSim;
+            // Find the family key of the selected sim to ensure correct highlighting in the sidebar
+            for (const familyKey in simData.families) {
+                if (familyKey === "worldInfo") continue;
+                if (familyKey === "homelessSims") {
+                    if (simData[familyKey] && simData[familyKey].find(s => s.name === simName)) {
+                        currentSelectedFamily = "homelessSims"; // Special key for homeless
+                        break;
+                    }
+                } else if (simData.families[familyKey].members && simData.families[familyKey].members.find(s => s.name === simName)) {
+                    currentSelectedFamily = familyKey;
+                    break;
+                }
+            }
+
+            updateFamilyList(); // Re-render the family list to apply selected states
+            hideAllContentSections();
+            displaySimDetails(currentSelectedSim);
+        }
+
+        function displaySimDetails(sim) {
+            const simDetailsSection = document.getElementById('simDetailsSection');
+            simDetailsSection.classList.remove('hidden');
+            document.getElementById('simNameDisplay').textContent = sim.name;
+            document.getElementById('simTitleDisplay').textContent = sim.title || '';
+            document.getElementById('simImage').src = sim.image || 'https://via.placeholder.com/400x225?text=Sim+Image';
+            document.getElementById('simBio').textContent = sim.bio;
+
+            const simQuoteBox = document.getElementById('simQuoteBox');
+            if (sim.quote) {
+                document.getElementById('simQuote').textContent = sim.quote;
+                document.getElementById('simQuoteSource').textContent = `- ${sim.quoteSource}`;
+                simQuoteBox.classList.remove('hidden');
+            } else {
+                simQuoteBox.classList.add('hidden');
+            }
+
+            document.getElementById('simStatus').textContent = sim.status;
+            document.getElementById('simStatus').className = `sim-stat-value-redesign status-${sim.status.toLowerCase()}`;
+            document.getElementById('simGender').textContent = sim.gender;
+            document.getElementById('simVoice').textContent = sim.voice;
+            document.getElementById('simWalkStyle').textContent = sim.walkStyle;
+            document.getElementById('simProfession').textContent = sim.profession;
+            document.getElementById('simEmployer').textContent = sim.employer;
+            document.getElementById('simSalary').textContent = sim.salary;
+            document.getElementById('simAspiration').textContent = sim.aspiration;
+            document.getElementById('simFamily').innerHTML = `<span class="partner-link" onclick="displayFamilyOverview('${sim.family}')">${sim.family}</span>`;
+            document.getElementById('simPartner').innerHTML = sim.partner ? `<span class="partner-link" onclick="selectSim('${sim.partner}')">${sim.partner}</span>` : 'None';
+
+            // Skills
+            const simSkillsContainer = document.getElementById('simSkills');
+            simSkillsContainer.innerHTML = '';
+            if (sim.skills) {
+                for (const skillName in sim.skills) {
+                    const skillValue = sim.skills[skillName];
+                    const skillItem = document.createElement('span');
+                    skillItem.classList.add('sim-skills-list-item');
+                    skillItem.innerHTML = `<span class="sim-skills-list-item-label">${skillName}:</span> <span class="sim-skills-list-item-value">${skillValue}</span>`;
+                    simSkillsContainer.appendChild(skillItem);
+                }
+            }
+
+            // Traits
+            const simTraitsContainer = document.getElementById('simTraits');
+            simTraitsContainer.innerHTML = '';
+            if (sim.traits) {
+                sim.traits.forEach(trait => {
+                    const traitItem = document.createElement('span');
+                    traitItem.classList.add('sim-trait-item-redesign');
+                    traitItem.textContent = trait;
+                    simTraitsContainer.appendChild(traitItem);
+                });
+            }
+
+            // Hobbies
+            const simHobbiesContainer = document.getElementById('simHobbies');
+            simHobbiesContainer.innerHTML = '';
+            if (sim.hobbies) {
+                sim.hobbies.forEach(hobby => {
+                    const hobbyItem = document.createElement('li');
+                    hobbyItem.textContent = hobby;
+                    simHobbiesContainer.appendChild(hobbyItem);
+                });
+            }
+
+            // Age Icons (assuming Font Awesome icons represent life stages)
+            const ageIconsContainer = document.getElementById('simAgeIcons');
+            ageIconsContainer.innerHTML = '';
+            const ageStages = {
+                "Baby": "fas fa-baby",
+                "Toddler": "fas fa-child",
+                "Child": "fas fa-person",
+                "Teen": "fas fa-user-graduate",
+                "Young Adult": "fas fa-user",
+                "Adult": "fas fa-user",
+                "Elder": "fas fa-person-cane"
+            };
+            for (const stage in ageStages) {
+                const icon = document.createElement('i');
+                icon.classList.add('age-icon', 'flex-shrink-0', ageStages[stage]);
+                if (sim.age === stage) {
+                    icon.classList.add('active-age-icon');
+                }
+                ageIconsContainer.appendChild(icon);
+            }
+
+            // Personality
+            const simPersonalityContainer = document.getElementById('simPersonality');
+            simPersonalityContainer.innerHTML = '';
+            if (sim.personality) {
+                for (const trait in sim.personality) {
+                    const value = sim.personality[trait];
+                    const personalityItem = document.createElement('div');
+                    personalityItem.classList.add('personality-item');
+                    personalityItem.innerHTML = `
+                        <span class="personality-item-label">${trait}:</span>
+                        <span class="personality-item-value ${value.toLowerCase()}">${value}</span>
+                    `;
+                    simPersonalityContainer.appendChild(personalityItem);
+                }
+            }
+        }
+
+        function displayFamilyOverview(familyNameKey) {
+            const family = simData.families[familyNameKey];
+            const familyOverviewSection = document.getElementById('familyOverviewSection');
+            familyOverviewSection.classList.remove('hidden');
+
+            document.querySelector('#familyOverviewSection .family-name-in-header').textContent = familyNameKey;
+            document.getElementById('familyLocation').textContent = family.location || 'N/A';
+            document.getElementById('familyNetWorth').textContent = family.netWorth || 'N/A';
+            document.getElementById('familyMemberCount').textContent = family.members ? family.members.length : 0;
+            document.getElementById('familyBio').textContent = family.bio || 'No family biography available.';
+
+            currentSelectedFamily = familyNameKey;
+            updateFamilyList(); // Ensure selected family is highlighted
+
+            hideAllContentSections();
+            familyOverviewSection.classList.remove('hidden'); // Show this section
+        }
+
+        function renderStories() {
+            const storiesSection = document.getElementById('storiesSection');
+            storiesSection.classList.remove('hidden');
+
+            const storiesGrid = storiesSection.querySelector('.stories-grid');
+            storiesGrid.innerHTML = ''; // Clear previous stories
+
+            simData.stories.forEach((story, index) => {
+                const storyDiv = document.createElement('div');
+                storyDiv.classList.add('story-list-item', 'p-4', 'cursor-pointer', 'border', 'border-border-color', 'rounded-md', 'shadow-sm');
+                storyDiv.innerHTML = `
+                    <h4 class="font-bold text-lg mb-2 text-link-color">${story.headline}</h4>
+                    <p class="text-sm line-clamp-3">${story.content}</p>
+                `;
+                storyDiv.addEventListener('click', () => displaySingleStory(index));
+                storiesGrid.appendChild(storyDiv);
+            });
+        }
+
+        function displaySingleStory(index) {
+            const story = simData.stories[index];
+            document.getElementById('storiesSection').classList.add('hidden');
+            const storyDisplayContent = document.getElementById('storyDisplayContent');
+            storyDisplayContent.classList.remove('hidden');
+
+            document.getElementById('storyHeadline').textContent = story.headline;
+            document.getElementById('storyImage').src = story.image || 'https://via.placeholder.com/600x338?text=Story+Image';
+            document.getElementById('storyContent').textContent = story.content;
+        }
+
+        let currentSortColumn = null;
+        let currentSortDirection = 'asc';
+
+        function renderSpreadsheet() {
+            const spreadsheetSection = document.getElementById('spreadsheetSection');
+            spreadsheetSection.classList.remove('hidden');
+
+            const simsTableBody = document.getElementById('simsTableBody');
+            simsTableBody.innerHTML = ''; // Clear existing rows
+
+            const allSims = [];
+            for (const familyKey in simData.families) {
+                if (simData.families[familyKey].members) {
+                    allSims.push(...simData.families[familyKey].members);
+                }
+            }
+            if (simData.homelessSims) {
+                allSims.push(...simData.homelessSims);
+            }
+
+            // Apply sorting
+            let sortedSims = [...allSims];
+            if (currentSortColumn) {
+                sortedSims.sort((a, b) => {
+                    let valA = a[currentSortColumn];
+                    let valB = b[currentSortColumn];
+
+                    if (currentSortColumn === 'skills' || currentSortColumn === 'traits') {
+                        valA = valA ? Object.keys(valA).length : 0;
+                        valB = valB ? Object.keys(valB).length : 0;
+                    }
+
+                    if (typeof valA === 'string' && typeof valB === 'string') {
+                        return currentSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                    }
+                    return currentSortDirection === 'asc' ? valA - valB : valB - valA;
+                });
+            }
+
+            sortedSims.forEach(sim => {
+                const row = simsTableBody.insertRow();
+                row.classList.add('hover:bg-button-hover-bg');
+
+                const nameCell = row.insertCell();
+                nameCell.innerHTML = `<span class="clickable-sim-name" onclick="selectSim('${sim.name}')">${sim.name}</span>`;
+                nameCell.classList.add('py-2', 'px-4', 'border');
+
+                const familyCell = row.insertCell();
+                familyCell.textContent = sim.family;
+                familyCell.classList.add('py-2', 'px-4', 'border');
+
+                const ageCell = row.insertCell();
+                ageCell.textContent = sim.age;
+                ageCell.classList.add('py-2', 'px-4', 'border');
+
+                const statusCell = row.insertCell();
+                statusCell.textContent = sim.status;
+                statusCell.classList.add('py-2', 'px-4', 'border', `status-${sim.status.toLowerCase()}`);
+
+                const professionCell = row.insertCell();
+                professionCell.textContent = sim.profession;
+                professionCell.classList.add('py-2', 'px-4', 'border');
+
+                const skillsCell = row.insertCell();
+                skillsCell.textContent = sim.skills ? Object.keys(sim.skills).join(', ') : 'N/A';
+                skillsCell.classList.add('py-2', 'px-4', 'border');
+
+                const traitsCell = row.insertCell();
+                traitsCell.textContent = sim.traits ? sim.traits.join(', ') : 'N/A';
+                traitsCell.classList.add('py-2', 'px-4', 'border');
+            });
+
+            // Add sort event listeners to headers
+            document.querySelectorAll('.sortable-th').forEach(header => {
+                header.removeEventListener('click', handleSortClick); // Remove old listener to prevent duplicates
+                header.addEventListener('click', handleSortClick);
+            });
+            updateSortIcons();
+        }
+
+        function handleSortClick(event) {
+            const column = event.currentTarget.dataset.sort;
+            if (currentSortColumn === column) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortColumn = column;
+                currentSortDirection = 'asc';
+            }
+            renderSpreadsheet(); // Re-render table with new sort order
+        }
+
+        function updateSortIcons() {
+            document.querySelectorAll('.sortable-th').forEach(header => {
+                header.classList.remove('asc', 'desc');
+                if (header.dataset.sort === currentSortColumn) {
+                    header.classList.add(currentSortDirection);
+                }
+            });
+        }
+
+        function renderGraveyard() {
+            const graveyardSection = document.getElementById('graveyardSection');
+            graveyardSection.classList.remove('hidden');
+
+            const graveyardList = document.getElementById('graveyardList');
+            graveyardList.innerHTML = ''; // Clear previous items
+
+            if (simData.graveyard && simData.graveyard.length > 0) {
+                simData.graveyard.forEach(sim => {
+                    const graveyardItem = document.createElement('div');
+                    graveyardItem.classList.add('graveyard-item', 'p-4', 'border', 'border-border-color', 'rounded-md', 'shadow-sm', 'flex', 'flex-col', 'items-center', 'text-center');
+                    graveyardItem.innerHTML = `
+                        <i class="fas fa-cross graveyard-icon mb-2 text-status-dead"></i>
+                        <h5 class="font-bold text-lg mb-1">${sim.name}</h5>
+                        <p class="text-sm text-text-primary">Died of: ${sim.causeOfDeath}</p>
+                        <p class="text-xs text-gray-600 mt-2 line-clamp-3">${sim.bio}</p>
+                    `;
+                    graveyardList.appendChild(graveyardItem);
+                });
+            } else {
+                graveyardList.innerHTML = '<p class="col-span-full text-center text-text-primary">No Sims in the graveyard.</p>';
+            }
+        }
+
+        function renderHomelessSims() {
+            const homelessSimsSection = document.getElementById('homelessSimsSection');
+            homelessSimsSection.classList.remove('hidden');
+
+            const homelessSimsList = document.getElementById('homelessSimsList');
+            homelessSimsList.innerHTML = ''; // Clear previous items
+
+            if (simData.homelessSims && simData.homelessSims.length > 0) {
+                simData.homelessSims.forEach(sim => {
+                    const homelessItem = document.createElement('div');
+                    homelessItem.classList.add('homeless-sim-item', 'p-4', 'border', 'border-border-color', 'rounded-md', 'shadow-sm', 'flex', 'flex-col', 'items-center', 'text-center', 'cursor-pointer');
+                    homelessItem.innerHTML = `
+                        <i class="fas fa-house-damage sim-stat-icon mb-2 text-link-color"></i>
+                        <h5 class="font-bold text-lg mb-1">${sim.name}</h5>
+                        <p class="text-sm text-text-primary">Profession: ${sim.profession}</p>
+                        <p class="text-xs text-gray-600 mt-2 line-clamp-3">${sim.bio}</p>
+                    `;
+                    homelessItem.addEventListener('click', () => selectSim(sim.name));
+                    homelessSimsList.appendChild(homelessItem);
+                });
+            } else {
+                homelessSimsList.innerHTML = '<p class="col-span-full text-center text-text-primary">No homeless Sims found.</p>';
+            }
+        }
+
+        function renderNotes() {
+            const notesSection = document.getElementById('notesSection');
+            notesSection.classList.remove('hidden');
+
+            const notesContent = document.getElementById('notesContent');
+            notesContent.innerHTML = `<p>${simData.notes}</p>`; // Display notes from simData
+        }
+    </script>
+</body>
+</html>
