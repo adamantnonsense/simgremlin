@@ -1277,7 +1277,7 @@
                     </div>
                 </div>
                 <div id="storyDisplayContent" class="sleek-panel hidden flex-col flex-grow">
-                    <h2 class="text-2xl font-bold mb-4 flex items-center relative z-20">
+                    <h2 id="storyListHeader" class="text-2xl font-bold mb-4 flex items-center relative z-20">
                         Neighborhood Stories
                     </h2>
                     <div id="storyListContainer" class="">
@@ -1288,9 +1288,13 @@
                         <button class="story-back-button px-4 py-2 rounded-md" onclick="showStoryList()">
                             <i class="fas fa-arrow-left mr-2"></i>Back to Stories
                         </button>
+                        <h3 id="singleStoryHeadline" class="text-2xl font-bold mb-4 text-center"></h3>
                         <div class="story-image-container" onclick="openImageModal(document.getElementById('storyImage').src)">
                             <img id="storyImage" src="https://placehold.co/400x225/EF5350/E2E8F0?text=Story%20Image" alt="Story Image" class="w-full h-full object-cover rounded-md">
                         </div>
+                        <!-- New link for 16:9 photo -->
+                        <a id="storyImageLink" href="#" target="_blank" class="block text-center text-link-color underline mt-2 mb-4 hidden">View Full Size Image</a>
+                        
                         <div id="storyContent" class="story-single-content-in-card p-4 rounded-md text-base leading-relaxed">
                         </div>
                     </div>
@@ -1724,11 +1728,16 @@
             const storyList = document.getElementById('storyList');
             const storyListContainer = document.getElementById('storyListContainer');
             const singleStoryContainer = document.getElementById('singleStoryContainer');
+            const storyListHeader = document.getElementById('storyListHeader');
 
             storyDisplayContent.classList.remove('hidden');
             storyDisplayContent.classList.add('flex');
             storyListContainer.classList.remove('hidden');
             singleStoryContainer.classList.add('hidden');
+            storyListHeader.textContent = "Neighborhood Stories"; // Ensure list header is correct
+            storyListHeader.classList.remove('hidden');
+            document.getElementById('singleStoryHeadline').classList.add('hidden'); // Hide single story headline
+
             storyList.innerHTML = '';
 
             if (neighborhoodStories && neighborhoodStories.length > 0) {
@@ -1749,14 +1758,37 @@
         function showSingleStory(story) {
             document.getElementById('storyListContainer').classList.add('hidden');
             document.getElementById('singleStoryContainer').classList.remove('hidden');
+            document.getElementById('storyListHeader').classList.add('hidden'); // Hide general list header
+
+            const singleStoryHeadline = document.getElementById('singleStoryHeadline');
+            singleStoryHeadline.textContent = story.headline; // Set headline to article name
+            singleStoryHeadline.classList.remove('hidden'); // Show story headline
+
             const storyImageContainer = document.querySelector('#singleStoryContainer .story-image-container');
             storyImageContainer.onclick = () => openImageModal(document.getElementById('storyImage').src);
             const storyImageElement = document.getElementById('storyImage');
+            const storyImageLink = document.getElementById('storyImageLink');
             
-            const encodedHeadlineForImage = encodeURIComponent(story.headline);
-            storyImageElement.src = `https://placehold.co/400x225/${encodeURIComponent('DCC29F')}/${encodeURIComponent('3A3A3A')}?text=Story%20Image%0A${encodedHeadlineForImage.substring(0, 30)}...`;
+            let imageUrlToDisplay = '';
+            if (story.imageUrl169) {
+                imageUrlToDisplay = story.imageUrl169;
+            } else {
+                // Fallback to a placeholder if no specific image URL is provided in story data
+                const encodedHeadlineForImage = encodeURIComponent(story.headline);
+                imageUrlToDisplay = `https://placehold.co/400x225/${encodeURIComponent('DCC29F')}/${encodeURIComponent('3A3A3A')}?text=Story%20Image%0A${encodedHeadlineForImage.substring(0, 30)}...`;
+            }
+            
+            storyImageElement.src = imageUrlToDisplay;
             storyImageElement.alt = story.headline;
             storyImageElement.classList.remove('hidden');
+
+            // Set up the "View Full Size Image" link
+            if (imageUrlToDisplay) {
+                storyImageLink.href = imageUrlToDisplay;
+                storyImageLink.classList.remove('hidden');
+            } else {
+                storyImageLink.classList.add('hidden');
+            }
             
             document.getElementById('storyContent').textContent = story.content;
             
@@ -1766,6 +1798,11 @@
         function showStoryList() {
             document.getElementById('storyListContainer').classList.remove('hidden');
             document.getElementById('singleStoryContainer').classList.add('hidden');
+            document.getElementById('storyListHeader').textContent = "Neighborhood Stories"; // Revert to general list header
+            document.getElementById('storyListHeader').classList.remove('hidden');
+            document.getElementById('singleStoryHeadline').classList.add('hidden'); // Hide single story headline
+            document.getElementById('storyImageLink').classList.add('hidden'); // Hide the image link
+
             document.getElementById('storyList').classList.add('max-h-96', 'scrollable-list');
         }
 
@@ -1991,7 +2028,8 @@
                 const data = parseCsvGeneric(csvText, [
                     'Name', 'Title', 'Image', 'Bio', 'Age', 'Gender', 'Status', 'Occult Status',
                     'Career', 'Career Level', 'Aspiration', 'Zodiac', 'Partners', 'Parents',
-                    'Children', 'Skills', 'Traits', 'Hobbies', 'Notes', 'Personality', 'Family Name'
+                    'Children', 'Skills', 'Traits', 'Hobbies', 'Notes', 'Personality', 'Family Name',
+                    'Image_Baby', 'Image_Toddler', 'Image_Child', 'Image_Teen', 'Image_YoungAdult', 'Image_Adult', 'Image_Elder'
                 ]);
 
                 data.forEach(row => {
@@ -2087,10 +2125,11 @@
                 const response = await fetch(csvUrl);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for Stories Sheet (GID: ${STORIES_GID})`);
                 const csvText = await response.text();
-                const data = parseCsvGeneric(csvText, ['Story Headline', 'Story Content']);
+                const data = parseCsvGeneric(csvText, ['Story Headline', 'Story Content', 'Story Image 16:9 URL']);
                 return data.map(row => ({
                     headline: row['Story Headline'],
-                    content: row['Story Content']
+                    content: row['Story Content'],
+                    imageUrl169: row['Story Image 16:9 URL'] || '' // New field for the 16:9 image
                 })).filter(story => story.headline && story.content); // Filter out empty stories
             } catch (error) {
                 console.error("Error loading Neighborhood Stories CSV:", error);
