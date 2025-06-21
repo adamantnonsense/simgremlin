@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+
+// --- Mock Data Definitions ---
 
 // Helper function to get mock Sim Biographies data
 const getMockSimsData = () => [
@@ -290,7 +292,7 @@ const getMockSimsData = () => [
     personalityShyOutgoing: 'Shy',
     personalityLazyActive: 'Lazy',
     personalitySeriousPlayful: 'Serious',
-    personalityGrouchyNice: 'Grouchy',
+    personalityGrouchyNice: 'Nice',
     favoriteFood: 'Plasma Pack',
     favoriteMusic: 'Classical',
     favoriteColor: 'Black',
@@ -477,31 +479,1324 @@ const getMockSimsData = () => [
     turnOff: 'Mean Sims',
     fullName: 'Caleb Vatore'
   },
+  {
+    id: 'sim-9',
+    firstName: 'Eliza',
+    name: 'Pancake',
+    household: 'Pancakes family',
+    imageYoungAdult: 'https://placehold.co/200x250/EC4899/ffffff?text=Eliza+Pancake',
+    imageAdult: 'https://placehold.co/80x80/DB2777/ffffff?text=A',
+    title: 'Ambitious Homemaker',
+    bio: 'Eliza Pancake is an ambitious sim who craves more from life than domestic bliss. While she loves her husband Bob, she often feels unfulfilled and dreams of a successful career. She struggles with Bob\'s laid-back nature and tries to motivate him.',
+    notes: 'Dreams of a promotion. Often found cleaning. Secretly wishes Bob would take her on more dates.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Adult',
+    zodiac: 'Libra',
+    aspiration: 'Popularity',
+    lifetimeWish: 'Become a Business Tycoon',
+    aspirationSims4: 'Fabulously Wealthy',
+    career: 'Business',
+    careerLvl: 6,
+    maritalStatus: 'Married',
+    partners: ['Bob Pancake'],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Logic',
+    skill1Lvl: 7,
+    skill2: 'Charisma',
+    skill2Lvl: 6,
+    skill3: 'Cooking',
+    skill3Lvl: 4,
+    traits: ['Neat', 'Materialistic', 'Noncommittal', 'Ambitious'],
+    bonusTrait: 'Business Savvy',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Shy',
+    personalityLazyActive: 'Active',
+    personalitySeriousPlayful: 'Serious',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Garden Salad',
+    favoriteMusic: 'Country',
+    favoriteColor: 'Green',
+    interest1: 'Business',
+    interest1Lvl: 8,
+    dislikedInterest1: 'Video Gaming',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Cleaning',
+    skinColor: 'Light',
+    hairColor: 'Blonde',
+    fitness: 'Average',
+    eyeColor: 'Blue',
+    turnOn1: 'Formal Wear',
+    turnOn2: 'Ambitious Sims',
+    turnOff: 'Sloppy Sims',
+    fullName: 'Eliza Pancake'
+  },
+  {
+    id: 'sim-10',
+    firstName: 'Bob',
+    name: 'Pancake',
+    household: 'Pancakes family',
+    imageYoungAdult: 'https://placehold.co/200x250/6EE7B7/ffffff?text=Bob+Pancake',
+    imageAdult: 'https://placehold.co/80x80/6EE7B7/ffffff?text=A',
+    title: 'Laid-back Chef',
+    bio: 'Bob Pancake is a cheerful and laid-back Sim who loves cooking and video games. He enjoys a quiet life at home and is often oblivious to his wife Eliza\'s ambitions. He is a talented cook, but his messy habits can sometimes annoy Eliza.',
+    notes: 'Obsessed with grilled cheese. Loves watching cooking shows. Tries to avoid arguments with Eliza.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Male',
+    age: 'Adult',
+    zodiac: 'Taurus',
+    aspiration: 'Food',
+    lifetimeWish: 'Master Chef',
+    aspirationSims4: 'Master Chef',
+    career: 'Culinary',
+    careerLvl: 7,
+    maritalStatus: 'Married',
+    partners: ['Eliza Pancake'],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Cooking',
+    skill1Lvl: 10,
+    skill2: 'Comedy',
+    skill2Lvl: 5,
+    skill3: 'Video Gaming',
+    skill3Lvl: 8,
+    traits: ['Sloppy', 'Glutton', 'Lazy', 'Good'],
+    bonusTrait: 'Essence of Flavor',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Grilled Cheese',
+    favoriteMusic: 'Alternative',
+    favoriteColor: 'Red',
+    interest1: 'Cooking',
+    interest1Lvl: 9,
+    dislikedInterest1: 'Cleaning',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Cooking',
+    skinColor: 'Medium',
+    hairColor: 'Brown',
+    fitness: 'Overweight',
+    eyeColor: 'Brown',
+    turnOn1: 'Cooking Skill',
+    turnOn2: 'Casual Wear',
+    turnOff: 'Neat Sims',
+    fullName: 'Bob Pancake'
+  },
+  {
+    id: 'sim-11',
+    firstName: 'Nancy',
+    name: 'Landgraab',
+    household: 'Landgraab family',
+    imageYoungAdult: 'https://placehold.co/200x250/F87171/ffffff?text=Nancy+Landgraab',
+    imageAdult: 'https://placehold.co/80x80/F87171/ffffff?text=A',
+    title: 'Business Mogul',
+    bio: 'Nancy Landgraab is the powerful and ruthless matriarch of the wealthy Landgraab family. She is highly ambitious and focuses on maintaining her family\'s immense fortune and social standing. She has a complicated relationship with her son, Malcolm, and a strained one with her husband, Geoffrey.',
+    notes: 'Controls most of Oasis Springs. Known for her cunning business deals. Has a hidden safe full of Simoleons.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Adult',
+    zodiac: 'Aries',
+    aspiration: 'Wealth',
+    lifetimeWish: 'Become a Celebrity',
+    aspirationSims4: 'Mansion Baron',
+    career: 'Business',
+    careerLvl: 10,
+    maritalStatus: 'Married',
+    partners: ['Geoffrey Landgraab'],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: ['Malcolm Landgraab'],
+    skill1: 'Charisma',
+    skill1Lvl: 10,
+    skill2: 'Logic',
+    skill2Lvl: 8,
+    skill3: 'Mischief',
+    skill3Lvl: 6,
+    traits: ['Snob', 'Materialistic', 'Ambitious', 'Mean', 'Evil'],
+    bonusTrait: 'Shrewd',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Serious',
+    personalityGrouchyNice: 'Grouchy',
+    favoriteFood: 'Ambrosia',
+    favoriteMusic: 'Classical',
+    favoriteColor: 'Red',
+    interest1: 'Business',
+    interest1Lvl: 10,
+    dislikedInterest1: 'Gardening',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Investing',
+    skinColor: 'Light',
+    hairColor: 'Blonde',
+    fitness: 'Average',
+    eyeColor: 'Blue',
+    turnOn1: 'Wealth',
+    turnOn2: 'Formal Wear',
+    turnOff: 'Poverty',
+    fullName: 'Nancy Landgraab'
+  },
+  {
+    id: 'sim-12',
+    firstName: 'Geoffrey',
+    name: 'Landgraab',
+    household: 'Landgraab family',
+    imageYoungAdult: 'https://placehold.co/200x250/22C55E/ffffff?text=Geoffrey+Landgraab',
+    imageAdult: 'https://placehold.co/80x80/22C55E/ffffff?text=A',
+    title: 'Good-Hearted Businessman',
+    bio: 'Geoffrey Landgraab is the kind-hearted and somewhat overshadowed husband of Nancy Landgraab. Despite his family\'s ruthless reputation, Geoffrey strives to be a good person, often doing charity work and trying to mediate family conflicts. He loves his son Malcolm deeply.',
+    notes: 'Secretly enjoys gardening. Wishes his family was closer. Donates to various causes anonymously.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Male',
+    age: 'Adult',
+    zodiac: 'Pisces',
+    aspiration: 'Family',
+    lifetimeWish: 'Have a Perfect Garden',
+    aspirationSims4: 'Good Super Parent',
+    career: 'Secret Agent (Good Branch)',
+    careerLvl: 8,
+    maritalStatus: 'Married',
+    partners: ['Nancy Landgraab'],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: ['Malcolm Landgraab'],
+    skill1: 'Gardening',
+    skill1Lvl: 9,
+    skill2: 'Charisma',
+    skill2Lvl: 7,
+    skill3: 'Logic',
+    skill3Lvl: 5,
+    traits: ['Good', 'Family-Oriented', 'Ambitious', 'Active'],
+    bonusTrait: 'Gregarious',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Tofu Scramble',
+    favoriteMusic: 'Jazz',
+    favoriteColor: 'Blue',
+    interest1: 'Gardening',
+    interest1Lvl: 10,
+    dislikedInterest1: 'Mischief',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Gardening',
+    skinColor: 'Light',
+    hairColor: 'Brown',
+    fitness: 'Fit',
+    eyeColor: 'Green',
+    turnOn1: 'Good Sims',
+    turnOn2: 'Family-Oriented Sims',
+    turnOff: 'Mean Sims',
+    fullName: 'Geoffrey Landgraab'
+  },
+  {
+    id: 'sim-13',
+    firstName: 'Malcolm',
+    name: 'Landgraab',
+    household: 'Landgraab family',
+    imageYoungAdult: 'https://placehold.co/200x250/60A5FA/ffffff?text=Malcolm+Landgraab',
+    imageAdult: 'https://placehold.co/80x80/60A5FA/ffffff?text=A',
+    title: 'Spoiled Heir',
+    bio: 'Malcolm Landgraab is the spoiled and mischievous heir to the Landgraab fortune. He enjoys tormenting other Sims and leveraging his family\'s wealth and influence to get what he wants. Despite his bad behavior, he seeks his parents\' approval, especially his mother\'s.',
+    notes: 'Enjoys pranking others. Spends money lavishly. Has a secret crush on Cassandra Goth.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Male',
+    age: 'Young Adult',
+    zodiac: 'Leo',
+    aspiration: 'Deviance',
+    lifetimeWish: 'Become a Villain',
+    aspirationSims4: 'Public Enemy',
+    career: 'Criminal',
+    careerLvl: 4,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: [],
+    parent1: 'Nancy Landgraab',
+    parent2: 'Geoffrey Landgraab',
+    children: [],
+    skill1: 'Mischief',
+    skill1Lvl: 7,
+    skill2: 'Logic',
+    skill2Lvl: 5,
+    skill3: 'Charisma',
+    skill3Lvl: 4,
+    traits: ['Snob', 'Evil', 'Mean', 'Genius'],
+    bonusTrait: 'Master of Mischief',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Grouchy',
+    favoriteFood: 'Tacos',
+    favoriteMusic: 'Spooky',
+    favoriteColor: 'Black',
+    interest1: 'Mischief',
+    interest1Lvl: 9,
+    dislikedInterest1: 'Good Deeds',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Video Gaming',
+    skinColor: 'Light',
+    hairColor: 'Black',
+    fitness: 'Average',
+    eyeColor: 'Brown',
+    turnOn1: 'Mean Sims',
+    turnOn2: 'Wealth',
+    turnOff: 'Good Sims',
+    fullName: 'Malcolm Landgraab'
+  },
+  {
+    id: 'sim-14',
+    firstName: 'Summer',
+    name: 'Holiday',
+    household: 'BFF household',
+    imageYoungAdult: 'https://placehold.co/200x250/DB2777/ffffff?text=Summer+Holiday',
+    title: 'Fun-Loving Friend',
+    bio: 'Summer Holiday is the cheerful and outgoing member of the BFF household. She loves parties, socializing, and making new friends. She is fiercely loyal to Liberty Lee and Travis Scott and always tries to lift their spirits.',
+    notes: 'Always up for an adventure. Loves taking selfies. Has a crush on Travis Scott.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Young Adult',
+    zodiac: 'Gemini',
+    aspiration: 'Popularity',
+    lifetimeWish: 'Become a Friend of the World',
+    aspirationSims4: 'Friend of the World',
+    career: 'Retail (Part-time)',
+    careerLvl: 3,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Charisma',
+    skill1Lvl: 6,
+    skill2: 'Comedy',
+    skill2Lvl: 4,
+    skill3: 'Dancing',
+    skill3Lvl: 5,
+    traits: ['Cheerful', 'Outgoing', 'Good', 'Active'],
+    bonusTrait: 'Gregarious',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Pizza',
+    favoriteMusic: 'Pop',
+    favoriteColor: 'Pink',
+    interest1: 'Parties',
+    interest1Lvl: 8,
+    dislikedInterest1: 'Studying',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Socializing',
+    skinColor: 'Medium',
+    hairColor: 'Brown',
+    fitness: 'Fit',
+    eyeColor: 'Brown',
+    turnOn1: 'Good Sense of Humor',
+    turnOn2: 'Outgoing Sims',
+    turnOff: 'Gloomy Sims',
+    fullName: 'Summer Holiday'
+  },
+  {
+    id: 'sim-15',
+    firstName: 'Travis',
+    name: 'Scott',
+    household: 'BFF household',
+    imageYoungAdult: 'https://placehold.co/200x250/C026D3/ffffff?text=Travis+Scott',
+    title: 'Geeky Gamer',
+    bio: 'Travis Scott is the resident geek and gamer of the BFF household. He enjoys video games, coding, and all things tech. He is a bit shy but loyal to his friends, Summer Holiday and Liberty Lee, and often tries to offer logical solutions to their problems.',
+    notes: 'Spends most of his time gaming. Dreams of becoming a professional e-sports player. Secretly admires Summer Holiday.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Male',
+    age: 'Young Adult',
+    zodiac: 'Virgo',
+    aspiration: 'Knowledge',
+    lifetimeWish: 'Become a Master Gamer',
+    aspirationSims4: 'Computer Whiz',
+    career: 'Tech Guru (Esports Competitor Branch)',
+    careerLvl: 4,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Video Gaming',
+    skill1Lvl: 8,
+    skill2: 'Programming',
+    skill2Lvl: 6,
+    skill3: 'Logic',
+    skill3Lvl: 5,
+    traits: ['Geek', 'Bookworm', 'Clumsy', 'Loves Outdoors'],
+    bonusTrait: 'Handy',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Shy',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Serious',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Pizza',
+    favoriteMusic: 'Electronica',
+    favoriteColor: 'Blue',
+    interest1: 'Video Gaming',
+    interest1Lvl: 9,
+    dislikedInterest1: 'Fitness',
+    dislikedInterest1Lvl: 2,
+    hobby: 'Video Gaming',
+    skinColor: 'Light',
+    hairColor: 'Brown',
+    fitness: 'Average',
+    eyeColor: 'Brown',
+    turnOn1: 'Geeks',
+    turnOn2: 'Intellectual Sims',
+    turnOff: 'Active Sims',
+    fullName: 'Travis Scott'
+  },
+  {
+    id: 'sim-16',
+    firstName: 'Liberty',
+    name: 'Lee',
+    household: 'BFF household',
+    imageYoungAdult: 'https://placehold.co/200x250/9333EA/ffffff?text=Liberty+Lee',
+    title: 'Creative Aspiring Artist',
+    bio: 'Liberty Lee is the sweet and slightly naive member of the BFF household. She is an aspiring artist who dreams of making a name for herself in the art world. She is supportive of her friends, Summer Holiday and Travis Scott, and often acts as the peacemaker.',
+    notes: 'Constantly doodling. Dreams of painting a masterpiece. A bit of a hopeless romantic.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Young Adult',
+    zodiac: 'Pisces',
+    aspiration: 'Creativity',
+    lifetimeWish: 'Become a Master Painter',
+    aspirationSims4: 'Painter Extraordinaire',
+    career: 'Painter',
+    careerLvl: 3,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Painting',
+    skill1Lvl: 7,
+    skill2: 'Creativity',
+    skill2Lvl: 6,
+    skill3: 'Charisma',
+    skill3Lvl: 4,
+    traits: ['Creative', 'Good', 'Clumsy', 'Loves Outdoors'],
+    bonusTrait: 'Muser',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Shy',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Cupcakes',
+    favoriteMusic: 'Classical',
+    favoriteColor: 'Purple',
+    interest1: 'Art',
+    interest1Lvl: 8,
+    dislikedInterest1: 'Logic',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Painting',
+    skinColor: 'Light',
+    hairColor: 'Blonde',
+    fitness: 'Average',
+    eyeColor: 'Green',
+    turnOn1: 'Artistic Sims',
+    turnOn2: 'Good Sims',
+    turnOff: 'Mean Sims',
+    fullName: 'Liberty Lee'
+  },
+  {
+    id: 'sim-17',
+    firstName: 'Bob',
+    name: 'Newbie',
+    household: 'Newbie family',
+    imageAdult: 'https://placehold.co/200x250/EC4899/ffffff?text=Bob+Newbie',
+    title: 'Classic Starter Sim',
+    bio: 'Bob Newbie is a classic Sim from earlier generations, known for his humble beginnings and approachable nature. He often finds himself in everyday situations and enjoys simple pleasures like gardening and spending time with his family.',
+    notes: 'Loves fishing. Trying to master the guitar. Occasionally gets abducted by aliens.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Male',
+    age: 'Adult',
+    zodiac: 'Leo',
+    aspiration: 'Family',
+    lifetimeWish: 'Have a Great Family',
+    aspirationSims4: 'Successful Lineage',
+    career: 'Culinary',
+    careerLvl: 5,
+    maritalStatus: 'Married',
+    partners: ['Betty Newbie'],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: ['Bob Jr. Newbie'],
+    skill1: 'Cooking',
+    skill1Lvl: 7,
+    skill2: 'Gardening',
+    skill2Lvl: 6,
+    skill3: 'Guitar',
+    skill3Lvl: 4,
+    traits: ['Good', 'Family-Oriented', 'Clumsy', 'Foodie'],
+    bonusTrait: 'Domestic',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Grilled Cheese',
+    favoriteMusic: 'Country',
+    favoriteColor: 'Green',
+    interest1: 'Gardening',
+    interest1Lvl: 7,
+    dislikedInterest1: 'Mischief',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Fishing',
+    skinColor: 'Light',
+    hairColor: 'Brown',
+    fitness: 'Average',
+    eyeColor: 'Blue',
+    turnOn1: 'Cooking Skill',
+    turnOn2: 'Family-Oriented Sims',
+    turnOff: 'Mean Sims',
+    fullName: 'Bob Newbie'
+  },
+  {
+    id: 'sim-18',
+    firstName: 'Betty',
+    name: 'Newbie',
+    household: 'Newbie family',
+    imageAdult: 'https://placehold.co/200x250/DB2777/ffffff?text=Betty+Newbie',
+    title: 'Classic Starter Sim',
+    bio: 'Betty Newbie is a classic Sim, known for her friendly demeanor and desire for a peaceful family life. She enjoys building relationships and making her home a comfortable place for her family. She is often the anchor for Bob\'s quirky tendencies.',
+    notes: 'Loves hosting dinner parties. Dreams of a perfect family. Always supports Bob.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Adult',
+    zodiac: 'Cancer',
+    aspiration: 'Family',
+    lifetimeWish: 'Have 10 Best Friends',
+    aspirationSims4: 'Successful Lineage',
+    career: 'Education',
+    careerLvl: 5,
+    maritalStatus: 'Married',
+    partners: ['Bob Newbie'],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: ['Bob Jr. Newbie'],
+    skill1: 'Charisma',
+    skill1Lvl: 7,
+    skill2: 'Parenting',
+    skill2Lvl: 6,
+    skill3: 'Cooking',
+    skill3Lvl: 5,
+    traits: ['Good', 'Family-Oriented', 'Outgoing', 'Loyal'],
+    bonusTrait: 'Responsible',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Spaghetti',
+    favoriteMusic: 'Pop',
+    favoriteColor: 'Yellow',
+    interest1: 'Relationships',
+    interest1Lvl: 8,
+    dislikedInterest1: 'Fighting',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Socializing',
+    skinColor: 'Light',
+    hairColor: 'Blonde',
+    fitness: 'Average',
+    eyeColor: 'Brown',
+    turnOn1: 'Friendly Sims',
+    turnOn2: 'Good Sense of Humor',
+    turnOff: 'Mean Sims',
+    fullName: 'Betty Newbie'
+  },
+  {
+    id: 'sim-19',
+    firstName: 'Bob Jr.',
+    name: 'Newbie',
+    household: 'Newbie family',
+    imageChild: 'https://placehold.co/200x250/C026D3/ffffff?text=Bob+Jr.+Newbie',
+    title: 'Curious Child',
+    bio: 'Bob Jr. Newbie is the energetic and curious son of Bob and Betty. He loves playing outdoors and exploring his neighborhood, often getting into small adventures. He is an imaginative child with a bright future.',
+    notes: 'Loves playing with toys. Dreams of being an astronaut. Sometimes gets lost on his way home from school.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Male',
+    age: 'Child',
+    zodiac: 'Cancer',
+    aspiration: 'Creativity',
+    lifetimeWish: 'Become a Space Ranger',
+    aspirationSims4: 'Whiz Kid',
+    career: 'Grade School Student',
+    careerLvl: null,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: [],
+    parent1: 'Bob Newbie',
+    parent2: 'Betty Newbie',
+    children: [],
+    skill1: 'Creativity',
+    skill1Lvl: 6,
+    skill2: 'Motor',
+    skill2Lvl: 5,
+    skill3: 'Mental',
+    skill3Lvl: 4,
+    traits: ['Active', 'Good', 'Childish'],
+    bonusTrait: 'Muser',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Fish Sticks',
+    favoriteMusic: 'Kids',
+    favoriteColor: 'Orange',
+    interest1: 'Toys',
+    interest1Lvl: 7,
+    dislikedInterest1: 'Chores',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Playing',
+    skinColor: 'Light',
+    hairColor: 'Brown',
+    fitness: 'Average',
+    eyeColor: 'Blue',
+    turnOn1: null,
+    turnOn2: null,
+    turnOff: null,
+    fullName: 'Bob Jr. Newbie'
+  },
+  {
+    id: 'sim-20',
+    firstName: 'Willow',
+    name: 'Creek',
+    household: 'Solo household',
+    imageYoungAdult: 'https://placehold.co/200x250/9333EA/ffffff?text=Willow+Creek',
+    title: 'New Resident',
+    bio: 'Willow Creek is a new resident to the neighborhood, eager to make new friends and establish herself. She is friendly and open, always ready to explore new opportunities and embrace challenges. She is currently searching for her true calling.',
+    notes: 'Loves to garden. Looking for a new hobby. Enjoys long walks in the park.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Young Adult',
+    zodiac: 'Leo',
+    aspiration: 'Popularity',
+    lifetimeWish: 'Become a Friend of the World',
+    aspirationSims4: 'Good',
+    career: 'Unemployed',
+    careerLvl: null,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Gardening',
+    skill1Lvl: 3,
+    skill2: 'Charisma',
+    skill2Lvl: 2,
+    skill3: 'Cooking',
+    skill3Lvl: 1,
+    traits: ['Good', 'Outgoing', 'Loves Outdoors'],
+    bonusTrait: 'Gregarious',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Garden Salad',
+    favoriteMusic: 'Pop',
+    favoriteColor: 'Green',
+    interest1: 'Gardening',
+    interest1Lvl: 5,
+    dislikedInterest1: 'Video Gaming',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Gardening',
+    skinColor: 'Light',
+    hairColor: 'Brown',
+    fitness: 'Average',
+    eyeColor: 'Green',
+    turnOn1: null,
+    turnOn2: null,
+    turnOff: null,
+    fullName: 'Willow Creek'
+  },
+  {
+    id: 'sim-21',
+    firstName: 'Dustin',
+    name: 'Broke',
+    household: 'Broke household',
+    imageTeen: 'https://placehold.co/200x250/6D28D9/ffffff?text=Dustin+Broke',
+    title: 'Rebellious Teen',
+    bio: 'Dustin Broke is the rebellious teen from the Broke household. He often gets into trouble and struggles with authority, but deep down, he cares about his family. He dreams of making enough money to escape their impoverished life.',
+    notes: 'Skips school frequently. Has a secret crush. Wants to join the criminal career.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Male',
+    age: 'Teen',
+    zodiac: 'Scorpio',
+    aspiration: 'Deviance',
+    lifetimeWish: 'Become a Master Thief',
+    aspirationSims4: 'Public Enemy',
+    career: 'High School Student', // Part-time job in Criminal possible
+    careerLvl: null,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: [], // Can add siblings if Data supports
+    parent1: 'Brandie Broke',
+    parent2: 'Skip Broke (Deceased)',
+    children: [],
+    skill1: 'Mischief',
+    skill1Lvl: 6,
+    skill2: 'Charisma',
+    skill2Lvl: 3,
+    skill3: 'Fitness',
+    skill3Lvl: 4,
+    traits: ['Hot-Headed', 'Mean', 'Loves Outdoors', 'Rebellious'],
+    bonusTrait: 'Scoundrel',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Grouchy',
+    favoriteFood: 'Mac and Cheese',
+    favoriteMusic: 'Rock',
+    favoriteColor: 'Black',
+    interest1: 'Mischief',
+    interest1Lvl: 7,
+    dislikedInterest1: 'Authority',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Pranks',
+    skinColor: 'Light',
+    hairColor: 'Blonde',
+    fitness: 'Fit',
+    eyeColor: 'Blue',
+    turnOn1: 'Bad Boys/Girls',
+    turnOn2: 'Fitness',
+    turnOff: 'Neat Sims',
+    fullName: 'Dustin Broke'
+  },
+  {
+    id: 'sim-22',
+    firstName: 'Brandie',
+    name: 'Broke',
+    household: 'Broke household',
+    imageAdult: 'https://placehold.co/200x250/4C1D95/ffffff?text=Brandie+Broke',
+    title: 'Struggling Mother',
+    bio: 'Brandie Broke is a single mother doing her best to raise her children in challenging circumstances. Despite financial struggles, she remains optimistic and strives to provide a good life for her family. She is often exhausted but determined.',
+    notes: 'Works multiple jobs. Worries about her kids\' future. Dreams of winning the lottery.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Adult',
+    zodiac: 'Cancer',
+    aspiration: 'Family',
+    lifetimeWish: 'Have a Big Family',
+    aspirationSims4: 'Successful Lineage',
+    career: 'Retail (Part-time)',
+    careerLvl: 2,
+    maritalStatus: 'Widowed',
+    partners: ['Skip Broke'],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: ['Dustin Broke', 'Beau Broke'],
+    skill1: 'Parenting',
+    skill1Lvl: 6,
+    skill2: 'Cooking',
+    skill2Lvl: 5,
+    skill3: 'Charisma',
+    skill3Lvl: 4,
+    traits: ['Family-Oriented', 'Good', 'Cheerful', 'Ambitious'],
+    bonusTrait: 'Caregiver',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Tuna Casserole',
+    favoriteMusic: 'Country',
+    favoriteColor: 'Yellow',
+    interest1: 'Family',
+    interest1Lvl: 9,
+    dislikedInterest1: 'Business',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Watching TV',
+    skinColor: 'Light',
+    hairColor: 'Blonde',
+    fitness: 'Average',
+    eyeColor: 'Green',
+    turnOn1: 'Good Sense of Humor',
+    turnOn2: 'Family-Oriented Sims',
+    turnOff: 'Mean Sims',
+    fullName: 'Brandie Broke'
+  },
+  {
+    id: 'sim-23',
+    firstName: 'Katrina',
+    name: 'Caliente',
+    household: 'Caliente household',
+    imageAdult: 'https://placehold.co/200x250/3B0764/ffffff?text=Katrina+Caliente',
+    title: 'Flirty Matriarch',
+    bio: 'Katrina Caliente is the glamorous and flirtatious matriarch of the Caliente household, always seeking attention and excitement. She is the mother of Nina and Dina, and her life is often a whirlwind of drama and romance. She loves to entertain and be the center of attention.',
+    notes: 'Constantly looking for a rich Sim to marry. Loves to dance. Has many secrets.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Adult',
+    zodiac: 'Leo',
+    aspiration: 'Popularity',
+    lifetimeWish: 'Become a Celebrity',
+    aspirationSims4: 'Serial Romantic',
+    career: 'Entertainer (Comedian Branch)',
+    careerLvl: 5,
+    maritalStatus: 'Single', // Or Complicated
+    partners: [],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: ['Nina Caliente', 'Dina Caliente'],
+    skill1: 'Charisma',
+    skill1Lvl: 8,
+    skill2: 'Comedy',
+    skill2Lvl: 6,
+    skill3: 'Mischief',
+    skill3Lvl: 5,
+    traits: ['Romantic', 'Outgoing', 'Materialistic', 'Hot-Headed'],
+    bonusTrait: 'Alluring',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Tacos',
+    favoriteMusic: 'Latin',
+    favoriteColor: 'Red',
+    interest1: 'Romance',
+    interest1Lvl: 9,
+    dislikedInterest1: 'Cleaning',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Dancing',
+    skinColor: 'Tan',
+    hairColor: 'Red',
+    fitness: 'Fit',
+    eyeColor: 'Green',
+    turnOn1: 'Romantic Sims',
+    turnOn2: 'Wealth',
+    turnOff: 'Sloppy Sims',
+    fullName: 'Katrina Caliente'
+  },
+  {
+    id: 'sim-24',
+    firstName: 'Nina',
+    name: 'Caliente',
+    household: 'Caliente household',
+    imageYoungAdult: 'https://placehold.co/200x250/EC4899/ffffff?text=Nina+Caliente',
+    title: 'Flirty & Rebellious',
+    bio: 'Nina Caliente is one of the energetic and rebellious twin daughters of Katrina. She is flirty and outgoing, always ready for a good time. She often finds herself caught in romantic entanglements and has a competitive streak with her sister, Dina.',
+    notes: 'Often found at the bar. Has a complicated relationship with the Goths. Loves to party.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Young Adult',
+    zodiac: 'Scorpio',
+    aspiration: 'Popularity',
+    lifetimeWish: 'Become a Romance Guru',
+    aspirationSims4: 'Serial Romantic',
+    career: 'Unemployed', // or Mixologist
+    careerLvl: null,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: ['Dina Caliente'],
+    parent1: 'Katrina Caliente',
+    parent2: null,
+    children: [],
+    skill1: 'Charisma',
+    skill1Lvl: 7,
+    skill2: 'Dancing',
+    skill2Lvl: 6,
+    skill3: 'Mixology',
+    skill3Lvl: 5,
+    traits: ['Romantic', 'Outgoing', 'Hot-Headed', 'Active'],
+    bonusTrait: 'Alluring',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Tacos',
+    favoriteMusic: 'Latin',
+    favoriteColor: 'Red',
+    interest1: 'Romance',
+    interest1Lvl: 8,
+    dislikedInterest1: 'Logic',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Dancing',
+    skinColor: 'Tan',
+    hairColor: 'Red',
+    fitness: 'Fit',
+    eyeColor: 'Green',
+    turnOn1: 'Romantic Sims',
+    turnOn2: 'Dancing',
+    turnOff: 'Intellectual Sims',
+    fullName: 'Nina Caliente'
+  },
+  {
+    id: 'sim-25',
+    firstName: 'Dina',
+    name: 'Caliente',
+    household: 'Caliente household',
+    imageYoungAdult: 'https://placehold.co/200x250/DB2777/ffffff?text=Dina+Caliente',
+    title: 'Gold-Digging Twin',
+    bio: 'Dina Caliente is the other twin daughter of Katrina, known for her gold-digging tendencies and desire for a wealthy lifestyle. She is cunning and determined to marry rich, often setting her sights on eligible bachelors in the neighborhood, including Mortimer Goth.',
+    notes: 'Has a history with Don Lothario. Eyes Mortimer Goth\'s fortune. Always dressed impeccably.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Young Adult',
+    zodiac: 'Scorpio',
+    aspiration: 'Wealth',
+    lifetimeWish: 'Marry for Money',
+    aspirationSims4: 'Fabulously Wealthy',
+    career: 'Unemployed', // or Business
+    careerLvl: null,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: ['Nina Caliente'],
+    parent1: 'Katrina Caliente',
+    parent2: null,
+    children: [],
+    skill1: 'Charisma',
+    skill1Lvl: 8,
+    skill2: 'Logic',
+    skill2Lvl: 6,
+    skill3: 'Cooking',
+    skill3Lvl: 4,
+    traits: ['Materialistic', 'Ambitious', 'Romantic', 'Noncommittal'],
+    bonusTrait: 'Shrewd',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Ambrosia',
+    favoriteMusic: 'Latin',
+    favoriteColor: 'Green',
+    interest1: 'Wealth',
+    interest1Lvl: 9,
+    dislikedInterest1: 'Poverty',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Shopping',
+    skinColor: 'Tan',
+    hairColor: 'Brown',
+    fitness: 'Fit',
+    eyeColor: 'Blue',
+    turnOn1: 'Wealthy Sims',
+    turnOn2: 'Formal Wear',
+    turnOff: 'Sloppy Sims',
+    fullName: 'Dina Caliente'
+  },
+  {
+    id: 'sim-26',
+    firstName: 'Don',
+    name: 'Lothario',
+    household: 'Lothario household',
+    imageYoungAdult: 'https://placehold.co/200x250/C026D3/ffffff?text=Don+Lothario',
+    title: 'Irresistible Ladies\' Man',
+    bio: 'Don Lothario is the charming and irresistible ladies\' man of the neighborhood. He is a serial romantic who enjoys juggling multiple relationships and avoiding commitment. His life is a constant pursuit of romance and excitement, often leading to humorous or dramatic situations.',
+    notes: 'Has a reputation. Always has a date. Hates being tied down.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Male',
+    age: 'Young Adult',
+    zodiac: 'Leo',
+    aspiration: 'Popularity',
+    lifetimeWish: 'Have 10 Lovers',
+    aspirationSims4: 'Serial Romantic',
+    career: 'Athlete',
+    careerLvl: 4,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Charisma',
+    skill1Lvl: 9,
+    skill2: 'Fitness',
+    skill2Lvl: 7,
+    skill3: 'Mischief',
+    skill3Lvl: 5,
+    traits: ['Romantic', 'Outgoing', 'Noncommittal', 'Active'],
+    bonusTrait: 'Alluring',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Lobster Thermidor',
+    favoriteMusic: 'Pop',
+    favoriteColor: 'Red',
+    interest1: 'Romance',
+    interest1Lvl: 10,
+    dislikedInterest1: 'Commitment',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Dating',
+    skinColor: 'Medium',
+    hairColor: 'Black',
+    fitness: 'Fit',
+    eyeColor: 'Brown',
+    turnOn1: 'Romantic Sims',
+    turnOn2: 'Dancing',
+    turnOff: 'Gloomy Sims',
+    fullName: 'Don Lothario'
+  },
+  // Candy Behr (Corrected firstName and added for testing purposes)
+  {
+    id: 'sim-27',
+    firstName: 'Candy',
+    name: 'Behr',
+    household: 'Behr',
+    imageYoungAdult: 'https://placehold.co/200x250/C026D3/ffffff?text=Candy+Behr',
+    title: 'Music Producer',
+    bio: 'Candy Behr is a vibrant and energetic music producer, passionate about electronic beats and throwing the best dance parties. She lives with her sister Yuki, always bringing creativity and fun to their modern home.',
+    notes: 'Dreams of producing a number one hit. Loves bright colors and eccentric fashion. Constantly experimenting with new sounds.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Young Adult',
+    zodiac: 'Gemini',
+    aspiration: 'Creativity',
+    lifetimeWish: 'Hit Songs',
+    aspirationSims4: 'Musical Genius',
+    career: 'Musician',
+    careerLvl: 7,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: ['Yuki Behr'],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Piano',
+    skill1Lvl: 8,
+    skill2: 'Guitar',
+    skill2Lvl: 7,
+    skill3: 'Logic',
+    skill3Lvl: 5,
+    traits: ['Creative', 'Music Lover', 'Outgoing', 'Loves Outdoors'],
+    bonusTrait: 'Muser',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Active',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Vegetarian Chili',
+    favoriteMusic: 'Electronic',
+    favoriteColor: 'Pink',
+    interest1: 'Music',
+    interest1Lvl: 10,
+    dislikedInterest1: 'Politics',
+    dislikedInterest1Lvl: 2,
+    hobby: 'Dancing',
+    skinColor: 'Light',
+    hairColor: 'Pink',
+    fitness: 'Fit',
+    eyeColor: 'Blue',
+    turnOn1: 'Music Lover Sims',
+    turnOn2: 'Creative Sims',
+    turnOff: 'Boring Sims',
+    fullName: 'Candy Behr'
+  },
+  // Yuki Behr
+  {
+    id: 'sim-28',
+    firstName: 'Yuki',
+    name: 'Behr',
+    household: 'Behr',
+    imageYoungAdult: 'https://placehold.co/200x250/FFD166/ffffff?text=Yuki+Behr',
+    title: 'Gamer & Streamer',
+    bio: 'Yuki Behr is the quieter, yet equally passionate, sister of Candy. She spends most of her time immersed in video games, streaming her sessions, and connecting with her online community. Despite her introverted nature, she is fiercely loyal to her friends and family.',
+    notes: 'Dreams of becoming a professional gamer. Loves collecting game memorabilia. Often stays up late gaming.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Young Adult',
+    zodiac: 'Cancer',
+    aspiration: 'Knowledge',
+    lifetimeWish: 'Master Gamer',
+    aspirationSims4: 'Computer Whiz',
+    career: 'Tech Guru (Streamer)',
+    careerLvl: 6,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: ['Candy Behr'],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Video Gaming',
+    skill1Lvl: 10,
+    skill2: 'Programming',
+    skill2Lvl: 7,
+    skill3: 'Logic',
+    skill3Lvl: 6,
+    traits: ['Geek', 'Loner', 'Creative', 'Good'],
+    bonusTrait: 'Webmaster',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Shy',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Pizza',
+    favoriteMusic: 'Pop',
+    favoriteColor: 'Blue',
+    interest1: 'Video Gaming',
+    interest1Lvl: 10,
+    dislikedInterest1: 'Fitness',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Streaming',
+    skinColor: 'Medium',
+    hairColor: 'Blue',
+    fitness: 'Average',
+    eyeColor: 'Green',
+    turnOn1: 'Geeks',
+    turnOn2: 'Intellectual Sims',
+    turnOff: 'Active Sims',
+    fullName: 'Yuki Behr'
+  },
+  // Baby Sim for Nursery Page
+  {
+    id: 'sim-baby-1',
+    firstName: 'Baby',
+    name: 'Akin',
+    household: 'Akin family',
+    imageBaby: 'https://placehold.co/200x250/ADD8E6/ffffff?text=Baby+Akin',
+    title: 'Newborn',
+    bio: 'A tiny bundle of joy, just starting their Sim journey. Loves to be cuddled and makes adorable gurgling sounds. Their future is bright with possibilities.',
+    notes: 'Cries when hungry. Sleeps most of the day. Has unusually expressive eyes.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Baby',
+    zodiac: 'N/A',
+    aspiration: 'N/A',
+    lifetimeWish: 'N/A',
+    aspirationSims4: 'N/A',
+    career: 'N/A',
+    careerLvl: null,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: [],
+    parent1: 'Parent A',
+    parent2: 'Parent B',
+    children: [],
+    skill1: 'N/A',
+    skill1Lvl: null,
+    skill2: 'N/A',
+    skill2Lvl: null,
+    skill3: 'N/A',
+    skill3Lvl: null,
+    traits: ['Infant', 'Requires Attention'],
+    bonusTrait: 'Innocent',
+    personalitySloppyNeat: 'N/A',
+    personalityShyOutgoing: 'N/A',
+    personalityLazyActive: 'N/A',
+    personalitySeriousPlayful: 'N/A',
+    personalityGrouchyNice: 'N/A',
+    favoriteFood: 'Milk',
+    favoriteMusic: 'Lullabies',
+    favoriteColor: 'Light Blue',
+    interest1: 'Toys',
+    interest1Lvl: 1,
+    dislikedInterest1: 'Loud noises',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Sleeping',
+    skinColor: 'Light',
+    hairColor: 'Brown',
+    fitness: 'N/A',
+    eyeColor: 'Blue',
+    turnOn1: null,
+    turnOn2: null,
+    turnOff: null,
+    fullName: 'Baby Akin'
+  },
+  // Deceased Sim for Cemetery Page
+  {
+    id: 'sim-deceased-1',
+    firstName: 'Agnes',
+    name: 'Crumplebottom',
+    household: 'Crumplebottom family',
+    imageAdult: 'https://placehold.co/200x250/808080/ffffff?text=Agnes+Crumplebottom',
+    title: 'Grumpy Widow',
+    bio: 'Agnes Crumplebottom, famously known for her stern demeanor and her handbag, lived a life shrouded in mystery after the tragic death of her husband. She was often seen reprimanding overly romantic Sims in public. Though deceased, her legend lives on.',
+    notes: 'Carried a large handbag. Disliked public displays of affection. Secretly loved romance novels.',
+    status: 'Deceased',
+    occultStatus: 'Ghost', // Can be a ghost if desired
+    gender: 'Female',
+    age: 'Elder',
+    zodiac: 'Scorpio',
+    aspiration: 'Love',
+    lifetimeWish: 'Find True Love',
+    aspirationSims4: 'Soulmate',
+    career: 'Retired',
+    careerLvl: null,
+    maritalStatus: 'Widowed',
+    partners: ['Erik Darling (Deceased)'],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Cooking',
+    skill1Lvl: 10,
+    skill2: 'Gardening',
+    skill2Lvl: 8,
+    skill3: 'Logic',
+    skill3Lvl: 7,
+    traits: ['Grumpy', 'Loves Outdoors', 'Mean', 'Neat', 'Loner'],
+    bonusTrait: 'Independent',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Shy',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Serious',
+    personalityGrouchyNice: 'Grouchy',
+    favoriteFood: 'Tofu Scramble',
+    favoriteMusic: 'Classical',
+    favoriteColor: 'Black',
+    interest1: 'Gardening',
+    interest1Lvl: 9,
+    dislikedInterest1: 'Romance',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Reading',
+    skinColor: 'Light',
+    hairColor: 'Grey',
+    fitness: 'Average',
+    eyeColor: 'Brown',
+    turnOn1: 'Formal Wear',
+    turnOn2: 'Neat Sims',
+    turnOff: 'Public Affection',
+    fullName: 'Agnes Crumplebottom'
+  },
+  // Another Deceased Sim
+  {
+    id: 'sim-deceased-2',
+    firstName: 'Skip',
+    name: 'Broke',
+    household: 'Broke household',
+    imageAdult: 'https://placehold.co/200x250/808080/ffffff?text=Skip+Broke',
+    title: 'Unlucky Patriarch',
+    bio: 'Skip Broke, the patriarch of the struggling Broke family, met an untimely end due to a satellite falling on him. His spirit watches over his family, hoping for a brighter future for them. His legacy is one of perseverance against hardship.',
+    notes: 'Died tragically. Misses his family. Often seen haunting the backyard.',
+    status: 'Deceased',
+    occultStatus: 'Ghost',
+    gender: 'Male',
+    age: 'Adult',
+    zodiac: 'Gemini',
+    aspiration: 'Family',
+    lifetimeWish: 'Have a Big Family',
+    aspirationSims4: 'Successful Lineage',
+    career: 'Unemployed',
+    careerLvl: null,
+    maritalStatus: 'Married',
+    partners: ['Brandie Broke'],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: ['Dustin Broke', 'Beau Broke'],
+    skill1: 'Handiness',
+    skill1Lvl: 6,
+    skill2: 'Fishing',
+    skill2Lvl: 5,
+    skill3: 'Comedy',
+    skill3Lvl: 4,
+    traits: ['Good', 'Family-Oriented', 'Clumsy', 'Unlucky'],
+    bonusTrait: 'Domestic',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Mac and Cheese',
+    favoriteMusic: 'Country',
+    favoriteColor: 'Red',
+    interest1: 'Family',
+    interest1Lvl: 8,
+    dislikedInterest1: 'Work',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Fishing',
+    skinColor: 'Light',
+    hairColor: 'Blonde',
+    fitness: 'Average',
+    eyeColor: 'Blue',
+    turnOn1: 'Good Sense of Humor',
+    turnOn2: 'Family-Oriented Sims',
+    turnOff: 'Mean Sims',
+    fullName: 'Skip Broke'
+  },
 ];
 
 // Mock data for news articles if CSV fetch fails or is empty
 const getMockNewsData = () => {
-  const filteredArticles = [
+  const allArticles = [
     {
       id: '0001',
       headline: 'Rubber Duck Mystery Deepens in Willow Creek',
       date: 'June 20, 2025',
       content: 'Residents of Willow Creek are baffled by the sudden vanishing act of dozens of rubber ducks from local fountains and bathtubs. The police are investigating whether it\'s a prank, an odd art installation, or something more sinister. This incident has sparked a town-wide debate and a new fascination with bath toys.',
-      image: 'https://64.media.tumblr.com/cc945a084bfd292dea717d0abc574a7b/f21acf2c10ef62f4-1b/s1280x1920/885ea0f18be74b1a16ad7e436c61b71f74a2cfb1.pnj',
+      images: [ // Multiple images for testing carousel
+        'https://64.media.tumblr.com/cc945a084bfd292dea717d0abc574a7b/f21acf2c10ef62f4-1b/s1280x1920/885ea0f18be74b1a16ad7e436c61b71f74a2cfb1.pnj',
+        'https://placehold.co/600x300/A0AEC0/ffffff?text=Rubber+Ducks+Gone',
+        'https://placehold.co/600x300/F0F0F0/000000?text=Willow+Creek+Fountain',
+      ],
     },
     {
       id: '0022',
       headline: 'Olivia Pine Wins Newcrest Pie Contest with Secret Ingredient',
       date: 'June 19, 2025',
       content: 'Olivia Pine, a renowned local baker, won the annual Newcrest Pie Contest. Her secret ingredient, as she stated, "A pinch of magic and a whole lot of Sim-love!". This unexpected turn of events has everyone talking about her newfound culinary genius, leading to a surge in pie sales across the neighborhood.',
-      image: 'https://adamantnonsense.github.io/simgremlin/005.jpg',
+      images: ['https://adamantnonsense.github.io/simgremlin/005.jpg'],
     },
     {
       id: '9000',
       headline: 'Frank Cedars\' Garden Bursts into Operatic Song',
       date: 'June 18, 2025',
       content: 'Frank Cedars\' meticulously tended garden has literally taken on a life of its own, with his prize-winning roses and sunflowers spontaneously bursting into operatic arias, much to the delight and confusion of passersby. Scientists are baffled by this botanical phenomenon, and tourists are flocking to witness the singing garden.',
-      image: 'https://adamantnonsense.github.io/simgremlin/005.jpg',
+      images: ['https://adamantnonsense.github.io/simgremlin/005.jpg'],
+    },
+    {
+      id: '0003',
+      headline: 'New Observatory Opens in Oasis Springs, Promises Alien Sightings',
+      date: 'June 17, 2025',
+      content: 'A state-of-the-art observatory, built by an anonymous benefactor, has opened in Oasis Springs. Locals are excited about the prospect of confirmed alien sightings, while skeptics remain unconvinced. The grand opening featured a rare cosmic event and free telescope viewing for all Sims.',
+      images: ['https://placehold.co/600x300/60A5FA/ffffff?text=Observatory+Opening'],
+    },
+    {
+      id: '0004',
+      headline: 'Local Bake Sale Raises Record Funds for Gnomes',
+      date: 'June 16, 2025',
+      content: 'The annual Willow Creek bake sale broke all previous records, raising over §5,000 for the "Gnomes in Need" foundation. Attendees enjoyed various baked goods, including "Ambrosia Pie" and "Flaming Hot Donuts." The event was capped off with a surprise gnome flash mob.',
+      images: ['https://placehold.co/600x300/D97706/ffffff?text=Bake+Sale'],
     },
   ];
 
@@ -513,201 +1808,24 @@ const getMockNewsData = () => {
     'Local Architect Builds Upside-Down House, Confounds Town Planners',
   ];
 
-  return filteredArticles.filter(article => !headlinesToFilter.includes(article.headline));
+  return allArticles.filter(article => !headlinesToFilter.includes(article.headline));
 };
 
-
-// --- SearchBar Component ---
-const SearchBar = ({ onSearch, onToggleFullScreen, isFullScreen, searchResults, onResultClick }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchType, setSearchType] = useState('sim'); // 'sim' or 'family'
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef(null);
-  const inputRef = useRef(null);
-
-  useEffect(() => {
-    // Close dropdown if clicked outside
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
-          inputRef.current && !inputRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const handleSearchChange = (e) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-    setShowDropdown(term.length > 0); // Show dropdown only if there's a search term
-    onSearch(term, searchType);
-  };
-
-  const handleTypeChange = (e) => {
-    const type = e.target.value;
-    setSearchType(type);
-    onSearch(searchTerm, type); // Re-run search with new type
-    setShowDropdown(searchTerm.length > 0); // Keep dropdown visible if term exists
-  };
-
-  const handleClearSearch = () => {
-    setSearchTerm('');
-    setShowDropdown(false);
-    onSearch('', searchType); // Clear search results
-  };
-
-  const handleFullScreenToggle = () => {
-    onToggleFullScreen(!isFullScreen);
-    if (!isFullScreen) { // If going into full screen, clear search for fresh start
-      setSearchTerm('');
-      onSearch('', searchType);
-      setShowDropdown(false); // Hide dropdown initially in full screen
-    }
-  };
-
-  const handleInputFocus = () => {
-    if (isFullScreen && searchTerm.length > 0) {
-      setShowDropdown(true); // Show dropdown on focus if in full screen and has term
-    } else if (!isFullScreen) {
-      // For compact search bar, directly toggle full screen on focus
-      handleFullScreenToggle();
-    }
-  };
-
-  const handleDropdownItemClick = (item, type, allItems, index, e) => {
-    e.stopPropagation(); // Prevent modal from closing immediately after opening
-    onResultClick(item, type, allItems, index);
-    setSearchTerm(''); // Clear search term after selection
-    setShowDropdown(false); // Hide dropdown
-    onToggleFullScreen(false); // Exit full screen search
-  };
-
-
-  return (
-    <>
-      <div className={`relative flex items-center bg-gray-200 rounded-full py-2 px-4 shadow-inner cursor-pointer transition-all duration-300 ${isFullScreen ? 'hidden' : 'w-full max-w-sm'}`}
-           onClick={handleFullScreenToggle} // Clicking compact bar toggles full screen
-           ref={inputRef} // Assign ref to the compact input container
-      >
-        <input
-          type="text"
-          placeholder={`Search ${searchType}...`}
-          className="bg-transparent outline-none flex-grow text-gray-800 placeholder-gray-500 cursor-pointer"
-          readOnly // Make it read-only to force click for full screen
-          value={searchTerm} // Display current search term even when readOnly
-        />
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </div>
-
-      {isFullScreen && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-95 flex flex-col justify-center items-center z-50 p-4">
-          <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-6 relative">
-            <button
-              onClick={handleFullScreenToggle}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-4xl font-light leading-none"
-              aria-label="Close search"
-            >
-              &times;
-            </button>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Search Neighborhood</h2>
-
-            <div className="mb-6 relative">
-              <label htmlFor="search-input" className="sr-only">Search term</label>
-              <input
-                id="search-input"
-                type="text"
-                placeholder={`Search for a ${searchType} name...`}
-                className="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                onFocus={handleInputFocus}
-                autoFocus
-              />
-              {showDropdown && searchResults && searchResults.length > 0 && (
-                <ul ref={dropdownRef} className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto z-10">
-                  {searchResults.map((result, index) => (
-                    <li
-                      key={result.id || index}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
-                      onClick={(e) => handleDropdownItemClick(result, searchType, searchResults, index, e)}
-                    >
-                      {searchType === 'sim' ? result.fullName : result.name}
-                      {searchType === 'sim' && result.household && <span className="text-gray-500 text-sm ml-2">({result.household})</span>}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            <div className="flex justify-center items-center space-x-6 mb-8">
-              <label className="flex items-center text-lg cursor-pointer">
-                <input
-                  type="radio"
-                  name="searchType"
-                  value="sim"
-                  checked={searchType === 'sim'}
-                  onChange={handleTypeChange}
-                  className="form-radio h-5 w-5 text-blue-600 transition-colors"
-                />
-                <span className="ml-2 text-gray-700">Search Sims</span>
-              </label>
-              <label className="flex items-center text-lg cursor-pointer">
-                <input
-                  type="radio"
-                  name="searchType"
-                  value="family"
-                  checked={searchType === 'family'}
-                  onChange={handleTypeChange}
-                  className="form-radio h-5 w-5 text-blue-600 transition-colors"
-                />
-                <span className="ml-2 text-gray-700">Search Families</span>
-              </label>
-            </div>
-
-            <div className="flex justify-center">
-              <button
-                onClick={handleClearSearch}
-                className="bg-red-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-red-600 transition-colors text-lg"
-              >
-                Clear Search
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
-
-
-// Main App Component
+// --- Main App Component ---
 const App = () => {
-  const [currentPage, setCurrentPage] = useState('simBiographies'); // Default page
-  const [db, setDb] = useState(null); // Firestore instance
-  const [auth, setAuth] = useState(null); // Firebase Auth instance
-  const [simsData, setSimsData] = useState([]); // State to hold Sim Biographies data
-  const [newsData, setNewsData] = useState([]); // State to hold Neighborhood News data
-  const [expandedItem, setExpandedItem] = useState(null); // State for the currently expanded item (Sim, Family, News)
+  const [currentPage, setCurrentPage] = useState('simBiographies');
+  const [simsData, setSimsData] = useState([]);
+  const [newsData, setNewsData] = useState([]);
+  const [expandedItem, setExpandedItem] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Initialize pagination states here
+  const [simCurrentPage, setSimCurrentPage] = useState(1);
+  const [familyCurrentPage, setFamilyCurrentPage] = useState(1);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  // Search States
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchType, setSearchType] = useState('sim');
-  const [isSearchFullScreen, setIsSearchFullScreen] = useState(false);
-
-  // Firebase Initialization and Authentication (Placeholder for actual Firebase integration)
-  useEffect(() => {
-    // Placeholder for userId (remove when Firebase is fully integrated)
-    setDb({}); // Mock db object
-    setAuth({}); // Mock auth object
-  }, []);
 
   // CSV Parsing Function for Sims
-  const parseSimsCsv = (csvText) => {
+  const parseSimsCsv = useCallback((csvText) => {
     const lines = csvText.split('\n').filter(line => line.trim() !== '');
     if (lines.length === 0) return [];
 
@@ -734,25 +1852,26 @@ const App = () => {
         row[cleanHeader] = values[index];
       });
 
-      row.traits = [
-        row.traits, row.trait2, row.trait3, row.trait4, row.trait5, row.bonusTrait
-      ].flat().filter(Boolean);
+      // Filter out empty strings from traits and then flatten
+      const rawTraits = [
+        row.trait1, row.trait2, row.trait3, row.trait4, row.trait5, row.bonusTrait
+      ].filter(Boolean); // Filter out null/undefined/empty strings
+      row.traits = rawTraits.map(t => t.trim()); // Trim remaining strings
 
       row.partners = row.partners ? row.partners.split(';').map(p => p.trim()).filter(Boolean) : [];
       row.siblings = row.siblings ? row.siblings.split(';').map(s => s.trim()).filter(Boolean) : [];
       row.children = row.children ? row.children.split(';').map(c => c.trim()).filter(Boolean) : [];
 
       row.id = row.id || `${row.firstName}-${row.name}-${Math.random().toString(36).substr(2, 9)}`;
-      // Combine firstName and name for easier display in census
       row.fullName = `${row.firstName || ''} ${row.name || ''}`.trim();
 
       return row;
     });
     return data;
-  };
+  }, []);
 
   // CSV Parsing Function for News
-  const parseNewsCsv = (csvText) => {
+  const parseNewsCsv = useCallback((csvText) => {
     const lines = csvText.split('\n').filter(line => line.trim() !== '');
     if (lines.length === 0) return [];
 
@@ -763,28 +1882,21 @@ const App = () => {
       headers.forEach((header, index) => {
         row[header] = values[index];
       });
-      // Ensure 'id' and 'image' fields are present, and 'date' is formatted
       row.id = row.id || `news-${Math.random().toString(36).substr(2, 9)}`;
-      row.image = row.image || 'https://placehold.co/600x300/A0AEC0/ffffff?text=News';
+      row.images = row.images ? row.images.split(';').map(img => img.trim()).filter(Boolean) : ['https://placehold.co/600x300/A0AEC0/ffffff?text=News'];
       row.date = row.date || new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
       return row;
     });
 
-    // Filter out specific "fake" headlines after parsing
     const headlinesToFilter = [
-      'Dustin Broke Becomes Internet Sensation Overnight', // Covers "Dustin broke viral"
-      'New Occult Restaurant "Plasma Feast" Opens in Forgotten Hollow', // Covers "plasma fruit"
+      'Dustin Broke Becomes Internet Sensation Overnight',
+      'New Occult Restaurant "Plasma Feast" Opens in Forgotten Hollow',
       'Wellness Guru Introduces Llama Yoga to Willow Creek',
       'Local Architect Builds Upside-Down House, Confounds Town Planners',
-      'Rubber Duck Mystery Deepens in Willow Creek',
-      'Elder Sim Discovers Hidden Talent for DJing',
-      'Alien Visitor Attempts to Understand "Human Humor"',
-      'Frank Cedars\' Garden Bursts into Operatic Song',
-      'Olivia Pine Wins Newcrest Pie Contest with Secret Ingredient',
     ];
 
     return data.filter(article => !headlinesToFilter.includes(article.headline));
-  };
+  }, []);
 
 
   // Fetch Sim Biographies data
@@ -797,200 +1909,289 @@ const App = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const csvText = await response.text();
-        const parsedData = parseSimsCsv(csvText); // Use parseSimsCsv
+        const parsedData = parseSimsCsv(csvText);
         setSimsData(parsedData);
       } catch (error) {
         console.error("Error fetching Sim Biographies data:", error);
-        // Fallback to mock data if fetching fails
         setSimsData(getMockSimsData());
       }
     };
 
     fetchSimBiographies();
-  }, []);
+  }, [parseSimsCsv]);
 
-  // Fetch Neighborhood News data (new useEffect)
+  // Fetch Neighborhood News data
   useEffect(() => {
     const fetchNeighborhoodNews = async () => {
-      // Mock CSV URL for News (replace with real if available)
       const newsUrl = 'https://mock-data-url.com/neighborhood-news.csv'; // Placeholder URL
       try {
         const response = await fetch(newsUrl);
         if (!response.ok) {
-          // If mock URL fails, fall back to hardcoded mock data
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const csvText = await response.text();
-        const parsedData = parseNewsCsv(csvText); // Use parseNewsCsv
+        const parsedData = parseNewsCsv(csvText);
         setNewsData(parsedData);
       } catch (error) {
         console.warn("Could not fetch news data from CSV. Falling back to mock news data.", error);
-        setNewsData(getMockNewsData()); // Fallback to getMockNewsData
+        setNewsData(getMockNewsData());
       }
     };
 
     fetchNeighborhoodNews();
-  }, []);
+  }, [parseNewsCsv]);
 
 
   const handleNavigationClick = (page) => {
     setCurrentPage(page);
     setExpandedItem(null); // Close any expanded view when changing pages
+    // Reset pagination to first page when changing main pages
+    setSimCurrentPage(1);
+    setFamilyCurrentPage(1);
+    setIsSearchOpen(false); // Close search bar on navigation
   };
 
-  // New function to handle opening expanded view with all items and current index
   const handleOpenExpandedView = (item, type, allItems = [], currentIndex = -1) => {
     setExpandedItem({ item, type, allItems, currentIndex });
+    setIsSearchOpen(false); // Close search bar when opening modal
   };
 
   const handleCloseExpandedView = () => {
     setExpandedItem(null);
   };
 
-  const handleSearch = (term, type) => {
-    setSearchTerm(term);
-    setSearchType(type);
-  };
+  // Sorted Sims data (no filtering besides initial data source)
+  const getSortedSims = useMemo(() => {
+    // Sort by fullName (A-Z) by default
+    return [...simsData].sort((a, b) => (a.fullName || '').localeCompare(b.fullName || ''));
+  }, [simsData]);
 
-  // Filtered data based on search term and type
-  const filteredSimsData = useMemo(() => {
-    if (!searchTerm) return simsData;
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    return simsData.filter(sim =>
-      sim.fullName.toLowerCase().includes(lowerCaseSearchTerm) ||
-      (sim.household && sim.household.toLowerCase().includes(lowerCaseSearchTerm))
-    );
-  }, [simsData, searchTerm]);
 
-  // Family data (currently mock, but now filtered)
-  const allFamiliesData = useMemo(() => {
+  // Sorted Families data (dynamically filtered and populated based on existing sims)
+  const getSortedFamilies = useMemo(() => {
     const rawFamilyData = [
-      { householdName: 'Behr', funds: 10000, biography: 'The Behr household, home to the dynamic duo of Candy and Yuki. They are known for their love of music and their vibrant personalities, always ready to throw a dance party. Their modern home is filled with eccentric art and a professional DJ booth.', imgFamilyBio: 'https://placehold.co/400x200/C026D3/ffffff?text=Behr+Family' },
-      { householdName: 'BFF household', funds: 5000, biography: 'A group of inseparable friends living together: Summer Holiday, Travis Scott, and Liberty Lee. They are young, ambitious, and navigating the ups and downs of adulting, always supporting each other through career struggles and romantic misadventures. Their house is a hub of laughter and video games.', imgFamilyBio: 'https://placehold.co/400x200/9333EA/ffffff?text=BFF+Household' },
-      { householdName: 'Bjergsen', funds: 75000, biography: 'Bjorn and Clara Bjergsen, a seemingly perfect family with hidden depths. Their daughter Sofia is a talented musician. Despite their public image, Bjorn often feels distant, and Clara struggles to keep the family\'s facade intact. Their elegant home in Windenburg is a testament to their wealth and status.', imgFamilyBio: 'https://placehold.co/400x200/6D28D9/ffffff?text=Bjergsen+Family' },
-      { householdName: 'Bro', funds: 20000, biography: 'Three brothers who love gaming and living life to the fullest: Geoffrey, Travis, and John. Their bachelor pad is perpetually messy, filled with pizza boxes and gaming consoles. They are fiercely loyal to each other, even if their competitive streak sometimes gets the better of them.', imgFamilyBio: 'https://placehold.co/400x200/4C1D95/ffffff?text=Bro+Household' },
+      { householdName: 'Behr', funds: 10000, biography: 'The Behr household is known for their love of music and vibrant personalities, always ready to throw a dance party. Their modern home is filled with eccentric art and a professional DJ booth.', imgFamilyBio: 'https://placehold.co/400x200/C026D3/ffffff?text=Behr+Family' },
+      { householdName: 'BFF household', funds: 5000, biography: 'A group of inseparable friends living together, navigating the ups and downs of adulting. They are young, ambitious, and always supporting each other through career struggles and romantic misadventures. Their house is a hub of laughter and video games.', imgFamilyBio: 'https://placehold.co/400x200/9333EA/ffffff?text=BFF+Household' },
+      { householdName: 'Bjergsen', funds: 75000, biography: 'The Bjergsen family is a seemingly perfect family with hidden depths. One of their members is a talented musician. Despite their public image, the father often feels distant, and the mother struggles to keep the family\'s facade intact. Their elegant home in Windenburg is a testament to their wealth and status.', imgFamilyBio: 'https://placehold.co/400x200/6D28D9/ffffff?text=Bjergsen+Family' },
+      { householdName: 'Bro', funds: 20000, biography: 'A household of three brothers who love gaming and living life to the fullest. Their bachelor pad is perpetually messy, filled with pizza boxes and gaming consoles. They are fiercely loyal to each other, even if their competitive streak sometimes gets the better of them.', imgFamilyBio: 'https://placehold.co/400x200/4C1D95/ffffff?text=Bro+Household' },
       { householdName: 'Bun Ma family', funds: 15000, biography: 'A cozy family with a love for traditional cooking. They recently moved to San Myshuno and are enjoying the vibrant city life, bringing their grandmother\'s recipes to the local food festivals. Their apartment is always filled with the aroma of delicious spices.', imgFamilyBio: 'https://placehold.co/400x200/3B0764/ffffff?text=Bun+Ma+Family' },
       { householdName: 'Cahil family', funds: 12000, biography: 'A family with a passion for the outdoors and adventure. They spend most weekends hiking, fishing, and camping in Granite Falls. Their home is filled with souvenirs from their travels and maps of unexplored territories.', imgFamilyBio: 'https://placehold.co/400x200/EC4899/ffffff?text=Cahil+Family' },
       { householdName: 'Cahyaputri family', funds: 18000, biography: 'Known for their hospitality and artistic endeavors. They frequently host painting workshops and open mic nights in their backyard, bringing the community together with their creative spirit. Their vibrant garden is as colorful as their personalities.', imgFamilyBio: 'https://placehold.co/400x200/DB2777/ffffff?text=Cahyaputri+Family' },
       { householdName: 'Eclectic Arts household', funds: 30000, biography: 'A vibrant household of creative Sims, always inspiring each other. This collective of painters, sculptors, and musicians thrives on collaboration and artistic expression. Their shared studio space is a chaotic but inspiring mess of ongoing projects.', imgFamilyBio: 'https://placehold.co/400x200/C026D3/ffffff?text=Eclectic+Arts' },
-      { householdName: 'Family Name', funds: 0, biography: 'This is a placeholder for a new family, ready for your stories to unfold.', imgFamilyBio: '' },
       { householdName: 'Free Spirils', funds: 10000, biography: 'Embracing independence and unconventional lifestyles, this household lives life on their own terms. They are often found traveling, exploring new cultures, and expressing themselves through street art and performance. Their home is a temporary stop before their next adventure.', imgFamilyBio: 'https://placehold.co/400x200/9333EA/ffffff?text=Free+Spirits' },
-      { householdName: 'Fyres', funds: 45000, biography: 'A large, lively family with a knack for mischief and fun. Siobhan and Morgan Fyres lead a household of energetic Sims who love pranks and outdoor activities. Their annual camping trips are legendary for their wild stories and unexpected twists.', imgFamilyBio: 'https://placehold.co/400x200/6D28D9/ffffff?text=Fyres+Family' },
-      { householdName: 'Goth family', funds: 999999, biography: 'The mysterious and wealthy Goth family, steeped in history and gothic charm. Mortimer, Bella, Cassandra, and Alexander reside in their grand mansion, where secrets and shadows linger around every corner. They are known for their intelligence, elegance, and occasional encounters with the supernatural.', imgFamilyBio: 'https://placehold.co/400x200/F87171/ffffff?text=Goth+Family' },
-      { householdName: 'Hoapil', funds: 25000, biography: 'A warm and welcoming island family. The Hoapil family are deeply connected to the culture and traditions of Sulani. They are environmentally conscious, love the ocean, and enjoy teaching others about island living. Their beachfront home is always open to friends and family.', imgFamilyBio: 'https://placehold.co/400x200/22C55E/ffffff?text=Hoapil+Family' },
+      { householdName: 'Fyres', funds: 45000, biography: 'A large, lively family with a knack for mischief and fun. This household of energetic Sims love pranks and outdoor activities. Their annual camping trips are legendary for their wild stories and unexpected twists.', imgFamilyBio: 'https://placehold.co/400x200/6D28D9/ffffff?text=Fyres+Family' },
+      { householdName: 'Goth family', funds: 999999, biography: 'The mysterious and wealthy Goth family, steeped in history and gothic charm. The family resides in their grand mansion, where secrets and shadows linger around every corner. They are known for their intelligence, elegance, and occasional encounters with the supernatural.', imgFamilyBio: 'https://placehold.co/400x200/F87171/ffffff?text=Goth+Family' },
+      { householdName: 'Hoapil', funds: 25000, biography: 'A warm and welcoming island family. They are deeply connected to the culture and traditions of Sulani. They are environmentally conscious, love the ocean, and enjoy teaching others about island living. Their beachfront home is always open to friends and family.', imgFamilyBio: 'https://placehold.co/400x200/22C55E/ffffff?text=Hoapil+Family' },
       { householdName: 'Jaleel household', funds: 8000, biography: 'A small family focused on community and learning. They are often found volunteering at the local library or organizing neighborhood clean-up events. Their quiet demeanor hides a fierce dedication to improving their community and fostering education.', imgFamilyBio: 'https://placehold.co/400x200/3B82F6/ffffff?text=Jaleel+Household' },
-      { householdName: 'Kahanani', funds: 17000, biography: 'Known for their strong family bonds and love for the ocean. The Kahanani family are master fishermen and storytellers, preserving ancient island legends. They spend most of their days by the water, living a peaceful life in harmony with nature.', imgFamilyBio: 'https://placehold.co/400x200/2563EB/ffffff?text=Kahanani' },
+      { householdName: 'Kahanani', funds: 17000, biography: 'Known for their strong family bonds and love for the ocean. The family members are master fishermen and storytellers, preserving ancient island legends. They spend most of their days by the water, living a peaceful life in harmony with nature.', imgFamilyBio: 'https://placehold.co/400x200/2563EB/ffffff?text=Kahanani' },
       { householdName: 'Keacha', funds: 9000, biography: 'A family of talented musicians and performers. They dream of forming a successful band and touring the world. Their garage is a makeshift recording studio, and their evenings are filled with jam sessions and songwriting. They are always ready to put on a show.', imgFamilyBio: 'https://placehold.co/400x200/1D4ED8/ffffff?text=Keacha+Family' },
       { householdName: 'Laurent family', funds: 35000, biography: 'A sophisticated family with a love for fine arts and culture. They are patrons of the arts, frequently hosting exclusive gallery openings and classical music concerts. Their lavish mansion is filled with priceless art pieces and rare antique furniture, reflecting their refined tastes.', imgFamilyBio: 'https://placehold.co/400x200/1E3A8A/ffffff?text=Laurent+Family' },
-      { householdName: 'Linh household', funds: 11000, biography: 'A quiet and studious household, always seeking knowledge. The Linh family values education above all else, with every member dedicated to academic pursuits or scientific research. Their home library is vast, and intellectual discussions are a daily occurrence.', imgFamilyBio: 'https://placehold.co/400x200/172554/ffffff?text=Linh+Household' },
-      { householdName: 'Linh-Sacya family', funds: 22000, biography: 'A blended family finding harmony and shared passions. The Linh-Sacya household has successfully merged two distinct backgrounds into a loving and supportive unit. They often combine their cultural traditions in unique and beautiful ways, creating a rich tapestry of experiences.', imgFamilyBio: 'https://placehold.co/400x200/0F172A/ffffff?text=Linh-Sacya+Family' },
-      { householdName: 'Markovic family', funds: 14000, biography: 'Known for their culinary skills and delicious family recipes. The Markovics run a popular local diner, serving up comfort food with a secret family twist. They believe that food is love and their kitchen is the heart of their home, always bustling with activity.', imgFamilyBio: 'https://placehold.co/400x200/3B0764/ffffff?text=Markovic+Family' },
+      { householdName: 'Linh household', funds: 11000, biography: 'A quiet and studious household, always seeking knowledge. The family values education above all else, with every member dedicated to academic pursuits or scientific research. Their home library is vast, and intellectual discussions are a daily occurrence.', imgFamilyBio: 'https://placehold.co/400x200/172554/ffffff?text=Linh+Household' },
+      { householdName: 'Linh-Sacya family', funds: 22000, biography: 'A blended family finding harmony and shared passions. This household has successfully merged two distinct backgrounds into a loving and supportive unit. They often combine their cultural traditions in unique and beautiful ways, creating a rich tapestry of experiences.', imgFamilyBio: 'https://placehold.co/400x200/0F172A/ffffff?text=Linh-Sacya+Family' },
+      { householdName: 'Markovic family', funds: 14000, biography: 'Known for their culinary skills and delicious family recipes. They run a popular local diner, serving up comfort food with a secret family twist. They believe that food is love and their kitchen is the heart of their home, always bustling with activity.', imgFamilyBio: 'https://placehold.co/400x200/3B0764/ffffff?text=Markovic+Family' },
       { householdName: 'Michaelson family', funds: 28000, biography: 'A family of inventors and tech enthusiasts, always innovating. Their home is a workshop filled with half-finished gadgets and experimental robots. They are constantly trying to build the next big thing, often resulting in hilarious (and sometimes explosive) failures.', imgFamilyBio: 'https://placehold.co/400x200/EC4899/ffffff?text=Michaelson+Family' },
-      { householdName: 'Munch', funds: 16000, biography: 'The lively Munch siblings, navigating life together in Windenburg. Mika, Lucas, and Elsa Munch are a tight-knit trio facing the challenges of adolescence and young adulthood. Despite their arguments, they always have each other\'s backs.', imgFamilyBio: 'https://placehold.co/400x200/DB2777/ffffff?text=Munch+Family' },
-      { householdName: 'Ngala', funds: 19000, biography: 'A vibrant family with deep roots in their community. The Ngalas are known for their storytelling, music, and festive gatherings. They play an active role in local events, sharing their rich heritage and bringing joy to everyone around them.', imgFamilyBio: 'https://placehold.co/400x200/C026D3/ffffff?text=Ngala+Family' },
-      { householdName: 'Pancakes family', funds: 7000, biography: 'Bob and Eliza Pancake, a couple with a complicated but endearing relationship. While Bob loves cooking and staying home, Eliza is ambitious and yearns for more. Their suburban home often feels like a battlefield of conflicting desires, but they secretly cherish their unique bond.', imgFamilyBio: 'https://placehold.co/400x200/6EE7B7/ffffff?text=Pancakes+Family' },
-      { householdName: 'Partihaus', funds: 25000, biography: 'The ultimate party animals, always hosting the best gatherings in Windenburg. This household, led by the charismatic Ulrike Faust, believes life is meant to be celebrated. Their home is a perpetual party zone, with music, laughter, and Sims from all walks of life.', imgFamilyBio: 'https://placehold.co/400x200/9333EA/ffffff?text=Partihaus' },
+      { householdName: 'Munch', funds: 16000, biography: 'The lively Munch siblings, navigating life together in Windenburg. This tight-knit trio faces the challenges of adolescence and young adulthood. Despite their arguments, they always have each other\'s backs.', imgFamilyBio: 'https://placehold.co/400x200/DB2777/ffffff?text=Munch+Family' },
+      { householdName: 'Ngala', funds: 19000, biography: 'A vibrant family with deep roots in their community. The family members are known for their storytelling, music, and festive gatherings. They play an active role in local events, sharing their rich heritage and bringing joy to everyone around them.', imgFamilyBio: 'https://placehold.co/400x200/C026D3/ffffff?text=Ngala+Family' },
+      { householdName: 'Pancakes family', funds: 7000, biography: 'The Pancakes family has a complicated but endearing relationship. While one loves cooking and staying home, the other is ambitious and yearns for more. Their suburban home often feels like a battlefield of conflicting desires, but they secretly cherish their unique bond.', imgFamilyBio: 'https://placehold.co/400x200/6EE7B7/ffffff?text=Pancakes+Family' },
+      { householdName: 'Partihaus', funds: 25000, biography: 'The ultimate party animals, always hosting the best gatherings in Windenburg. This household believes life is meant to be celebrated. Their home is a perpetual party zone, with music, laughter, and Sims from all walks of life.', imgFamilyBio: 'https://placehold.co/400x200/9333EA/ffffff?text=Partihaus' },
       { householdName: 'Robles family', funds: 13000, biography: 'A family of nature lovers, dedicated to preserving the environment. They live off the grid as much as possible, tending to their large garden and advocating for sustainable living. Their home is a green oasis, filled with plants and the gentle hum of self-sufficiency.', imgFamilyBio: 'https://placehold.co/400x200/6D28D9/ffffff?text=Robles+Family' },
       { householdName: 'Roswell family', funds: 21000, biography: 'An enigmatic family with rumored alien connections. They moved to Oasis Springs under mysterious circumstances, and their behavior often raises eyebrows. They have an unusual affinity for stargazing and a peculiar diet, leading many to wonder about their true origins.', imgFamilyBio: 'https://placehold.co/400x200/4C1D95/ffffff?text=Roswell+Family' },
       { householdName: 'Sigworth family', funds: 10000, biography: 'A family of explorers, always seeking new adventures. They are rarely found at home, preferring to trek through jungles, uncover ancient ruins, and discover hidden worlds. Their lives are a continuous journey of discovery and thrill-seeking.', imgFamilyBio: 'https://placehold.co/400x200/3B0764/ffffff?text=Sigworth+Family' },
       { householdName: '8000 family', funds: 8000, biography: 'A modern family embracing technology and innovation. They are early adopters of every new gadget, and their home is a smart house run by AI. They believe technology holds the key to a better future, constantly upgrading their lives with the latest advancements.', imgFamilyBio: 'https://placehold.co/400x200/EC4899/ffffff?text=8000+Family' },
-      { householdName: 'Spencer-Kim-Lewis family', funds: 40000, biography: 'A large, busy household with diverse personalities. Dennis Kim, Alice Spencer-Kim, and their children Olivia and Eric, along with Eric\'s parents, make for a lively, often chaotic, but loving home. Juggling careers, school, and family drama is their daily routine.', imgFamilyBio: 'https://placehold.co/400x200/DB2777/ffffff?text=Spencer-Kim-Lewis' },
-      { householdName: 'Villareal', funds: 50000, biography: 'The wealthy and influential Villareal family, known for their elaborate home and a father with a penchant for mischief. Jacques Villareal and his children Hugo and Luna lead a life of luxury, but beneath the surface, family dynamics are complex and full of secrets. Their sprawling estate hosts many clandestine meetings.', imgFamilyBio: 'https://placehold.co/400x200/C026D3/ffffff?text=Villareal+Family' },
+      { householdName: 'Spencer-Kim-Lewis family', funds: 40000, biography: 'A large, busy household with diverse personalities. This family makes for a lively, often chaotic, but loving home. Juggling careers, school, and family drama is their daily routine.', imgFamilyBio: 'https://placehold.co/400x200/DB2777/ffffff?text=Spencer-Kim-Lewis' },
+      { householdName: 'Villareal', funds: 50000, biography: 'The wealthy and influential Villareal family, known for their elaborate home and a father with a penchant for mischief. They lead a life of luxury, but beneath the surface, family dynamics are complex and full of secrets. Their sprawling estate hosts many clandestine meetings.', imgFamilyBio: 'https://placehold.co/400x200/C026D3/ffffff?text=Villareal+Family' },
+      { householdName: 'Landgraab family', funds: 1000000, biography: 'The powerful and influential Landgraab family. Their vast wealth dictates much of Oasis Springs, but beneath the surface, family dynamics are complex and full of secrets.', imgFamilyBio: 'https://placehold.co/400x200/60A5FA/ffffff?text=Landgraab+Family' },
+      { householdName: 'Zest household', funds: 1000, biography: 'The Zest household, a testament to aspiring artists making their own way. Despite financial struggles, they remain optimistic and determined to make it big in the entertainment industry.', imgFamilyBio: 'https://placehold.co/400x200/6EE7B7/ffffff?text=Zest+Household' },
+      { householdName: 'Vatore household', funds: 30000, biography: 'The Vatore household, home to kind-hearted vampires striving for a good life, often trying to make new friends in Forgotten Hollow while battling their inner urges.', imgFamilyBio: 'https://placehold.co/400x200/2563EB/ffffff?text=Vatore+Household' },
+      { householdName: 'Newbie family', funds: 5000, biography: 'The Newbie family is a classic starter family, known for their humble beginnings and friendly demeanor. They enjoy simple pleasures and building a comfortable home.', imgFamilyBio: 'https://placehold.co/400x200/EC4899/ffffff?text=Newbie+Family' },
+      { householdName: 'Solo household', funds: 2000, biography: 'The Solo household represents independent Sims forging their own path in the neighborhood, eager to make new friends and establish themselves.', imgFamilyBio: 'https://placehold.co/400x200/9333EA/ffffff?text=Solo+Household' },
+      { householdName: 'Broke household', funds: 500, biography: 'The struggling Broke household, doing their best to raise children in challenging circumstances, often exhausted but determined to build a better future.', imgFamilyBio: 'https://placehold.co/400x200/4C1D95/ffffff?text=Broke+Household' },
+      { householdName: 'Caliente household', funds: 15000, biography: 'The glamorous and flirtatious Caliente household, always seeking attention and excitement, where life is a whirlwind of drama and romance.', imgFamilyBio: 'https://placehold.co/400x200/3B0764/ffffff?text=Caliente+Household' },
+      { householdName: 'Lothario household', funds: 20000, biography: 'The Lothario household, home to the charming ladies\' man Don Lothario, whose life is a constant pursuit of romance and excitement.', imgFamilyBio: 'https://placehold.co/400x200/C026D3/ffffff?text=Lothario+Household' },
     ];
-    return rawFamilyData.map((data, index) => ({
-      id: `family-${index}`,
-      name: data.householdName,
-      description: data.biography || 'No biography available for this family yet.',
-      funds: data.funds || 0,
-      members: [],
-      image: data.imgFamilyBio || `https://placehold.co/400x200/A0AEC0/ffffff?text=${encodeURIComponent(data.householdName)}+Family`,
-    }));
-  }, []);
 
-  const filteredFamilyData = useMemo(() => {
-    if (!searchTerm) return allFamiliesData;
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    return allFamiliesData.filter(family =>
-      family.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-      family.description.toLowerCase().includes(lowerCaseSearchTerm)
-    );
-  }, [allFamiliesData, searchTerm]);
+    const familyMap = new Map();
 
-  const filteredNewsData = useMemo(() => {
-    if (!searchTerm) return newsData;
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    return newsData.filter(article =>
-      article.headline.toLowerCase().includes(lowerCaseSearchTerm) ||
-      article.content.toLowerCase().includes(lowerCaseSearchTerm)
-    );
-  }, [newsData, searchTerm]);
+    // First, populate families from hardcoded list (for custom bios/images)
+    rawFamilyData.forEach(f => {
+      familyMap.set(f.householdName, {
+        id: `family-${f.householdName.replace(/\s+/g, '-')}`, // Unique ID
+        name: f.householdName,
+        description: f.biography || 'No biography available for this family yet.',
+        funds: f.funds || 0,
+        image: f.imgFamilyBio || `https://placehold.co/400x200/A0AEC0/ffffff?text=${encodeURIComponent(f.householdName)}+Family`,
+        members: [] // Will be populated from simsData
+      });
+    });
+
+    // Then, add members and any households not explicitly in rawFamilyData but present in simsData
+    simsData.forEach(sim => {
+      if (sim.household && sim.household !== 'N/A') {
+        if (!familyMap.has(sim.household)) {
+          // If a household exists in simsData but not in rawFamilyData, add a basic entry
+          familyMap.set(sim.household, {
+            id: `family-${sim.household.replace(/\s+/g, '-')}`,
+            name: sim.household,
+            description: `The ${sim.household} household.`,
+            funds: 0, // Default funds for dynamically added households
+            image: `https://placehold.co/400x200/A0AEC0/ffffff?text=${encodeURIComponent(sim.household)}+Family`,
+            members: []
+          });
+        }
+        // Add sim to the household's members
+        const familyEntry = familyMap.get(sim.household);
+        if (familyEntry && !familyEntry.members.includes(sim.fullName)) { // Check familyEntry is not undefined
+          familyEntry.members.push(sim.fullName);
+        }
+      }
+    });
+
+    // Convert map values back to an array
+    let currentFamilies = Array.from(familyMap.values());
+
+    // Filter out any households that explicitly have no members (even if they were in rawFamilyData)
+    // and sort
+    return currentFamilies
+      .filter(f => f.members.length > 0)
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [simsData]); // Depend on simsData
+
+
+  const sortedNewsData = useMemo(() => {
+    // News data doesn't have a specific sort order, just returns the mock data
+    return newsData && newsData.length > 0 ? newsData : getMockNewsData();
+  }, [newsData]);
 
   // Calculate alive population count
   const alivePopulationCount = useMemo(() => {
     return simsData.filter(sim => sim.status === 'Alive').length;
   }, [simsData]);
 
-
   const renderPage = () => {
     switch (currentPage) {
       case 'simBiographies':
-        return <SimBiographies simsData={filteredSimsData} getMockSimsData={getMockSimsData} onExpand={handleOpenExpandedView} />;
+        return (
+          <SimBiographies
+            simsData={simsData}
+            sortedSimsData={getSortedSims}
+            onExpand={handleOpenExpandedView}
+            currentPage={simCurrentPage}
+            setCurrentPage={setSimCurrentPage}
+            isDarkMode={isDarkMode}
+          />
+        );
       case 'familyBiographies':
-        return <FamilyBiographies filteredFamilyData={filteredFamilyData} onExpand={handleOpenExpandedView} />; // Pass filtered data
+        return (
+          <FamilyBiographies
+            sortedFamiliesData={getSortedFamilies}
+            onExpand={handleOpenExpandedView}
+            currentPage={familyCurrentPage}
+            setCurrentPage={setFamilyCurrentPage}
+            isDarkMode={isDarkMode}
+          />
+        );
       case 'neighborhoodNews':
-        return <NeighborhoodNews newsData={filteredNewsData} onExpand={handleOpenExpandedView} />; // Pass filtered data
+        return <NeighborhoodNews newsData={sortedNewsData} onExpand={handleOpenExpandedView} isDarkMode={isDarkMode} />;
       case 'population':
-        return <PopulationStats simsData={filteredSimsData} alivePopulationCount={alivePopulationCount} />; // Pass filtered data and count
+        return <PopulationStats
+          simsData={simsData}
+          alivePopulationCount={alivePopulationCount}
+          onExpand={handleOpenExpandedView}
+          allFamilies={getSortedFamilies}
+          isDarkMode={isDarkMode}
+        />;
+      case 'nursery':
+        return <NurseryPage simsData={simsData} onExpand={handleOpenExpandedView} isDarkMode={isDarkMode} />;
+      case 'cemetery':
+        return <CemeteryPage simsData={simsData} onExpand={handleOpenExpandedView} isDarkMode={isDarkMode} />;
       case 'notes':
-        return <NotesSection />;
+        return <NotesSection isDarkMode={isDarkMode} />;
       default:
-        return <SimBiographies simsData={filteredSimsData} getMockSimsData={getMockSimsData} onExpand={handleOpenExpandedView} />;
+        // Default to Sim Biographies if currentPage is not recognized
+        return (
+          <SimBiographies
+            simsData={simsData}
+            sortedSimsData={getSortedSims}
+            onExpand={handleOpenExpandedView}
+            currentPage={simCurrentPage}
+            setCurrentPage={setSimCurrentPage}
+            isDarkMode={isDarkMode}
+          />
+        );
     }
   };
 
-  // Determine search results to pass to SearchBar
-  const currentSearchResults = useMemo(() => {
-    if (searchType === 'sim') {
-      return filteredSimsData.map(sim => ({ id: sim.id, fullName: sim.fullName, household: sim.household, item: sim }));
-    } else if (searchType === 'family') {
-      return filteredFamilyData.map(family => ({ id: family.id, name: family.name, item: family }));
-    }
-    return [];
-  }, [searchType, filteredSimsData, filteredFamilyData]);
-
-
   return (
-    <div className="min-h-screen bg-gray-100 font-sans antialiased text-gray-800">
+    <div className={`min-h-screen font-sans antialiased transition-colors duration-300 ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-800'}`}>
       {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 shadow-lg">
+      <header className={`p-4 shadow-lg ${isDarkMode ? 'bg-gray-950' : 'bg-gradient-to-r from-blue-600 to-indigo-700'}`}>
         <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center">
-          <h1 className="text-white text-3xl font-bold mb-2 sm:mb-0">Sims Neighborhood Portal</h1>
-          <SearchBar
-            onSearch={handleSearch}
-            onToggleFullScreen={setIsSearchFullScreen}
-            isFullScreen={isSearchFullScreen}
-            searchResults={currentSearchResults}
-            onResultClick={(result, type) => handleOpenExpandedView(result.item, type, (type === 'sim' ? filteredSimsData : filteredFamilyData), (type === 'sim' ? filteredSimsData : filteredFamilyData).findIndex(item => item.id === result.id))}
-          />
+          <h1 className="text-white text-3xl font-bold mb-2 sm:mb-0">Neighborhood Stories Portal</h1> {/* Renamed Title */}
+          <div className="flex items-center space-x-4 mt-2 sm:mt-0">
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2 rounded-full text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+              title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDarkMode ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 5.5l-.707.707M6.088 6.088l-.707-.707M17.912 6.088l.707-.707M6.088 17.912l-.707.707M18 12a6 6 0 11-12 0 6 6 0 0112 0z" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z" />
+                </svg>
+              )}
+            </button>
+            {/* Search Toggle Button */}
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="p-2 rounded-full text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+              title="Search"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        {/* Search Bar Container */}
+        <div className={`transition-all duration-300 ease-in-out ${isSearchOpen ? 'max-h-40 opacity-100 mt-4' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+          {isSearchOpen && (
+            <SearchBar
+              simsData={getSortedSims}
+              familiesData={getSortedFamilies}
+              onSelect={handleOpenExpandedView}
+              isDarkMode={isDarkMode}
+              onNavigatePage={handleNavigationClick}
+            />
+          )}
         </div>
       </header>
 
       {/* Navigation */}
-      <nav className="bg-white shadow-md py-3 sticky top-0 z-10">
+      <nav className={`py-3 sticky top-0 z-10 ${isDarkMode ? 'bg-gray-800 shadow-xl' : 'bg-white shadow-md'}`}>
         <div className="container mx-auto flex flex-wrap justify-center sm:justify-start gap-2 px-2">
-          <NavLink onClick={() => handleNavigationClick('simBiographies')} isActive={currentPage === 'simBiographies'}>
+          <NavLink onClick={() => handleNavigationClick('simBiographies')} isActive={currentPage === 'simBiographies'} isDarkMode={isDarkMode}>
             Sim Biographies
           </NavLink>
-          <NavLink onClick={() => handleNavigationClick('familyBiographies')} isActive={currentPage === 'familyBiographies'}>
+          <NavLink onClick={() => handleNavigationClick('familyBiographies')} isActive={currentPage === 'familyBiographies'} isDarkMode={isDarkMode}>
             Family Biographies
           </NavLink>
-          <NavLink onClick={() => handleNavigationClick('neighborhoodNews')} isActive={currentPage === 'neighborhoodNews'}>
+          <NavLink onClick={() => handleNavigationClick('neighborhoodNews')} isActive={currentPage === 'neighborhoodNews'} isDarkMode={isDarkMode}>
             Neighborhood News
           </NavLink>
-          <NavLink onClick={() => handleNavigationClick('population')} isActive={currentPage === 'population'}>
+          <NavLink onClick={() => handleNavigationClick('population')} isActive={currentPage === 'population'} isDarkMode={isDarkMode}>
             Population
           </NavLink>
-          <NavLink onClick={() => handleNavigationClick('notes')} isActive={currentPage === 'notes'}>
+          <NavLink onClick={() => handleNavigationClick('nursery')} isActive={currentPage === 'nursery'} isDarkMode={isDarkMode}>
+            Nursery
+          </NavLink>
+          <NavLink onClick={() => handleNavigationClick('cemetery')} isActive={currentPage === 'cemetery'} isDarkMode={isDarkMode}>
+            Cemetery
+          </NavLink>
+          <NavLink onClick={() => handleNavigationClick('notes')} isActive={currentPage === 'notes'} isDarkMode={isDarkMode}>
             Notes
           </NavLink>
         </div>
@@ -1009,14 +2210,15 @@ const App = () => {
           allItems={expandedItem.allItems}
           currentIndex={expandedItem.currentIndex}
           onClose={handleCloseExpandedView}
-          onNavigate={handleOpenExpandedView} // Pass the navigation function
+          onNavigate={handleOpenExpandedView}
+          isDarkMode={isDarkMode}
         />
       )}
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white p-4 text-center text-sm mt-8">
+      <footer className={`p-4 text-center text-sm mt-8 ${isDarkMode ? 'bg-gray-950 text-gray-400' : 'bg-gray-800 text-white'}`}>
         <div className="container mx-auto">
-          &copy; {new Date().getFullYear()} Sims Neighborhood Portal. All rights reserved.
+          &copy; {new Date().getFullYear()} Neighborhood Stories Portal. All rights reserved.
         </div>
       </footer>
     </div>
@@ -1024,13 +2226,13 @@ const App = () => {
 };
 
 // Reusable Navigation Link Component
-const NavLink = ({ children, onClick, isActive }) => (
+const NavLink = ({ children, onClick, isActive, isDarkMode }) => (
   <button
     onClick={onClick}
     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ease-in-out
       ${isActive
-        ? 'bg-blue-500 text-white shadow-lg'
-        : 'text-gray-700 hover:bg-gray-200 hover:text-blue-600'
+        ? (isDarkMode ? 'bg-blue-700 text-white shadow-lg' : 'bg-blue-500 text-white shadow-lg')
+        : (isDarkMode ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-200 hover:text-blue-600')
       }`}
   >
     {children}
@@ -1038,99 +2240,259 @@ const NavLink = ({ children, onClick, isActive }) => (
 );
 
 // --- Expanded View Modal Component ---
-const ExpandedViewModal = ({ item, type, allItems, currentIndex, onClose, onNavigate }) => {
+const ExpandedViewModal = ({ item, type, allItems, currentIndex, onClose, onNavigate, isDarkMode }) => {
   const [fullScreenImage, setFullScreenImage] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0); // For image carousel within modal
 
-  // Reset image index when item changes
+  // For Sim specific images by life stage
+  const [simLifeStageImage, setSimLifeStageImage] = useState('');
+
   useEffect(() => {
-    setCurrentImageIndex(0);
-  }, [item]);
+    // Reset image for news/family, or set initial sim image based on age
+    if (type === 'sim') {
+      const ageImages = {
+        'Baby': item.imageBaby,
+        'Toddler': item.imageToddler,
+        'Child': item.imageChild,
+        'Teen': item.imageTeen,
+        'Young Adult': item.imageYoungAdult,
+        'Adult': item.imageAdult,
+        'Elder': item.imageElder,
+      };
+      // Default to current age image, fallback to Young Adult, then generic placeholder
+      setSimLifeStageImage(ageImages[item.age] || item.imageYoungAdult || 'https://placehold.co/200x250/A0AEC0/ffffff?text=No+Image');
+    }
+  }, [item, type]);
 
   if (!item) return null;
 
   let title = '';
   let mainContent = null;
-  let imagesForDisplay = []; // Images for the internal carousel/gallery within the modal
-  let enableContentNavigation = false; // For News articles
+  let enableContentNavigation = false;
+
+  const lifeStagesForButtons = [
+    { label: 'Baby', key: 'imageBaby' },
+    { label: 'Toddler', key: 'imageToddler' },
+    { label: 'Child', key: 'imageChild' },
+    { label: 'Teen', key: 'imageTeen' },
+    { label: 'Young Adult', key: 'imageYoungAdult' },
+    { label: 'Adult', key: 'imageAdult' },
+    { label: 'Elder', key: 'imageElder' },
+  ];
 
   if (type === 'sim') {
-    title = `${item.firstName} ${item.name}`;
+    title = `${item.fullName}`; // Title is just the full name
     mainContent = (
-      <div className="space-y-4 text-gray-800 text-base leading-relaxed">
-        <p className="text-lg font-normal mb-4">{item.bio || 'No biography available.'}</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          <div><span className="font-semibold">Career:</span> {item.career || 'N/A'} (Level {item.careerLvl || 'N/A'})</div>
-          <div><span className="font-semibold">Aspiration:</span> {item.aspirationSims4 || item.aspiration || 'N/A'}</div>
-          <div><span className="font-semibold">Zodiac:</span> {item.zodiac || 'N/A'}</div>
-          <div><span className="font-semibold">Favorite Food:</span> {item.favoriteFood || 'N/A'}</div>
-          <div><span className="font-semibold">Marital Status:</span> {item.maritalStatus || 'N/A'}</div>
-          {item.occultStatus && item.occultStatus !== 'None' && <div><span className="font-semibold">Occult:</span> {item.occultStatus}</div>}
+      <div className="flex flex-col items-center p-4"> {/* Centered content */}
+        {/* Sim Name */}
+        <h2 className={`text-4xl font-extrabold mb-4 text-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{item.fullName}</h2>
+
+        {/* Sim Image Section (Top, single image) */}
+        <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mb-4">
+          <img
+            src={simLifeStageImage}
+            alt={`${item.fullName} as ${item.age}`}
+            className="w-full h-auto rounded-lg shadow-lg object-cover object-center cursor-pointer border border-green-700"
+            onClick={() => setFullScreenImage(simLifeStageImage)} // This triggers full screen
+            onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/200x250/A0AEC0/ffffff?text=No+Image'; }}
+          />
         </div>
-        {item.traits && item.traits.length > 0 && (
-          <div>
-            <h4 className="font-semibold text-gray-800 text-base mb-1">Traits:</h4>
-            <div className="flex flex-wrap gap-1 text-sm text-gray-700">
-              {item.traits.map((trait, index) => (
-                <span key={index} className="bg-gray-100 px-2 py-0.5 rounded-full">{trait}</span>
-              ))}
+
+        {/* Life Stage Buttons - Rectangular styling */}
+        <div className={`mt-4 py-3 px-2 rounded-lg ${isDarkMode ? 'bg-gray-800 border border-green-700' : 'bg-gray-100 border border-gray-300'}`}>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {lifeStagesForButtons.map((stageInfo) => {
+              const imageSrc = item[stageInfo.key];
+              return imageSrc ? (
+                <button
+                  key={stageInfo.label}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSimLifeStageImage(imageSrc);
+                  }}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ease-in-out
+                    ${simLifeStageImage === imageSrc
+                      ? (isDarkMode ? 'bg-blue-700 text-white ring-2 ring-blue-500' : 'bg-blue-500 text-white ring-2 ring-blue-500')
+                      : (isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')
+                    }`
+                  }
+                  title={`View as ${stageInfo.label}`}
+                >
+                  {stageInfo.label}
+                </button>
+              ) : null;
+            })}
+          </div>
+        </div>
+
+        {/* Sim Details Section - Trading Card Format (single column below image) */}
+        <div className={`p-6 mt-6 rounded-lg shadow-inner border border-green-700 w-full ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+
+          {/* Bio and Notes */}
+          <h4 className={`text-2xl font-bold mb-4 border-b pb-2 ${isDarkMode ? 'text-gray-100 border-gray-600' : 'text-gray-800'}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2 align-middle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Biography
+          </h4>
+          <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'} text-base mb-2`}>{item.bio || 'No biography available.'}</p>
+          {item.notes && <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-sm italic`}>{item.notes}</p>}
+        </div>
+
+        {/* Two-Column Layout for other details */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-6">
+          {/* Column 1: Basic Info & Career */}
+          <div className={`p-6 rounded-lg shadow-inner border border-green-700 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+            <h5 className={`font-semibold text-lg mb-4 border-b pb-2 ${isDarkMode ? 'text-gray-200 border-gray-600' : 'text-gray-700'}`}>Basic & Career Info</h5>
+            <div className="space-y-3">
+              <InfoItem label="Status" value={item.status} isDarkMode={isDarkMode} />
+              <InfoItem label="Occult Status" value={item.occultStatus} isDarkMode={isDarkMode} />
+              <InfoItem label="Gender" value={item.gender} isDarkMode={isDarkMode} />
+              <InfoItem label="Age" value={item.age} isDarkMode={isDarkMode} />
+              <InfoItem label="Zodiac" value={item.zodiac} isDarkMode={isDarkMode} />
+              <InfoItem label="Marital Status" value={item.maritalStatus} isDarkMode={isDarkMode} />
+              <InfoItem label="Career" value={item.career} isDarkMode={isDarkMode} />
+              {item.lifetimeWish ? (
+                <InfoItem label="Lifetime Wish" value={item.lifetimeWish} isDarkMode={isDarkMode} />
+              ) : item.aspirationSims4 ? (
+                <InfoItem label="Aspiration (Sims 4)" value={item.aspirationSims4} isDarkMode={isDarkMode} />
+              ) : item.aspiration ? (
+                <InfoItem label="Aspiration" value={item.aspiration} isDarkMode={isDarkMode} />
+              ) : (
+                <InfoItem label="Aspiration" value="N/A" isDarkMode={isDarkMode} />
+              )}
             </div>
           </div>
-        )}
-        {item.notes && (
-          <div>
-            <h4 className="font-semibold text-gray-800 text-base mb-1">Notes:</h4>
-            <p className="text-sm text-gray-700 italic">{item.notes}</p>
+
+          {/* Column 2: Relationships & Skills */}
+          <div className={`p-6 rounded-lg shadow-inner border border-green-700 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+            <h5 className={`font-semibold text-lg mb-4 border-b pb-2 ${isDarkMode ? 'text-gray-200 border-gray-600' : 'text-gray-700'}`}>Relationships & Skills</h5>
+            <div className="space-y-3">
+              <InfoItem label="Partners" value={item.partners && item.partners.length > 0 ? item.partners.join(', ') : 'N/A'} isDarkMode={isDarkMode} />
+              <InfoItem label="Siblings" value={item.siblings && item.siblings.length > 0 ? item.siblings.join(', ') : 'N/A'} isDarkMode={isDarkMode} />
+              <InfoItem label="Parent 1" value={item.parent1} isDarkMode={isDarkMode} />
+              <InfoItem label="Parent 2" value={item.parent2} isDarkMode={isDarkMode} />
+              <InfoItem label="Children" value={item.children && item.children.length > 0 ? item.children.join(', ') : 'N/A'} isDarkMode={isDarkMode} />
+              {item.skill1 && <InfoItem label={`Skill 1 (${item.skill1})`} value={`Level ${item.skill1Lvl}`} isDarkMode={isDarkMode} />}
+              {item.skill2 && <InfoItem label={`Skill 2 (${item.skill2})`} value={`Level ${item.skill2Lvl}`} isDarkMode={isDarkMode} />}
+              {item.skill3 && <InfoItem label={`Skill 3 (${item.skill3})`} value={`Level ${item.skill3Lvl}`} isDarkMode={isDarkMode} />}
+              {!(item.skill1 || item.skill2 || item.skill3) && <div className={`col-span-full ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>No skills listed.</div>}
+            </div>
           </div>
-        )}
-        {/* Relations */}
-        { (item.partners && item.partners.length > 0) || (item.siblings && item.siblings.length > 0) || (item.children && item.children.length > 0) ? (
-          <div>
-            <h4 className="font-semibold text-gray-800 text-base mb-1">Relationships:</h4>
-            {item.partners && item.partners.length > 0 && <p className="text-sm text-gray-700"><span className="font-semibold">Partners:</span> {item.partners.join(', ')}</p>}
-            {item.siblings && item.siblings.length > 0 && <p className="text-sm text-gray-700"><span className="font-semibold">Siblings:</span> {item.siblings.join(', ')}</p>}
-            {item.children && item.children.length > 0 && <p className="text-sm text-gray-700"><span className="font-semibold">Children:</span> {item.children.join(', ')}</p>}
+        </div>
+
+        {/* Bottom Section: Personality, Preferences, Appearance */}
+        <div className={`p-6 mt-6 rounded-lg shadow-inner border border-green-700 w-full ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+          <h5 className={`font-semibold text-lg mb-4 border-b pb-2 ${isDarkMode ? 'text-gray-200 border-gray-600' : 'text-gray-700'}`}>Personality & Preferences</h5>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 mb-6">
+            <InfoItem label="Sloppy-Neat" value={item.personalitySloppyNeat} isDarkMode={isDarkMode} />
+            <InfoItem label="Shy-Outgoing" value={item.personalityShyOutgoing} isDarkMode={isDarkMode} />
+            <InfoItem label="Lazy-Active" value={item.personalityLazyActive} isDarkMode={isDarkMode} />
+            <InfoItem label="Serious-Playful" value={item.personalitySeriousPlayful} isDarkMode={isDarkMode} />
+            <InfoItem label="Grouchy-Nice" value={item.personalityGrouchyNice} isDarkMode={isDarkMode} />
           </div>
-        ) : null}
+
+          <h5 className={`font-semibold text-lg mt-4 mb-2 border-b pb-2 ${isDarkMode ? 'text-gray-200 border-gray-600' : 'text-gray-700'}`}>Appearance & Compatibility</h5>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+            <InfoItem label="Favorite Food" value={item.favoriteFood} isDarkMode={isDarkMode} />
+            <InfoItem label="Favorite Music" value={item.favoriteMusic} isDarkMode={isDarkMode} />
+            <InfoItem label="Favorite Color" value={item.favoriteColor} isDarkMode={isDarkMode} />
+            {item.interest1 && <InfoItem label="Interest" value={item.interest1} isDarkMode={isDarkMode} />}
+            {item.dislikedInterest1 && <InfoItem label="Disliked Interest" value={item.dislikedInterest1} isDarkMode={isDarkMode} />}
+            <InfoItem label="Hobby" value={item.hobby} isDarkMode={isDarkMode} />
+            <InfoItem label="Skin Color" value={item.skinColor} isDarkMode={isDarkMode} />
+            <InfoItem label="Hair Color" value={item.hairColor} isDarkMode={isDarkMode} />
+            <InfoItem label="Fitness" value={item.fitness} isDarkMode={isDarkMode} />
+            <InfoItem label="Eye Color" value={item.eyeColor} isDarkMode={isDarkMode} />
+            <InfoItem label="Turn-On 1" value={item.turnOn1} isDarkMode={isDarkMode} />
+            <InfoItem label="Turn-On 2" value={item.turnOn2} isDarkMode={isDarkMode} />
+            <InfoItem label="Turn-Off" value={item.turnOff} isDarkMode={isDarkMode} />
+          </div>
+        </div>
       </div>
     );
-    imagesForDisplay = [
-      item.imageYoungAdult, item.imageAdult, item.imageTeen,
-      item.imageChild, item.imageToddler, item.imageBaby, item.imageElder
-    ].filter(Boolean);
   } else if (type === 'family') {
-    title = item.name;
+    // For families and news, keep the image carousel/gallery
+    const imagesForDisplay = (item.images && item.images.length > 0) ? item.images : (item.image ? [item.image] : ['https://placehold.co/600x300/A0AEC0/ffffff?text=Image+Not+Found']);
+
     mainContent = (
-      <div className="space-y-4 text-gray-800 text-base leading-relaxed">
-        <p className="text-lg font-normal mb-4">{item.description || 'No biography available.'}</p>
-        <div className="text-base text-gray-700 mb-3">
+      <div className={`space-y-4 text-base leading-relaxed p-4 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+        <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-lg mb-4">
+          <img
+            src={imagesForDisplay[0]} // Always show the first image for family/news
+            alt={`${item.name || item.headline} banner`}
+            className="w-full h-full object-cover object-center cursor-pointer"
+            onClick={() => setFullScreenImage(imagesForDisplay[0])} // Enable click to full screen
+            onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x200/A0AEC0/ffffff?text=Family+Image'; }}
+          />
+        </div>
+        <p className="text-lg font-normal mb-4">{item.description || item.content || 'No biography available.'}</p>
+        <div className={`text-base mb-3 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
           <span className="font-semibold">Household Funds:</span> §{item.funds.toLocaleString()}
         </div>
         {item.members && item.members.length > 0 && (
           <div>
-            <h4 className="font-semibold text-gray-800 text-base mb-1">Members:</h4>
-            <ul className="list-disc list-inside text-base text-gray-700">
-              {item.members.map((member, index) => (
-                <li key={index}>{member}</li>
-              ))}
-            </ul>
+            <h4 className={`font-semibold text-base mb-3 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>Members:</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {item.members.map((memberName, index) => {
+                const memberSim = allItems.find(sim => sim.fullName === memberName && sim.type === 'sim'); // Corrected allItems usage
+                return (
+                  <div key={index} className="flex flex-col items-center text-center">
+                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-2 ${isDarkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
+                      {/* Blank profile picture icon */}
+                      <svg xmlns="http://www.w3.org/2000/svg" className={`h-10 w-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    {memberSim ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onNavigate(memberSim, 'sim', allItems.filter(i => i.type === 'sim'), allItems.filter(i => i.type === 'sim').findIndex(s => s.id === memberSim.id));
+                        }}
+                        className={`text-sm font-medium ${isDarkMode ? 'text-blue-300 hover:text-blue-100' : 'text-blue-600 hover:text-blue-800'} transition-colors duration-200`}
+                      >
+                        {memberName}
+                      </button>
+                    ) : (
+                      <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        {memberName}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
     );
-    imagesForDisplay = [item.image].filter(Boolean);
   } else if (type === 'news') {
-    title = item.title;
+    title = item.headline;
+    const imagesForDisplay = (item.images && item.images.length > 0) ? item.images : ['https://placehold.co/600x300/A0AEC0/ffffff?text=News'];
+    enableContentNavigation = true;
+
     mainContent = (
-      <div className="space-y-4 text-gray-800 text-base leading-relaxed">
-        <p className="text-base text-gray-500 mb-3">{item.date}</p>
+      <div className={`space-y-4 text-base leading-relaxed p-4 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+        <p className={`text-base mb-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{item.date}</p>
         <p className="text-lg font-normal leading-relaxed">{item.content || 'No content available.'}</p>
+        {imagesForDisplay.length > 0 && (
+            <div className="mt-6">
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden shadow-lg mb-4">
+                <img
+                  src={imagesForDisplay[0]} // Show the first image directly
+                  alt={item.headline}
+                  className="w-full h-full object-contain cursor-pointer"
+                  onClick={() => setFullScreenImage(imagesForDisplay[0])} // Click to full screen
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/A0AEC0/ffffff?text=Image+Not+Found'; }}
+                />
+              </div>
+            </div>
+          )}
       </div>
     );
-    imagesForDisplay = [item.image].filter(Boolean);
-    enableContentNavigation = true; // Enable article navigation for news
   }
 
+  // Define full screen image handlers within the component scope
   const openFullScreenImage = (src) => {
     setFullScreenImage(src);
   };
@@ -1139,108 +2501,65 @@ const ExpandedViewModal = ({ item, type, allItems, currentIndex, onClose, onNavi
     setFullScreenImage(null);
   };
 
-  // Handlers for image carousel within Sim/Family/News modal
-  const handlePrevImage = (e) => {
-    e.stopPropagation(); // Prevent modal close
-    setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? imagesForDisplay.length - 1 : prevIndex - 1));
-  };
-
-  const handleNextImage = (e) => {
-    e.stopPropagation(); // Prevent modal close
-    setCurrentImageIndex((prevIndex) => (prevIndex === imagesForDisplay.length - 1 ? 0 : prevIndex + 1));
-  };
-
-  // Handlers for news article navigation
   const handlePrevContent = (e) => {
-    e.stopPropagation(); // Prevent modal close
+    e.stopPropagation();
     const prevIndex = (currentIndex === 0 ? allItems.length - 1 : currentIndex - 1);
     onNavigate(allItems[prevIndex], type, allItems, prevIndex);
   };
 
   const handleNextContent = (e) => {
-    e.stopPropagation(); // Prevent modal close
+    e.stopPropagation();
     const nextIndex = (currentIndex === allItems.length - 1 ? 0 : currentIndex + 1);
     onNavigate(allItems[nextIndex], type, allItems, nextIndex);
   };
 
 
   return (
-    <div
-      className="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center p-4 z-50 overflow-y-auto"
-      onClick={onClose} // Close modal when clicking outside
-    >
+    <> {/* Fragment to hold multiple top-level elements */}
       <div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto flex flex-col"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal content
+        className="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center p-4 z-50 overflow-y-auto"
+        onClick={onClose}
       >
-        {/* Modal Header */}
-        <div className="p-5 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
-          <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-3xl font-light leading-none"
-            aria-label="Close modal"
-          >
-            &times;
-          </button>
-        </div>
+        <div
+          className={`rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto flex flex-col ${isDarkMode ? 'bg-gray-950 text-gray-100' : 'bg-white text-gray-800'} border-2 border-green-500`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Modal Header */}
+          <div className={`p-5 border-b flex justify-between items-center sticky top-0 z-10 ${isDarkMode ? 'bg-gray-900 border-green-600' : 'bg-gray-100 border-gray-200'}`}>
+            <h2 className="text-2xl font-bold">{title}</h2>
+            <button
+              onClick={onClose}
+              className={`text-3xl font-light leading-none ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-700'}`}
+              aria-label="Close modal"
+            >
+              &times;
+            </button>
+          </div>
 
-        {/* Modal Body - Main Content */}
-        <div className="p-5 flex-grow">
-          {/* Main Image (with carousel for multiple images) */}
-          {imagesForDisplay.length > 0 && (
-            <div className="mb-4 flex flex-col items-center">
-              <div className="relative w-full max-w-sm mx-auto">
-                <img
-                  src={imagesForDisplay[currentImageIndex]}
-                  alt={`${title} image`}
-                  className="w-full h-auto rounded-lg shadow-md cursor-pointer mb-2"
-                  onClick={() => openFullScreenImage(imagesForDisplay[currentImageIndex])}
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/300x200/E2E8F0/ffffff?text=Image'; }}
-                />
-                {imagesForDisplay.length > 1 && (
-                  <>
-                    <button
-                      onClick={handlePrevImage}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      aria-label="Previous image"
-                    >
-                      &#10094;
-                    </button>
-                    <button
-                      onClick={handleNextImage}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      aria-label="Next image"
-                    >
-                      &#10095;
-                    </button>
-                  </>
-                )}
+          {/* Modal Body - Main Content */}
+          <div className="flex-grow"> {/* No padding here, moved to mainContent specific rendering */}
+            {mainContent}
+
+            {/* Navigation for News Articles (Previous/Next) */}
+            {enableContentNavigation && allItems && allItems.length > 1 && (
+              <div className={`flex justify-between mt-6 p-4 border-t pt-4 ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                <button
+                  onClick={handlePrevContent}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={currentIndex === 0}
+                >
+                  &#9664; Previous
+                </button>
+                <button
+                  onClick={handleNextContent}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={currentIndex === allItems.length - 1}
+                >
+                  Next &#9654;
+                </button>
               </div>
-            </div>
-          )}
-
-          {mainContent}
-
-          {/* Navigation for News Articles (Previous/Next) - only for news type and multiple items */}
-          {enableContentNavigation && allItems && allItems.length > 1 && (
-            <div className="flex justify-between mt-6 border-t pt-4">
-              <button
-                onClick={handlePrevContent}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={currentIndex === 0}
-              >
-                &#9664; Previous
-              </button>
-              <button
-                onClick={handleNextContent}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={currentIndex === allItems.length - 1}
-              >
-                Next &#9654;
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -1254,7 +2573,7 @@ const ExpandedViewModal = ({ item, type, allItems, currentIndex, onClose, onNavi
             src={fullScreenImage}
             alt="Full screen view"
             className="max-w-[90%] max-h-[90%] object-contain rounded-lg shadow-xl"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking on the image itself
+            onClick={(e) => e.stopPropagation()}
           />
           <button
             onClick={closeFullScreenImage}
@@ -1265,38 +2584,98 @@ const ExpandedViewModal = ({ item, type, allItems, currentIndex, onClose, onNavi
           </button>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
+// Helper Component for Info Items in Trading Card
+const InfoItem = ({ label, value, isDarkMode }) => (
+  <div className="flex items-center">
+    <span className={`font-semibold w-32 shrink-0 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{label}:</span>
+    <span className={`${isDarkMode ? 'text-gray-100' : 'text-gray-800'} flex-grow`}>{value || 'N/A'}</span>
+  </div>
+);
+
 
 // --- Sim Biographies Section ---
-const SimBiographies = ({ simsData, getMockSimsData, onExpand }) => {
-  // Determine which data to display: fetched data if available and not empty, otherwise mock data.
-  const dataToDisplay = simsData && simsData.length > 0 ? simsData : getMockSimsData();
+const SimBiographies = ({
+  simsData,
+  sortedSimsData, // Now directly sorted data
+  onExpand,
+  currentPage, // Renamed from simCurrentPage
+  setCurrentPage, // Renamed from setSimCurrentPage
+  isDarkMode,
+}) => {
+  const SIMS_PER_PAGE = 24;
+
+  const dataToDisplay = sortedSimsData.length > 0 ? sortedSimsData : (simsData.length > 0 ? simsData : getMockSimsData());
+
+  const totalPages = Math.ceil(dataToDisplay.length / SIMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * SIMS_PER_PAGE;
+  const endIndex = startIndex + SIMS_PER_PAGE;
+  const currentSims = dataToDisplay.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    // Reset to page 1 on component mount/data change, but only if current page is out of bounds
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [sortedSimsData, currentPage, totalPages, setCurrentPage]); // Depend on sortedSimsData and its setter
+
 
   return (
-    <section className="bg-white p-6 rounded-xl shadow-lg">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Sim Biographies</h2>
-      <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
-        Explore the detailed lives of your Sims neighborhood residents. Click on a Sim's card to imagine more details!
+    <section className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+      <h2 className={`text-3xl font-bold mb-6 text-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Sim Biographies</h2>
+      <p className={`mb-8 text-center max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        Explore the detailed lives of your Sims neighborhood residents. Navigate through the pages to discover more!
       </p>
 
+      {currentSims.length === 0 && (
+        <p className={`text-center text-lg py-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>No Sims found.</p>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {dataToDisplay.map((sim, index) => ( // Pass index to SimCard for navigation within modal
-          <SimCard key={sim.id || `${sim.firstName}-${sim.name}`} sim={sim} onExpand={onExpand} allSims={dataToDisplay} simIndex={index} />
+        {currentSims.map((sim, index) => (
+          <SimCard key={sim.id || `${sim.firstName}-${sim.name}`} sim={sim} onExpand={onExpand} allSims={dataToDisplay} simIndex={startIndex + index} isDarkMode={isDarkMode} />
         ))}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-2 mt-8">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`px-4 py-2 rounded-lg font-medium ${currentPage === i + 1 ? 'bg-blue-700 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </section>
   );
 };
 
 // Component to display an individual Sim's card
-const SimCard = ({ sim, onExpand, allSims, simIndex }) => {
-  const [currentLifeStageImage, setCurrentLifeStageImage] = useState('');
-
-  // Map age string to corresponding image property
-  const getInitialImage = (sim) => {
+const SimCard = ({ sim, onExpand, allSims, simIndex, isDarkMode }) => {
+  // SimCard now only displays the primary image for the Sim based on their current age
+  const getSimPrimaryImage = (sim) => {
     const ageImages = {
       'Baby': sim.imageBaby,
       'Toddler': sim.imageToddler,
@@ -1309,49 +2688,23 @@ const SimCard = ({ sim, onExpand, allSims, simIndex }) => {
     return ageImages[sim.age] || sim.imageYoungAdult || 'https://placehold.co/200x250/A0AEC0/ffffff?text=No+Image';
   };
 
-  useEffect(() => {
-    setCurrentLifeStageImage(getInitialImage(sim));
-  }, [sim]);
-
-  // Define life stages and their corresponding image keys
-  const lifeStages = [
-    { label: 'Baby', key: 'imageBaby', ageString: 'Baby' },
-    { label: 'Toddler', key: 'imageToddler', ageString: 'Toddler' },
-    { label: 'Child', key: 'imageChild', ageString: 'Child' },
-    { label: 'Teen', key: 'imageTeen', ageString: 'Teen' },
-    { label: 'Young Adult', key: 'imageYoungAdult', ageString: 'Young Adult' },
-    { label: 'Adult', key: 'imageAdult', ageString: 'Adult' },
-    { label: 'Elder', key: 'imageElder', ageString: 'Elder' },
-  ];
-
-  // Helper to ensure 'traits' is an array, handling various input formats
-  const allTraits = Array.isArray(sim.traits)
-    ? sim.traits.filter(Boolean)
-    : [
-        sim.traits,
-        sim.trait2,
-        sim.trait3,
-        sim.trait4,
-        sim.trait5,
-        sim.bonusTrait,
-      ].flat().filter(Boolean);
-
+  const displayImage = getSimPrimaryImage(sim);
 
   return (
     <div
-      className="bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-      onClick={() => onExpand(sim, 'sim', allSims, simIndex)} // Pass allSims and simIndex for navigation
+      className={`border rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-200 text-gray-800'}`}
+      onClick={() => onExpand(sim, 'sim', allSims, simIndex)}
     >
       <div className="relative">
         <img
-          src={currentLifeStageImage}
-          alt={`${sim.firstName || ''} ${sim.name || ''}`}
+          src={displayImage}
+          alt={`${sim.fullName}`}
           className="w-full h-64 object-cover object-center rounded-t-xl"
           onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/200x250/A0AEC0/ffffff?text=No+Image'; }}
         />
         <div className="absolute bottom-0 left-0 bg-gradient-to-t from-black via-black/70 to-transparent p-4 w-full">
           <h3 className="text-xl font-bold text-white leading-tight">
-            {sim.firstName || 'Unknown'} {sim.name || 'Sim'}
+            {sim.fullName || 'Unknown Sim'}
           </h3>
           <p className="text-sm text-gray-300">{sim.title || 'N/A'}</p>
         </div>
@@ -1360,49 +2713,18 @@ const SimCard = ({ sim, onExpand, allSims, simIndex }) => {
       <div className="p-4 space-y-4">
         {/* Quick Info Badges */}
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
-          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{sim.age || 'N/A'}</span>
-          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">{sim.gender || 'N/A'}</span>
-          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full">{sim.maritalStatus || 'N/A'}</span>
+          <span className={`px-2 py-1 rounded-full ${isDarkMode ? 'bg-blue-800 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>{sim.age || 'N/A'}</span>
+          <span className={`px-2 py-1 rounded-full ${isDarkMode ? 'bg-green-800 text-green-200' : 'bg-green-100 text-green-800'}`}>{sim.gender || 'N/A'}</span>
+          <span className={`px-2 py-1 rounded-full ${isDarkMode ? 'bg-purple-800 text-purple-200' : 'bg-purple-100 text-purple-800'}`}>{sim.maritalStatus || 'N/A'}</span>
           {sim.occultStatus && sim.occultStatus !== 'None' && (
-            <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">{sim.occultStatus}</span>
+            <span className={`px-2 py-1 rounded-full ${isDarkMode ? 'bg-yellow-800 text-yellow-200' : 'bg-yellow-100 text-yellow-800'}`}>{sim.occultStatus}</span>
           )}
         </div>
 
         {/* Short Bio */}
-        <p className="text-sm text-gray-700">
+        <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
           {(sim.bio || 'No biography available.').substring(0, 150)}{((sim.bio || '').length > 150) ? '...' : ''}
         </p>
-
-        {/* Life Stage Buttons */}
-        <div className="border-t border-gray-200 pt-4 mt-4">
-          <h4 className="font-semibold text-gray-800 text-sm mb-2">View by Age:</h4>
-          <div className="flex flex-wrap gap-2 justify-center">
-            {lifeStages.map((stage) => {
-              const imageSrc = sim[stage.key];
-              // Render button only if imageSrc exists for that stage
-              return imageSrc ? (
-                <button
-                  key={stage.key}
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent card from expanding when clicking age button
-                    setCurrentLifeStageImage(imageSrc);
-                  }}
-                  className={`p-1 rounded-full overflow-hidden shadow-md transition-all duration-200 ease-in-out
-                    ${currentLifeStageImage === imageSrc ? 'ring-2 ring-blue-500 transform scale-110' : 'hover:scale-105'}`
-                  }
-                  title={stage.label}
-                >
-                  <img
-                    src={imageSrc}
-                    alt={stage.label}
-                    className="w-10 h-10 rounded-full object-cover"
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/40x40/E2E8F0/ffffff?text=' + stage.label.substring(0,1); }}
-                  />
-                </button>
-              ) : null; // Do not render button if no image for that stage
-            })}
-          </div>
-        </div>
       </div>
     </div>
   );
@@ -1410,31 +2732,46 @@ const SimCard = ({ sim, onExpand, allSims, simIndex }) => {
 
 
 // --- Family Biographies Section ---
-const FamilyBiographies = ({ filteredFamilyData, onExpand }) => { // Accept filteredFamilyData prop
-  // Transform raw data to match component's expected structure
-  const families = filteredFamilyData.map((data, index) => ({
-    id: `family-${index}`, // Generate a unique ID
-    name: data.householdName,
-    description: data.biography || 'No biography available for this family yet.', // Default text if empty
-    funds: data.funds || 0, // Default to 0 if no funds specified
-    // For now, members will be generic. In a real app, you'd link this to Sim data.
-    members: [], // Placeholder for members (could be added manually or from another CSV later)
-    image: data.imgFamilyBio || `https://placehold.co/400x200/A0AEC0/ffffff?text=${encodeURIComponent(data.householdName)}+Family`,
-  }));
+const FamilyBiographies = ({
+  sortedFamiliesData, // Now directly sorted data
+  onExpand,
+  currentPage, // Renamed from familyCurrentPage
+  setCurrentPage, // Renamed from setFamilyCurrentPage
+  isDarkMode,
+}) => {
+  const FAMILIES_PER_PAGE = 12;
+
+  const dataToDisplay = sortedFamiliesData;
+
+  const totalPages = Math.ceil(dataToDisplay.length / FAMILIES_PER_PAGE);
+  const startIndex = (currentPage - 1) * FAMILIES_PER_PAGE;
+  const endIndex = startIndex + FAMILIES_PER_PAGE;
+  const currentFamilies = dataToDisplay.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    // Reset to page 1 on component mount/data change, but only if current page is out of bounds
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [sortedFamiliesData, currentPage, totalPages, setCurrentPage]);
 
   return (
-    <section className="bg-white p-6 rounded-xl shadow-lg">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Family Biographies</h2>
-      <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
-        Discover the histories and dynamics of the prominent families living in your Sims neighborhood. Click on a family card for more details!
+    <section className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+      <h2 className={`text-3xl font-bold mb-6 text-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Family Biographies</h2>
+      <p className={`mb-8 text-center max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        Discover the histories and dynamics of the prominent families living in your Sims neighborhood. Navigate through the pages to discover more!
       </p>
 
+      {currentFamilies.length === 0 && (
+        <p className={`text-center text-lg py-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>No families found.</p>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {families.map((family, index) => (
+        {currentFamilies.map((family, index) => (
           <div
             key={family.id}
-            className="bg-gray-50 border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer"
-            onClick={() => onExpand(family, 'family', families, index)} // Pass family data, type, all families, and index to expand
+            className={`border rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
+            onClick={() => onExpand(family, 'family', dataToDisplay, startIndex + index)}
           >
             <img
               src={family.image}
@@ -1443,54 +2780,80 @@ const FamilyBiographies = ({ filteredFamilyData, onExpand }) => { // Accept filt
               onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x200/A0AEC0/ffffff?text=Family+Image'; }}
             />
             <div className="p-4">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{family.name}</h3>
-              <p className="text-sm text-gray-700 mb-3">{family.description.substring(0, 100)}{family.description.length > 100 ? '...' : ''}</p>
-              <div className="text-sm text-gray-600 mb-3">
-                <span className="font-semibold">Funds:</span> §{family.funds.toLocaleString()} {/* Format funds */}
+              <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{family.name}</h3>
+              <p className={`text-sm mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{family.description.substring(0, 100)}{family.description.length > 100 ? '...' : ''}</p>
+              <div className={`text-sm mb-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <span className="font-semibold">Funds:</span> §{family.funds.toLocaleString()}
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-2 mt-8">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`px-4 py-2 rounded-lg font-medium ${currentPage === i + 1 ? 'bg-blue-700 text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </section>
   );
 };
 
 // --- Neighborhood News Section ---
-const NeighborhoodNews = ({ newsData, onExpand }) => { // Accept newsData prop
-  // Use newsData directly, or fallback to mock if empty
+const NeighborhoodNews = ({ newsData, onExpand, isDarkMode }) => {
   const articlesToDisplay = newsData && newsData.length > 0 ? newsData : getMockNewsData();
 
-
   return (
-    <section className="bg-white p-6 rounded-xl shadow-lg">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Neighborhood News</h2>
-      <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
+    <section className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+      <h2 className={`text-3xl font-bold mb-6 text-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Neighborhood News</h2>
+      <p className={`mb-8 text-center max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
         Stay updated with the latest happenings, gossip, and bizarre events from across your Sims neighborhood!
       </p>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {articlesToDisplay.map((article, index) => {
-          // Use parsed content and image from article object directly
           const displayContent = article.content || 'No content available.';
-          const displayImage = article.image || 'https://placehold.co/600x300/A0AEC0/ffffff?text=News+Image';
+          const displayImage = (article.images && article.images.length > 0) ? article.images[0] : 'https://placehold.co/600x300/A0AEC0/ffffff?text=News+Image';
 
           return (
             <div
               key={article.id}
-              className="bg-gray-50 border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer"
-              onClick={() => onExpand(article, 'news', articlesToDisplay, index)} // Pass article data, type, all articles, and index to expand
+              className={`border rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
+              onClick={() => onExpand(article, 'news', articlesToDisplay, index)}
             >
               <img
                 src={displayImage}
-                alt={article.title}
+                alt={article.headline}
                 className="w-full h-48 object-cover rounded-t-xl"
                 onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x300/A0AEC0/ffffff?text=News+Image'; }}
               />
               <div className="p-4">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{article.title}</h3>
-                <p className="text-sm text-gray-500 mb-2">{article.date}</p>
-                <p className="text-gray-700 text-sm">{displayContent.substring(0, 100)}{displayContent.length > 100 ? '...' : ''}</p>
+                <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{article.headline}</h3>
+                <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{article.date}</p>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{displayContent.substring(0, 100)}{displayContent.length > 100 ? '...' : ''}</p>
               </div>
             </div>
           );
@@ -1501,61 +2864,113 @@ const NeighborhoodNews = ({ newsData, onExpand }) => { // Accept newsData prop
 };
 
 // --- Population Stats Section ---
-// Now accepts simsData as a prop
-const PopulationStats = ({ simsData, alivePopulationCount }) => { // Accept alivePopulationCount prop
-  // Use the simsData directly for rendering the table
-  const dataToDisplay = simsData && simsData.length > 0 ? simsData : getMockSimsData(); // Fallback to mock data if fetched is empty or null
+const PopulationStats = ({ simsData, alivePopulationCount, onExpand, allFamilies, isDarkMode }) => {
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc'
+
+  const handleSort = (column) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedPopulation = useMemo(() => {
+    let sortableData = [...simsData]; // Always use the raw simsData for sorting
+    if (sortColumn) {
+      sortableData.sort((a, b) => {
+        const valA = a[sortColumn] || '';
+        const valB = b[sortColumn] || '';
+
+        if (typeof valA === 'string' && typeof valB === 'string') {
+          return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        }
+        // Handle numeric sorting if applicable (e.g., careerLvl, skillLvl)
+        if (typeof valA === 'number' && typeof valB === 'number') {
+          return sortDirection === 'asc' ? valA - valB : valB - valA;
+        }
+        return 0;
+      });
+    }
+    return sortableData;
+  }, [simsData, sortColumn, sortDirection]);
+
+  const getSortIcon = (column) => {
+    if (sortColumn === column) {
+      return sortDirection === 'asc' ? ' ▲' : ' ▼';
+    }
+    return '';
+  };
 
   return (
-    <section className="bg-white p-6 rounded-xl shadow-lg">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Population: {alivePopulationCount}</h2>
-      <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
+    <section className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+      <h2 className={`text-3xl font-bold mb-6 text-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Population: {alivePopulationCount}</h2>
+      <p className={`mb-8 text-center max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
         A detailed look at each Sim in your neighborhood who is currently alive, including their household, age, gender, aspirations, and status.
       </p>
 
-      <div className="overflow-x-auto rounded-lg shadow-md">
+      <div className={`overflow-x-auto rounded-lg shadow-md ${isDarkMode ? 'bg-gray-700' : 'bg-white'}`}>
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
+              <th scope="col" className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`} onClick={() => handleSort('fullName')}>
+                Name {getSortIcon('fullName')}
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Household
+              <th scope="col" className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`} onClick={() => handleSort('household')}>
+                Household {getSortIcon('household')}
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Age
+              <th scope="col" className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`} onClick={() => handleSort('age')}>
+                Age {getSortIcon('age')}
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Gender
+              <th scope="col" className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`} onClick={() => handleSort('gender')}>
+                Gender {getSortIcon('gender')}
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Aspiration
+              <th scope="col" className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`} onClick={() => handleSort('aspirationSims4')}>
+                Aspiration {getSortIcon('aspirationSims4')}
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
+              <th scope="col" className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`} onClick={() => handleSort('status')}>
+                Status {getSortIcon('status')}
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {dataToDisplay.map((sim, index) => ( // Use dataToDisplay here
-              <tr key={sim.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {sim.fullName || `${sim.firstName || 'N/A'} ${sim.name || 'N/A'}`} {/* Use fullName here */}
+          <tbody className={`divide-y ${isDarkMode ? 'divide-gray-600' : 'divide-gray-200'}`}>
+            {sortedPopulation.map((sim, index) => (
+              <tr key={sim.id} className={index % 2 === 0 ? (isDarkMode ? 'bg-gray-700' : 'bg-white') : (isDarkMode ? 'bg-gray-600' : 'bg-gray-50')}>
+                <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                  <button
+                    onClick={() => onExpand(sim, 'sim', simsData, simsData.findIndex(s => s.id === sim.id))}
+                    className={`${isDarkMode ? 'text-blue-300 hover:text-blue-100' : 'text-blue-600 hover:text-blue-800'} transition-colors duration-200`}
+                  >
+                    {sim.fullName || `N/A`}
+                  </button>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                  {sim.household || 'N/A'} {/* Assuming 'household' field exists in CSV data */}
+                <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                  {sim.household ? (
+                    <button
+                      onClick={() => {
+                        const family = allFamilies.find(f => f.name === sim.household);
+                        if (family) {
+                          onExpand(family, 'family', allFamilies, allFamilies.findIndex(f => f.id === family.id));
+                        }
+                      }}
+                      className={`${isDarkMode ? 'text-blue-300 hover:text-blue-100' : 'text-blue-600 hover:text-blue-800'} transition-colors duration-200`}
+                    >
+                      {sim.household}
+                    </button>
+                  ) : 'N/A'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                   {sim.age || 'N/A'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                   {sim.gender || 'N/A'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                  {sim.aspirationSims4 || sim.aspiration || 'N/A'} {/* Prioritize Sims4 aspiration */}
+                <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                  {sim.aspirationSims4 || sim.aspiration || 'N/A'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                   {sim.status || 'N/A'}
                 </td>
               </tr>
@@ -1567,75 +2982,196 @@ const PopulationStats = ({ simsData, alivePopulationCount }) => { // Accept aliv
   );
 };
 
-// --- Notes Section ---
-const NotesSection = () => {
-  const creatorNotes = [
-    {
-      id: 'cn-1',
-      title: 'Current Storylines in Progress',
-      content: 'Focusing on the Bella Goth abduction storyline this cycle. Also, planning a major career event for Cassandra Goth. Need to introduce a new rival for Mortimer in the science field.',
-    },
-    {
-      id: 'cn-2',
-      title: 'Future Generations Planning',
-      content: 'Considering a new generation of Caliente twins. How will the Pleasants react to their children growing up?',
-    },
-  ];
-
-  const characterNotes = [
-    {
-      id: 'char-1',
-      sim: 'Bella Goth',
-      content: 'Found a strange device in Mortimer\'s study. What is he really working on? Feeling a strong urge to travel somewhere new...',
-    },
-    {
-      id: 'char-2',
-      sim: 'Mortimer Goth',
-      content: 'My latest experiment requires more rare earth elements. The local supplier is running low. Perhaps a trip to Sixam is in order.',
-    },
-    {
-      id: 'char-3',
-      sim: 'Cassandra Goth',
-      content: 'My music isn\'t appreciated enough here. Maybe a move to Oasis Springs would inspire me. Geoffrey Landgraab keeps sending me anonymous flowers... weird.',
-    },
-  ];
+// --- Nursery Page ---
+const NurseryPage = ({ simsData, onExpand, isDarkMode }) => {
+  const babies = useMemo(() => {
+    return simsData.filter(sim => sim.age === 'Baby' && sim.status === 'Alive');
+  }, [simsData]);
 
   return (
-    <section className="bg-white p-6 rounded-xl shadow-lg">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Neighborhood Notes</h2>
-      <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
+    <section className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+      <h2 className={`text-3xl font-bold mb-6 text-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+        <span className="mr-2">&#127880;</span> Nursery <span className="ml-2">&#128118;</span>
+      </h2>
+      <p className={`mb-8 text-center max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        A collection of the neighborhood's newest and tiniest residents, full of potential and endless cuteness!
+      </p>
+
+      {babies.length === 0 && (
+        <p className={`text-center text-lg py-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>No babies found in the neighborhood!</p>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {babies.map((baby, index) => (
+          <SimCard key={baby.id} sim={baby} onExpand={onExpand} allSims={babies} simIndex={index} isDarkMode={isDarkMode} />
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// --- Cemetery Page ---
+const CemeteryPage = ({ simsData, onExpand, isDarkMode }) => {
+  const deceasedSims = useMemo(() => {
+    return simsData.filter(sim => sim.status === 'Deceased');
+  }, [simsData]);
+
+  return (
+    <section className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+      <h2 className={`text-3xl font-bold mb-6 text-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+        <span className="mr-2">&#9760;</span> Cemetery <span className="ml-2">&#9760;</span>
+      </h2>
+      <p className={`mb-8 text-center max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        Honor the memory of Sims who have passed on. Their stories, though ended, are not forgotten.
+      </p>
+
+      {deceasedSims.length === 0 && (
+        <p className={`text-center text-lg py-10 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>No deceased Sims found in the neighborhood yet. Everyone's still alive!</p>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {deceasedSims.map((sim, index) => (
+          <SimCard key={sim.id} sim={sim} onExpand={onExpand} allSims={deceasedSims} simIndex={index} isDarkMode={isDarkMode} />
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// --- Notes Section ---
+const NotesSection = ({ isDarkMode }) => {
+  // Removed hardcoded mock data for creatorNotes and characterNotes
+  const creatorNotes = [];
+  const characterNotes = [];
+
+  return (
+    <section className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+      <h2 className={`text-3xl font-bold mb-6 text-center ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Neighborhood Notes</h2>
+      <p className={`mb-8 text-center max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
         Keep track of creator-specific thoughts, plans, and in-character notes for your Sims neighborhood.
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Creator Notes */}
         <div>
-          <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Creator Notes</h3>
-          <div className="space-y-4">
-            {creatorNotes.map((note) => (
-              <div key={note.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
-                <h4 className="font-bold text-gray-900 mb-1">{note.title}</h4>
-                <p className="text-sm text-gray-700">{note.content}</p>
-              </div>
-            ))}
-          </div>
+          <h3 className={`text-2xl font-semibold mb-4 border-b pb-2 ${isDarkMode ? 'text-gray-100 border-gray-700' : 'text-gray-800 border-gray-200'}`}>Creator Notes</h3>
+          {creatorNotes.length === 0 ? (
+            <p className={`text-center text-md py-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>No creator notes added yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {creatorNotes.map((note) => (
+                <div key={note.id} className={`border rounded-lg p-4 shadow-sm ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
+                  <h4 className={`font-bold mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{note.title}</h4>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{note.content}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Character Notes */}
         <div>
-          <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">In-Character Notes</h3>
-          <div className="space-y-4">
-            {characterNotes.map((note) => (
-              <div key={note.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
-                <h4 className="font-bold text-gray-900 mb-1">From: {note.sim}</h4>
-                <p className="text-sm text-gray-700 italic">"{note.content}"</p>
-              </div>
-            ))}
-          </div>
+          <h3 className={`text-2xl font-semibold mb-4 border-b pb-2 ${isDarkMode ? 'text-gray-100 border-gray-700' : 'text-gray-800 border-gray-200'}`}>In-Character Notes</h3>
+          {characterNotes.length === 0 ? (
+            <p className={`text-center text-md py-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>No in-character notes added yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {characterNotes.map((note) => (
+                <div key={note.id} className={`border rounded-lg p-4 shadow-sm ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
+                  <h4 className={`font-bold mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>From: {note.sim}</h4>
+                  <p className={`text-sm italic ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>"{note.content}"</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>
   );
 };
+
+// --- SearchBar Component ---
+const SearchBar = ({ simsData, familiesData, onSelect, isDarkMode, onNavigatePage }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    const newResults = [];
+
+    // Search Sims
+    simsData.forEach(sim => {
+      if ((sim.fullName && sim.fullName.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (sim.bio && sim.bio.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (sim.household && sim.household.toLowerCase().includes(lowerCaseSearchTerm))) {
+        newResults.push({
+          id: sim.id,
+          name: sim.fullName,
+          type: 'sim',
+          data: sim,
+          allItems: simsData,
+          currentIndex: simsData.findIndex(s => s.id === sim.id)
+        });
+      }
+    });
+
+    // Search Families
+    familiesData.forEach(family => {
+      if ((family.name && family.name.toLowerCase().includes(lowerCaseSearchTerm)) ||
+        (family.description && family.description.toLowerCase().includes(lowerCaseSearchTerm))) {
+        newResults.push({
+          id: family.id,
+          name: family.name,
+          type: 'family',
+          data: family,
+          allItems: familiesData,
+          currentIndex: familiesData.findIndex(f => f.id === family.id)
+        });
+      }
+    });
+
+    setSearchResults(newResults);
+  }, [searchTerm, simsData, familiesData]);
+
+  const handleResultClick = (result) => {
+    onNavigatePage(result.type === 'sim' ? 'simBiographies' : 'familyBiographies');
+    onSelect(result.data, result.type, result.allItems, result.currentIndex);
+    setSearchTerm(''); // Clear search bar after selection
+    setSearchResults([]);
+  };
+
+  return (
+    <div className={`relative w-full max-w-lg mx-auto ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+      <input
+        type="text"
+        placeholder="Search Sims or Families..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className={`w-full px-4 py-2 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-500
+          ${isDarkMode ? 'bg-gray-700 border border-gray-600 text-white placeholder-gray-400' : 'bg-white border border-gray-300 text-gray-900 placeholder-gray-500'}`}
+      />
+      {searchResults.length > 0 && (
+        <ul className={`absolute left-0 right-0 mt-2 rounded-lg shadow-lg max-h-60 overflow-y-auto z-20
+          ${isDarkMode ? 'bg-gray-700 border border-gray-600' : 'bg-white border border-gray-200'}`}>
+          {searchResults.map((result) => (
+            <li
+              key={result.id}
+              className={`px-4 py-2 cursor-pointer border-b ${isDarkMode ? 'border-gray-600 hover:bg-gray-600' : 'border-gray-100 hover:bg-gray-100'}`}
+              onClick={() => handleResultClick(result)}
+            >
+              <span className="font-semibold">{result.name}</span> <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>({result.type === 'sim' ? 'Sim' : 'Family'})</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
 
 export default App;
