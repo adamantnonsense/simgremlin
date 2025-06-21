@@ -1,2432 +1,1641 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Sims Notes!</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* Base color variables for Light Mode (default) */
-        :root {
-            --bg-primary: #f8f9fa; /* Wikipedia's light gray background */
-            --text-primary: #202122; /* Wikipedia's dark text */
-            --link-color: #3366cc; /* Wikipedia's standard blue link */
-            --link-hover-color: #204080; /* Darker blue on hover */
-            --border-color: #a2a9b1; /* Wikipedia's light border gray */
-            --card-bg: #ffffff; /* White card background */
-            --header-bg: #eaecf0; /* Wikipedia's section header gray */
-            --button-bg: #eaecf0; /* Light button background */
-            --button-text: #202122; /* Dark text on buttons */
-            --button-hover-bg: #e0e3e7; /* Slightly darker button on hover */
-            --table-header-bg: #eaecf0; /* Table header background */
-            --table-row-odd-bg: #fdfdfd; /* Very light for odd rows */
-            --table-row-even-bg: #ffffff; /* White for even rows */
-            --status-alive: #28a745; /* Green for alive */
-            --status-dead: #dc3545; /* Red for dead */
-            --sim-name-header-text: #202122; /* Dark text for sim name in header */
-            --sim-title-header-text: #4d5156; /* Muted text for sim title in header */
-            --highlight-active: #6c8ebf; /* A subtle highlight color for active elements */
-            --personality-low-color: #e67c73; /* Reddish for low end */
-            --personality-high-color: #72a6e6; /* Bluish for high end */
-            --personality-balanced-color: #778899; /* Grey for balanced */
-        }
-
-        /* Dark Mode variables */
-        body.dark-theme {
-            --bg-primary: #1c1c1c; /* Dark gray background */
-            --text-primary: #f0f0f0; /* Light text */
-            --link-color: #64b5f6; /* Lighter blue link */
-            --link-hover-color: #42a5f5; /* Slightly brighter blue on hover */
-            --border-color: #444444; /* Darker border gray */
-            --card-bg: #2d2d2d; /* Dark card background */
-            --header-bg: #3c3c3c; /* Darker section header gray */
-            --button-bg: #3c3c3c; /* Dark button background */
-            --button-text: #f0f0f0; /* Light text on buttons */
-            --button-hover-bg: #4f4f4f; /* Slightly lighter button on hover */
-            --table-header-bg: #3c3c3c; /* Table header background */
-            --table-row-odd-bg: #2d2d2d; /* Darker for odd rows */
-            --table-row-even-bg: #2a2a2a; /* Even darker for even rows */
-            --status-alive: #2ecc71; /* Brighter green for alive */
-            --status-dead: #e74c3c; /* Brighter red for dead */
-            --sim-name-header-text: #f0f0f0; /* Light text for sim name in header */
-            --sim-title-header-text: #b0b0b0; /* Muted light text for sim title in header */
-            --highlight-active: var(--link-color); /* Now uses the link color for consistency */
-            --personality-low-color: #cc524a; /* Darker red for low end */
-            --personality-high-color: #4a8ed9; /* Darker blue for high end */
-            --personality-balanced-color: #556677; /* Darker grey for balanced */
-        }
-
-        /* General Body and Text Styles */
-        body {
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.3s ease, color 0.3s ease;
-            padding: 1.5rem;
-            line-height: 1.6;
-            box-sizing: border-box;
-            min-height: 100vh; /* Ensure body takes full height for dark mode effect */
-        }
-
-        h1, h2, h3, h4 {
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-            color: var(--text-primary);
-            font-weight: 600; /* Bolder headings */
-            margin-bottom: 0.8rem;
-        }
-
-        /* Link Styling */
-        a {
-            color: var(--link-color);
-            text-decoration: underline;
-            transition: color 0.2s ease;
-        }
-
-        a:hover {
-            color: var(--link-hover-color);
-        }
-
-        /* Panels and Cards - Clean, flat look */
-        .sleek-panel, .trading-card-redesign, .family-overview-section, .spreadsheet-container, .graveyard-section, .homeless-sims-section {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08); /* Subtle shadow for definition */
-            border-radius: 4px; /* Slightly rounded corners */
-            padding: 1.5rem;
-            margin-bottom: 0;
-            position: relative;
-            overflow: hidden;
-            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-        }
-
-        .sleek-panel:hover, .trading-card-redesign:hover, .family-overview-section:hover, .spreadsheet-container:hover, .graveyard-section:hover, .homeless-sims-section:hover {
-            transform: translateY(-2px); /* Slight lift on hover */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        /* Specific header colors for sections */
-        .sleek-panel h2, .sleek-panel h3, .sleek-panel h4,
-        .family-overview-section h4,
-        .graveyard-section h3,
-        .homeless-sims-section h3,
-        .notes-section h2 {
-            color: var(--text-primary); /* Ensures headers are visible */
-            border-bottom: 1px solid var(--border-color); /* Simple border bottom */
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        /* World Header - Wikipedia style (simple, clean) */
-        .world-header {
-            background-color: var(--header-bg);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            padding: 1.5rem;
-            border-radius: 4px;
-            margin-bottom: 0.5rem; /* Adjusted gap: Reduced from 0.75rem to 0.5rem */
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .world-header h1 {
-            color: var(--text-primary);
-            font-size: 2.5rem;
-            font-weight: 700; /* Bold */
-        }
-
-        @media (min-width: 768px) {
-            .world-header h1 {
-                font-size: 3.2rem;
-            }
-        }
-
-        .world-header p {
-            font-size: 1rem;
-            color: var(--text-primary); /* Ensure contrast */
-        }
-
-        /* Theme Toggle Button */
-        #themeToggle {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-primary);
-            transition: color 0.2s ease, background-color 0.2s ease;
-            padding: 0.5rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: fixed; /* Fixed position */
-            top: 1rem; /* 16px from top */
-            right: 1rem; /* 16px from right */
-            z-index: 100; /* Ensure it's above other content */
-        }
-
-        #themeToggle:hover {
-            background-color: var(--button-hover-bg);
-        }
-
-        /* Scrollbar */
-        .scrollable-list {
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border-color) var(--card-bg);
-        }
-
-        .scrollable-list::-webkit-scrollbar-thumb {
-            background-color: var(--border-color);
-            border-radius: 10px;
-            border: 2px solid var(--card-bg);
-        }
-
-        .scrollable-list::-webkit-scrollbar-track {
-            background: var(--card-bg);
-            border-radius: 10px;
-        }
-
-        /* Families Sidebar and its content */
-        .families-sidebar {
-            /* flex-grow for vertical expansion */
-            flex-grow: 1; /* Allow it to grow to fill space */
-            overflow-y: auto; /* Enable scrolling if content overflows */
-        }
-
-        /* Family Item (unselected family rectangle) */
-        .family-item {
-            background-color: #eaecf0; /* Light grey background */
-            border: 1px solid var(--border-color);
-            box-shadow: none;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            padding: 0.7rem;
-            margin-bottom: 0.8rem;
-            color: #202122; /* Black text */
-            border-radius: 4px;
-        }
-
-        /* Dark mode override for unselected family item */
-        body.dark-theme .family-item {
-            background-color: #1A2B4C; /* Darker blue background */
-            color: #ffffff; /* White text */
-        }
-
-        .family-item h3 {
-            color: inherit; /* Inherit color from parent (.family-item) */
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .family-item:hover {
-            background-color: var(--button-hover-bg);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-            transform: none; /* No translation */
-        }
-
-        /* Dark mode override for unselected family item on hover */
-        body.dark-theme .family-item:hover {
-            background-color: #0F1A2D; /* Even darker blue on hover */
-            color: #ffffff;
-        }
-
-        /* Selected Family Item (blue family rectangle) */
-        .family-item.selected-family {
-            background-color: #3366cc; /* Blue background */
-            border-color: #204080; /* Darker blue border for contrast */
-            color: #ffffff; /* White text */
-            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-            transform: none; /* No scale or rotation */
-        }
-
-        /* Dark mode override for selected family item */
-        body.dark-theme .family-item.selected-family {
-            background-color: #3465cc; /* Changed to 3465cc for dark mode selected family */
-            color: #ffffff; /* White text */
-            border-color: #0F1A2D; /* A slightly lighter border than background for subtle definition */
-        }
-
-        .family-item + .family-item {
-            margin-top: 1rem;
-        }
-
-        .family-item .expand-icon {
-            transition: transform 0.3s ease;
-        }
-
-        .family-item.selected-family .expand-icon {
-            transform: rotate(90deg);
-        }
-
-        /* Sims List */
-        .sims-list {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
-            padding-top: 0;
-            padding-bottom: 0;
-            margin-top: 0.5rem;
-        }
-
-        .sims-list.expanded {
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
-        }
-
-        /* Sim Button (individual sim button - unselected) */
-        .sim-button {
-            background-color: #ffffff; /* White background in oval */
-            color: #202122; /* Black text */
-            border: 1px solid var(--border-color);
-            transition: all 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            padding: 0.8rem 1.5rem;
-            margin-bottom: 0.8rem;
-            border-radius: 4px; /* Still a rectangle, but the request mentioned "oval" visually, can make it rounded */
-            text-align: left;
-            font-size: 1.1rem;
-            font-weight: 500;
-            box-shadow: none;
-        }
-
-        /* Dark mode override for unselected sim button */
-        body.dark-theme .sim-button {
-            background-color: #ffffff; /* White background */
-            color: #202122; /* Black text */
-        }
-
-        .sim-button:last-child {
-            margin-bottom: 0;
-        }
-
-        .sim-button:hover {
-            background-color: var(--button-hover-bg);
-            color: var(--text-primary); /* Keep text primary color on hover */
-            transform: translateX(4px);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-        }
-
-        /* Selected Sim Button (clicked on sim - blue background button) */
-        .sim-button.selected-sim {
-            background-color: #3366cc; /* Blue background button */
-            font-weight: 600;
-            color: #ffffff; /* White text */
-            border-color: #204080; /* Darker blue border for contrast */
-            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-            transform: none; /* No scale or rotation */
-        }
-
-        /* Dark mode override for selected sim button */
-        body.dark-theme .sim-button.selected-sim {
-            background-color: #3366cc; /* Blue background button */
-            color: #ffffff; /* White text */
-        }
-
-        /* Sim Details Card */
-        .trading-card-redesign {
-            padding: 1.8rem;
-            transform: none; /* No rotation */
-        }
-
-        .trading-card-redesign:hover {
-            transform: translateY(-2px);
-        }
-
-        .card-header-redesign {
-            background-color: var(--header-bg); /* Solid background */
-            color: var(--sim-name-header-text); /* Ensure contrast */
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08); /* Subtle shadow */
-            border-top-left-radius: 4px;
-            border-top-right-radius: 4px;
-            padding: 1rem 1.5rem; /* Adjusted padding */
-            margin: -1.8rem -1.8rem 1.5rem -1.8rem;
-            position: relative;
-            z-index: 2;
-            overflow: hidden;
-            border-bottom: 1px solid var(--border-color);
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .card-header-redesign h2 {
-            color: var(--sim-name-header-text);
-            font-weight: 700;
-        }
-
-        .card-header-redesign .sim-name-display-redesign {
-            color: var(--sim-name-header-text);
-            font-size: 2.2rem;
-            font-weight: 700;
-        }
-
-        .card-header-redesign .sim-title-display {
-            color: var(--sim-title-header-text);
-            font-style: normal;
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        .card-content-redesign {
-            border-bottom-left-radius: 6px;
-            border-bottom-right-radius: 6px;
-        }
-
-        .card-image-section-redesign {
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio (height / width * 100) */
-            margin-bottom: 1.2rem;
-            box-shadow: none;
-            transform: none;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .card-image-section-redesign img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            border-radius: 2px;
-        }
-
-        .section-block-style {
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            margin-top: 1.2rem;
-            border-radius: 4px;
-            padding: 1rem;
-            position: relative;
-            overflow: hidden;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .section-block-style:first-of-type {
-            margin-top: 0;
-        }
-
-        .section-block-style h4 {
-            color: var(--text-primary);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.4rem;
-            font-weight: 600;
-            font-size: 1.2rem;
-        }
-
-        .section-block-style h4 .sim-stat-icon {
-            color: var(--link-color);
-            margin-right: 0.5rem;
-        }
-
-        .sim-bio-box-redesign p, .notes-section p {
-            color: var(--text-primary);
-            font-size: 1rem;
-            line-height: 1.5;
-        }
-
-        .sim-quote-box p {
-            color: var(--text-primary);
-            font-size: 1rem;
-        }
-
-        .sim-quote-box span {
-            color: var(--text-primary);
-        }
-
-        .sim-stat-icon {
-            color: var(--link-color);
-        }
-
-        .sim-stat-label-redesign {
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
-
-        .sim-stat-value-redesign {
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            white-space: normal;
-            word-break: break-word;
-            overflow-wrap: break-word;
-            display: inline-block;
-            max-width: calc(100% - 60px);
-            vertical-align: top;
-            line-height: 1.3;
-        }
-
-        .sim-stat-item {
-            margin-bottom: 0.4rem;
-        }
-
-        /* Spacing for Key Details and Bio */
-        .details-and-skills-grid {
-            margin-top: 1.8rem;
-        }
-
-        /* Style for clickable partner names */
-        .partner-link {
-            cursor: pointer;
-            color: var(--link-color);
-            text-decoration: underline;
-            font-weight: normal;
-        }
-
-        .partner-link:hover {
-            color: var(--link-hover-color);
-        }
-
-        .status-alive { color: var(--status-alive); font-weight: bold; }
-        .status-dead { color: var(--status-dead); font-weight: bold; }
-
-        /* New styles for the skills list */
-        .sim-skills-list {
-            gap: 0.6rem;
-            padding: 0.4rem;
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-        }
-
-        .sim-skills-list-item {
-            font-size: 1rem;
-            color: var(--text-primary);
-            padding: 0.2rem 0.4rem;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .sim-skills-list-item-label {
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .sim-skills-list-item-value {
-            font-weight: 600;
-            color: var(--link-color);
-        }
-
-        .sim-trait-item-redesign {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            font-size: 0.95rem;
-            border-radius: 4px;
-            padding: 0.3rem 0.7rem;
-            font-weight: 500;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .hobbies-list li {
-            color: var(--text-primary);
-            font-size: 1rem;
-            list-style: disc;
-            margin-left: 1.25rem;
-        }
-
-        .hobbies-list li::before {
-            content: none;
-        }
-
-        /* Age Icons Container */
-        .sim-age-icons-container {
-            display: flex;
-            justify-content: center;
-            gap: 0.8rem;
-            padding: 0.5rem 0;
-            margin-bottom: 1.2rem;
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            background-color: var(--header-bg);
-            border-radius: 4px;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .age-icon {
-            font-size: 1.5rem;
-            padding: 0;
-            border-radius: 50%;
-            background-color: var(--button-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            box-shadow: none;
-            width: 2em;
-            height: 2em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-        }
-
-        .age-icon:hover {
-            background-color: var(--button-hover-bg);
-            border-color: var(--link-color);
-            transform: scale(1.05);
-        }
-
-        .age-icon.active-age-icon {
-            background-color: var(--highlight-active);
-            color: var(--text-primary);
-            border-color: var(--link-color);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-            transform: scale(1.1);
-            animation: none;
-        }
-
-        /* Personality Display */
-        .personality-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.4rem 0;
-            font-size: 1rem;
-        }
-
-        /* Adjustments for the new format */
-        .personality-item-label {
-            flex-grow: 1;
-            text-align: left;
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        .personality-item-value {
-            font-weight: bold;
-            padding-left: 0.25rem; /* Adjusted space between label and value */
-            color: var(--link-color);
-        }
-
-        /* Highlight for personality traits on the value */
-        .personality-item-value.low {
-            color: var(--personality-low-color);
-        }
-
-        .personality-item-value.high {
-            color: var(--personality-high-color);
-        }
-
-        .personality-item-value.balanced {
-            color: var(--personality-balanced-color);
-        }
-
-        /* Family Overview Section */
-        .family-overview-section h4 {
-            color: var(--text-primary);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .family-overview-section h4 .fas.fa-home {
-            margin-right: 0.4rem;
-            color: var(--link-color);
-        }
-
-        .family-overview-section h4 .family-name-in-header {
-            color: var(--text-primary);
-        }
-
-        .family-overview-section .family-bio-detail, .family-overview-section .family-bio-text-content {
-            color: var(--text-primary);
-        }
-
-        .family-overview-section .family-bio-detail {
-            font-size: 1rem;
-            margin-bottom: 0.8rem;
-            line-height: 1.4;
-        }
-
-        .family-overview-section .family-bio-detail .detail-value {
-            color: var(--text-primary);
-            font-weight: 500;
-            display: inline-block;
-            margin-left: 0.25rem;
-        }
-
-        .family-overview-section .family-bio-text-content {
-            margin-top: 1.5rem;
-        }
-
-        .family-overview-section .family-bio-text-content h5 {
-            color: var(--text-primary);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.3rem;
-            margin-bottom: 0.8rem;
-            font-weight: 600;
-            font-size: 1.15rem;
-        }
-
-        .family-overview-section .family-bio-text-content p {
-            font-size: 1rem;
-            line-height: 1.5;
-        }
-
-        /* Spreadsheet */
-        .spreadsheet-container {
-            padding-top: 1rem;
-            transform: none;
-        }
-
-        .spreadsheet-container:hover {
-            transform: translateY(-2px);
-        }
-
-        .sims-table th, .sims-table td {
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            font-weight: normal;
-        }
-
-        .sims-table th {
-            background-color: var(--table-header-bg);
-            color: var(--text-primary);
-            border-bottom: 2px solid var(--link-color);
-            font-weight: 600;
-            font-size: 0.9rem;
-            padding: 0.6rem 0.8rem;
-            white-space: nowrap;
-            text-align: left;
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .sims-table tbody tr:nth-child(odd) {
-            background-color: var(--table-row-odd-bg);
-        }
-
-        .sims-table tbody tr:nth-child(even) {
-            background-color: var(--table-row-even-bg);
-        }
-
-        .sims-table tbody tr:hover {
-            background-color: var(--button-hover-bg);
-        }
-
-        .sims-table td strong {
-            color: var(--status-alive);
-        }
-
-        .sims-table .clickable-sim-name {
-            color: var(--link-color);
-            font-weight: normal;
-            text-decoration: underline;
-        }
-
-        .sims-table .clickable-sim-name:hover {
-            color: var(--link-hover-color);
-        }
-
-        /* Sortable table headers */
-        .sortable-th {
-            cursor: pointer;
-            position: relative;
-            padding-right: 20px;
-        }
-
-        .sortable-th .sort-icon {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.7em;
-            color: var(--text-primary);
-            transition: color 0.2s ease;
-        }
-
-        .sortable-th:hover .sort-icon {
-            color: var(--link-color);
-        }
-
-        .sortable-th.asc .sort-icon::before {
-            content: "\f0d8";
-        }
-
-        .sortable-th.desc .sort-icon::before {
-            content: "\f0d7";
-        }
-
-        .sortable-th:not(.asc):not(.desc) .sort-icon::before {
-            content: "\f0dc";
-            opacity: 0.5;
-        }
-
-        /* Stories */
-        #storyDisplayContent {
-            padding: 1.5rem;
-            transform: none;
-        }
-
-        #storyDisplayContent:hover {
-            transform: translateY(-2px);
-        }
-
-        #storyDisplayContent h2 {
-            color: var(--text-primary);
-            font-weight: 600;
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        #storyDisplayContent p {
-            color: var(--text-primary);
-        }
-
-        .story-list-in-card {
-            gap: 0.8rem;
-        }
-
-        .story-list-item {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            font-size: 1rem;
-            border-radius: 4px;
-            box-shadow: none;
-            transition: all 0.2s ease-in-out;
-            padding: 0.6rem 1rem;
-            cursor: pointer;
-            transform: none;
-        }
-
-        .story-list-item:hover {
-            background-color: var(--button-hover-bg);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-            transform: none;
-        }
-
-        .story-list-item.selected-story-in-card {
-            background-color: var(--highlight-active);
-            border-color: var(--link-color);
-            color: var(--text-primary);
-            font-weight: 600;
-            transform: none;
-        }
-
-        .story-list-item span {
-            font-weight: 500;
-        }
-
-        /* Single Story Content */
-        .story-single-content-in-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 1.5rem;
-            position: relative;
-            overflow: visible;
-            transform: none;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        }
-
-        .story-single-content-in-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .story-back-button {
-            background-color: var(--button-bg);
-            border: 1px solid var(--border-color);
-            color: var(--button-text);
-            font-weight: 500;
-            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            box-shadow: none;
-            margin-bottom: 1rem;
-            border-radius: 4px;
-            font-size: 0.95rem;
-        }
-
-        .story-back-button:hover {
-            background-color: var(--button-hover-bg);
-            filter: none;
-            transform: translateY(-1px);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-        }
-
-        .story-image-container {
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            margin-bottom: 1rem;
-            box-shadow: none;
-            transform: none;
-            overflow: hidden;
-            position: relative;
-            padding-bottom: 56.25%;
-        }
-
-        .story-image-container img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
-
-        #storyContent {
-            font-size: 1rem;
-            line-height: 1.5;
-            color: var(--text-primary);
-        }
-
-        /* Graveyard Specific Styling */
-        .graveyard-section {
-            padding: 1.5rem;
-            transform: none;
-        }
-
-        .graveyard-section:hover {
-            transform: translateY(-2px);
-        }
-
-        .graveyard-section h3 {
-            color: var(--text-primary);
-            font-weight: 600;
-            font-size: 2rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .graveyard-section h3 .sim-stat-icon {
-            margin-right: 0.6rem;
-            color: var(--status-dead);
-        }
-
-        .graveyard-section p {
-            color: var(--text-primary);
-            font-size: 1rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .graveyard-item {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            box-shadow: none;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease;
-            padding: 0.7rem 1rem;
-            cursor: pointer;
-            transform: none;
-        }
-
-        .graveyard-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-            background-color: var(--button-hover-bg);
-        }
-
-        .graveyard-item .graveyard-icon {
-            font-size: 2.2rem;
-            color: var(--status-dead);
-        }
-
-        .graveyard-item h5 {
-            color: var(--text-primary);
-            font-weight: 500;
-            margin: 0;
-            line-height: 1.1;
-        }
-
-        .graveyard-item p {
-            font-size: 0.85rem;
-            color: var(--text-primary);
-            margin: 0;
-            line-height: 1.1;
-        }
-
-        /* Homeless Sims Section */
-        .homeless-sims-section {
-            padding: 1.5rem;
-            transform: none;
-        }
-
-        .homeless-sims-section:hover {
-            transform: translateY(-2px);
-        }
-
-        .homeless-sims-section h3 {
-            color: var(--text-primary);
-            font-weight: 600;
-            font-size: 2rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .homeless-sims-section h3 .sim-stat-icon {
-            margin-right: 0.6rem;
-            color: var(--link-color);
-        }
-
-        .homeless-sim-item {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            box-shadow: none;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease;
-            padding: 0.7rem 1rem;
-            cursor: pointer;
-            transform: none;
-        }
-
-        .homeless-sim-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-            background-color: var(--button-hover-bg);
-        }
-
-        .homeless-sim-item h5 {
-            color: var(--text-primary);
-            font-weight: 500;
-            margin: 0;
-            line-height: 1.1;
-        }
-
-        .homeless-sim-item p {
-            font-size: 0.85rem;
-            color: var(--text-primary);
-            margin: 0;
-            line-height: 1.1;
-        }
-
-        /* Responsive adjustments */
-        @media (min-width: 768px) {
-            .main-layout-grid {
-                display: flex;
-                flex-direction: row;
-                gap: 2rem;
-            }
-
-            .families-sidebar {
-                flex-basis: 280px;
-                flex-shrink: 0;
-                flex-grow: 0;
-            }
-
-            .main-content-area {
-                flex-grow: 1;
-            }
-        }
-
-        /* Static Navigation Bar - Flat, tab-like buttons */
-        .static-nav-bar {
-            display: flex;
-            justify-content: center;
-            gap: 0.8rem;
-            padding: 0.6rem 1rem;
-            border-radius: 4px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-            margin-top: 0;
-            margin-bottom: 0;
-            flex-wrap: wrap;
-            transform: none;
-        }
-
-        .static-nav-bar button {
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            font-weight: 500;
-            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            box-shadow: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            white-space: nowrap;
-            border: 1px solid var(--border-color);
-        }
-
-        .static-nav-bar button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-            background-color: var(--button-hover-bg);
-        }
-
-        /* Specific colors for nav buttons (adjusted for general scheme) */
-        #showNeighborhoodStoriesBtn { background-color: var(--button-bg); }
-        #showNeighborhoodStoriesBtn:hover { background-color: var(--button-hover-bg); }
-        #showSpreadsheetBtn { background-color: var(--button-bg); }
-        #showSpreadsheetBtn:hover { background-color: var(--button-hover-bg); }
-        #showGraveyardBtn { background-color: var(--button-bg); }
-        #showGraveyardBtn:hover { background-color: var(--button-hover-bg); }
-        #showNotesBtn { background-color: var(--button-bg); }
-        #showNotesBtn:hover { background-color: var(--button-hover-bg); }
-        #showHomelessSimsBtn { background-color: var(--button-bg); }
-        #showHomelessSimsBtn:hover { background-color: var(--button-hover-bg); }
-
-        /* Mobile adjustments for nav bar */
-        @media (max-width: 767px) {
-            .static-nav-bar {
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-                padding: 0.8rem;
-                gap: 0.5rem;
-                border-radius: 8px;
-                max-width: calc(100% - 2rem);
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .static-nav-bar button {
-                width: auto;
-                flex-grow: 1;
-                min-width: fit-content;
-            }
-        }
-
-        /* Image Modal Styles */
-        .image-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .image-modal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-        }
-
-        /* Ensure pointer-events are off when hidden */
-        .image-modal-overlay:not(.visible) {
-            pointer-events: none;
-        }
-
-        .image-modal-content {
-            position: relative;
-            max-width: 90%;
-            max-height: 90%;
-            background-color: var(--card-bg);
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .image-modal-content img {
-            max-width: 100%;
-            max-height: 100%;
-            display: block;
-            object-fit: contain;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-
-        .image-modal-close {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: var(--button-bg);
-            color: var(--button-text);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
-            z-index: 1001;
-        }
-
-        .image-modal-close:hover {
-            background-color: var(--status-dead);
-            color: white;
-            transform: scale(1.1);
-        }
-    </style>
-</head>
-<body class="p-4 md:p-8">
-    <button id="themeToggle" class="fixed top-4 right-4 z-100">
-        <i class="fas fa-sun"></i> <!-- Sun icon for light mode, will change to moon in dark mode -->
-    </button>
-    <div class="main-layout-grid flex flex-col md:flex-row gap-6 max-w-5xl mx-auto">
-        <div class="families-sidebar sleek-panel p-6 md:w-72 md:flex-shrink-0 flex flex-col">
-            <h2 class="text-2xl font-bold mb-4 flex items-center justify-between relative z-20">
-                Families <i class="fas fa-users"></i>
-            </h2>
-            <div id="familyList" class="scrollable-list flex-grow relative z-20">
-                <!-- Family list will be dynamically populated here -->
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+
+// Helper function to get mock Sim Biographies data
+const getMockSimsData = () => [
+  // Bella Goth
+  {
+    id: 'sim-1',
+    firstName: 'Bella',
+    name: 'Goth',
+    household: 'Goth family',
+    imageBaby: 'https://placehold.co/80x80/EC4899/ffffff?text=B',
+    imageToddler: 'https://placehold.co/80x80/DB2777/ffffff?text=T',
+    imageChild: 'https://placehold.co/80x80/C026D3/ffffff?text=C',
+    imageTeen: 'https://placehold.co/80x80/9333EA/ffffff?text=Tn',
+    imageYoungAdult: 'https://placehold.co/200x250/F87171/ffffff?text=Bella+Goth',
+    imageAdult: 'https://placehold.co/80x80/6D28D9/ffffff?text=A',
+    imageElder: 'https://placehold.co/80x80/4C1D95/ffffff?text=E',
+    title: 'Matriarch',
+    bio: 'Bella Goth is the iconic matriarch of the Goth family, known for her mysterious charm and enigmatic presence. She loves her family dearly and often finds herself caught in dramatic neighborhood events, always with a flair for the dramatic. Rumored to have been abducted by aliens multiple times, she maintains a composed demeanor.',
+    notes: 'Keeps a hidden journal. Has a secret fondness for gardening despite her elegant appearance. Very protective of Cassandra.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Adult',
+    zodiac: 'Scorpio',
+    aspiration: 'Family',
+    lifetimeWish: 'Reach Max Level in Logic Skill',
+    aspirationSims4: 'Successful Lineage',
+    career: 'Journalist',
+    careerLvl: 9,
+    maritalStatus: 'Married',
+    partners: ['Mortimer Goth'],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: ['Cassandra Goth', 'Alexander Goth'],
+    skill1: 'Logic',
+    skill1Lvl: 10,
+    skill2: 'Charisma',
+    skill2Lvl: 8,
+    skill3: 'Writing',
+    skill3Lvl: 7,
+    traits: ['Family-Oriented', 'Good Sense of Humor', 'Loves Outdoors', 'Neat', 'Genius'],
+    bonusTrait: 'Observant',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Active',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Lobster Thermidor',
+    favoriteMusic: 'Classical',
+    favoriteColor: 'Red',
+    interest1: 'Paranormal',
+    interest1Lvl: 8,
+    dislikedInterest1: 'Sports',
+    dislikedInterest1Lvl: 2,
+    hobby: 'Astronomy',
+    skinColor: 'Light',
+    hairColor: 'Black',
+    fitness: 'Fit',
+    eyeColor: 'Brown',
+    turnOn1: 'Fitness',
+    turnOn2: 'Charismatic Sims',
+    turnOff: 'Bad Hygiene',
+    fullName: 'Bella Goth'
+  },
+  // Mortimer Goth
+  {
+    id: 'sim-2',
+    firstName: 'Mortimer',
+    name: 'Goth',
+    household: 'Goth family',
+    imageBaby: 'https://placehold.co/80x80/3B82F6/ffffff?text=B',
+    imageToddler: 'https://placehold.co/80x80/2563EB/ffffff?text=T',
+    imageChild: 'https://placehold.co/80x80/1D4ED8/ffffff?text=C',
+    imageTeen: 'https://placehold.co/80x80/1E3A8A/ffffff?text=Tn',
+    imageYoungAdult: 'https://placehold.co/200x250/60A5FA/ffffff?text=Mortimer+Goth',
+    imageAdult: 'https://placehold.co/80x80/172554/ffffff?text=A',
+    imageElder: 'https://placehold.co/80x80/0F172A/ffffff?text=E',
+    title: 'Patriarch',
+    bio: 'Mortimer Goth is a distinguished scientist with a passion for logic and the macabre. He is devoted to his family and enjoys quiet evenings at home, often pondering the mysteries of the universe and conducting unusual experiments in his private laboratory. He has a keen interest in all things supernatural.',
+    notes: 'Frequently stays up late researching forgotten tomes. Believes in extraterrestrial life and seeks proof. Secretly afraid of clowns.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Male',
+    age: 'Adult',
+    zodiac: 'Virgo',
+    aspiration: 'Knowledge',
+    lifetimeWish: 'Become Mad Scientist',
+    aspirationSims4: 'Nerd Brain',
+    career: 'Scientist',
+    careerLvl: 10,
+    maritalStatus: 'Married',
+    partners: ['Bella Goth'],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: ['Cassandra Goth', 'Alexander Goth'],
+    skill1: 'Logic',
+    skill1Lvl: 10,
+    skill2: 'Handiness',
+    skill2Lvl: 7,
+    skill3: 'Gardening',
+    skill3Lvl: 5,
+    traits: ['Genius', 'Loves Books', 'Geek', 'Serious', 'Loner'],
+    bonusTrait: 'Analytical',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Shy',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Serious',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Mac and Cheese',
+    favoriteMusic: 'Classical',
+    favoriteColor: 'Purple',
+    interest1: 'Science',
+    interest1Lvl: 10,
+    dislikedInterest1: 'Parties',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Tinkering',
+    skinColor: 'Fair',
+    hairColor: 'Black',
+    fitness: 'Average',
+    eyeColor: 'Green',
+    turnOn1: 'Formal Wear',
+    turnOn2: 'Intelligence',
+    turnOff: 'Too Playful',
+    fullName: 'Mortimer Goth'
+  },
+  // Cassandra Goth
+  {
+    id: 'sim-3',
+    firstName: 'Cassandra',
+    name: 'Goth',
+    household: 'Goth family',
+    imageBaby: 'https://placehold.co/80x80/7C3AED/ffffff?text=B',
+    imageToddler: 'https://placehold.co/80x80/6D28D9/ffffff?text=T',
+    imageChild: 'https://placehold.co/80x80/5B21B6/ffffff?text=C',
+    imageTeen: 'https://placehold.co/80x80/4C1D95/ffffff?text=Tn',
+    imageYoungAdult: 'https://placehold.co/200x250/8B5CF6/ffffff?text=Cassandra+Goth',
+    imageAdult: 'https://placehold.co/80x80/3B0764/ffffff?text=A',
+    imageElder: 'https://placehold.co/80x80/2F004F/ffffff?text=E',
+    title: 'Heiress',
+    bio: 'Cassandra Goth is the artistic and somewhat moody daughter of Bella and Mortimer. She dreams of a career in music and often feels misunderstood by her eccentric family. Despite her quiet nature, she possesses a passionate creative spirit that she expresses through her melodies and art.',
+    notes: 'Spends hours playing the piano and violin. Has a secret crush on the Landgraab heir. Wishes her parents would be "normal" for once.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Young Adult',
+    zodiac: 'Pisces',
+    aspiration: 'Popularity',
+    lifetimeWish: 'Become a Rock Star',
+    aspirationSims4: 'Soulmate',
+    career: 'Musician',
+    careerLvl: 6,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: ['Alexander Goth'],
+    parent1: 'Bella Goth',
+    parent2: 'Mortimer Goth',
+    children: [],
+    skill1: 'Creativity',
+    skill1Lvl: 9,
+    skill2: 'Guitar',
+    skill2Lvl: 7,
+    skill3: 'Piano',
+    skill3Lvl: 8,
+    traits: ['Brooding', 'Artistic', 'Music Lover', 'Unflirty', 'Loyal'],
+    bonusTrait: 'Muser',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Shy',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Serious',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Grilled Cheese',
+    favoriteMusic: 'Pop',
+    favoriteColor: 'Black',
+    interest1: 'Music',
+    interest1Lvl: 9,
+    dislikedInterest1: 'Logic',
+    dislikedInterest1Lvl: 2,
+    hobby: 'Playing Instruments',
+    skinColor: 'Light',
+    hairColor: 'Black',
+    fitness: 'Thin',
+    eyeColor: 'Brown',
+    turnOn1: 'Bad Boys',
+    turnOn2: 'Artistic Sims',
+    turnOff: 'Athletic Sims',
+    fullName: 'Cassandra Goth'
+  },
+  // Alexander Goth
+  {
+    id: 'sim-4',
+    firstName: 'Alexander',
+    name: 'Goth',
+    household: 'Goth family',
+    imageBaby: 'https://placehold.co/80x80/16A34A/ffffff?text=B',
+    imageToddler: 'https://placehold.co/80x80/15803D/ffffff?text=T',
+    imageChild: 'https://placehold.co/80x80/14532D/ffffff?text=C',
+    imageTeen: 'https://placehold.co/80x80/052E16/ffffff?text=Tn',
+    imageYoungAdult: 'https://placehold.co/200x250/22C55E/ffffff?text=Alexander+Goth',
+    imageAdult: 'https://placehold.co/80x80/042F2E/ffffff?text=A',
+    imageElder: 'https://placehold.co/80x80/011C1C/ffffff?text=E',
+    title: 'Prodigy',
+    bio: 'Alexander Goth is the intelligent and introverted youngest child of the Goth family. He shows a keen interest in science and enjoys spending time alone with his books and telescope. He often dreams of exploring the furthest reaches of space.',
+    notes: 'Currently obsessed with space travel and alien theories. Wants a pet alien. Finds social gatherings overwhelming.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Male',
+    age: 'Teen',
+    zodiac: 'Aries',
+    aspiration: 'Knowledge',
+    lifetimeWish: 'Become a Visionary',
+    aspirationSims4: 'Whiz Kid',
+    career: 'High School Student',
+    careerLvl: null,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: ['Cassandra Goth'],
+    parent1: 'Bella Goth',
+    parent2: 'Mortimer Goth',
+    children: [],
+    skill1: 'Logic',
+    skill1Lvl: 8,
+    skill2: 'Rocket Science',
+    skill2Lvl: 4,
+    skill3: 'Video Gaming',
+    skill3Lvl: 6,
+    traits: ['Bookworm', 'Loves Outdoors', 'Clumsy', 'Genius', 'Absent-Minded'],
+    bonusTrait: 'Inquisitive',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Shy',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Serious',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Fish and Chips',
+    favoriteMusic: 'Kids',
+    favoriteColor: 'Blue',
+    interest1: 'Science',
+    interest1Lvl: 9,
+    dislikedInterest1: 'Sports',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Reading',
+    skinColor: 'Fair',
+    hairColor: 'Brown',
+    fitness: 'Average',
+    eyeColor: 'Green',
+    turnOn1: null,
+    turnOn2: null,
+    turnOff: null,
+    fullName: 'Alexander Goth'
+  },
+  // Vladislaus Straud (Vampire)
+  {
+    id: 'sim-5',
+    firstName: 'Vladislaus',
+    name: 'Straud',
+    household: 'Straud family',
+    imageYoungAdult: 'https://placehold.co/200x250/374151/ffffff?text=Vladislaus+Straud',
+    imageAdult: 'https://placehold.co/80x80/1F2937/ffffff?text=A',
+    imageElder: 'https://placehold.co/80x80/111827/ffffff?text=E',
+    title: 'Ancient Vampire',
+    bio: 'Vladislaus Straud IV is the ancient and mysterious founder of Forgotten Hollow. He is a powerful vampire who enjoys the quiet solitude of his mansion and occasionally dabbles in minor neighborhood mischief. He finds modern life perplexing.',
+    notes: 'Dislikes sunlight intensely. Has a collection of ancient artifacts. Still trying to understand "selfies." Rarely leaves his manor during the day.',
+    status: 'Alive',
+    occultStatus: 'Vampire',
+    gender: 'Male',
+    age: 'Elder', // Or ancient adult
+    zodiac: 'Capricorn',
+    aspiration: 'Knowledge',
+    lifetimeWish: 'Master Vampire Lore',
+    aspirationSims4: 'Vampire Family',
+    career: 'Unemployed', // Or retired
+    careerLvl: null,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Vampire Lore',
+    skill1Lvl: 15, // Max for Vampires
+    skill2: 'Pipe Organ',
+    skill2Lvl: 10,
+    skill3: 'Charisma',
+    skill3Lvl: 6,
+    traits: ['Loner', 'Evil', 'Mean', 'Gloomy', 'Night Owl'],
+    bonusTrait: 'Master of Darkness',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Shy',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Serious',
+    personalityGrouchyNice: 'Grouchy',
+    favoriteFood: 'Plasma Pack',
+    favoriteMusic: 'Classical',
+    favoriteColor: 'Black',
+    interest1: 'Vampire Lore',
+    interest1Lvl: 10,
+    dislikedInterest1: 'Fitness',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Playing Pipe Organ',
+    skinColor: 'Pale',
+    hairColor: 'Black',
+    fitness: 'Unfit',
+    eyeColor: 'Red',
+    turnOn1: 'Gothic Attire',
+    turnOn2: 'Fear',
+    turnOff: 'Garlic',
+    fullName: 'Vladislaus Straud'
+  },
+  // Lily Zest (Comedian)
+  {
+    id: 'sim-6',
+    firstName: 'Lily',
+    name: 'Zest',
+    household: 'Zest household',
+    imageYoungAdult: 'https://placehold.co/200x250/EC4899/ffffff?text=Lily+Zest',
+    imageAdult: 'https://placehold.co/80x80/DB2777/ffffff?text=A',
+    title: 'Aspiring Comedian',
+    bio: 'Lily Zest is a cheerful and ambitious Sim who dreams of becoming a famous comedian. She lives in Oasis Springs and is always ready with a witty remark or a silly joke. She tries to find humor in every situation, even when things go wrong.',
+    notes: 'Practices stand-up routines in front of the mirror. Tries to make everyone laugh. Struggles with confidence sometimes.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Female',
+    age: 'Young Adult',
+    zodiac: 'Leo',
+    aspiration: 'Popularity',
+    lifetimeWish: 'Achieve Global Superstar',
+    aspirationSims4: 'Joke Star',
+    career: 'Comedian',
+    careerLvl: 4,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: [],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Comedy',
+    skill1Lvl: 7,
+    skill2: 'Charisma',
+    skill2Lvl: 5,
+    skill3: 'Mischief',
+    skill3Lvl: 3,
+    traits: ['Outgoing', 'Goofball', 'Ambitious', 'Creative', 'Self-Assured'],
+    bonusTrait: 'Gregarious',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Grilled Cheese',
+    favoriteMusic: 'Pop',
+    favoriteColor: 'Yellow',
+    interest1: 'Comedy',
+    interest1Lvl: 9,
+    dislikedInterest1: 'Gardening',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Performing',
+    skinColor: 'Medium',
+    hairColor: 'Red',
+    fitness: 'Average',
+    eyeColor: 'Green',
+    turnOn1: 'Good Sense of Humor',
+    turnOn2: 'Outgoing Sims',
+    turnOff: 'Mean Sims',
+    fullName: 'Lily Zest'
+  },
+  // Johnny Zest (Disowned Landgraab)
+  {
+    id: 'sim-7',
+    firstName: 'Johnny',
+    name: 'Zest', // Not directly related to Lily Zest, but shares surname
+    household: 'Zest household',
+    imageYoungAdult: 'https://placehold.co/200x250/6EE7B7/ffffff?text=Johnny+Zest',
+    title: 'Unemployed Aspiring Performer',
+    bio: 'Johnny Zest is a struggling comedian who was disowned by the Landgraabs. Despite his misfortunes, he remains optimistic and determined to make it big in the entertainment industry. He lives in a trailer and works hard on his craft.',
+    notes: 'Ex-Landgraab. Practices jokes constantly. Dreams of winning a comedy award. Often broke.',
+    status: 'Alive',
+    occultStatus: 'None',
+    gender: 'Male',
+    age: 'Young Adult',
+    zodiac: 'Gemini',
+    aspiration: 'Popularity',
+    lifetimeWish: 'Become a World Renowned Celebrity',
+    aspirationSims4: 'Joke Star',
+    career: 'Unemployed', // Or part-time job
+    careerLvl: null,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: [], // Can link to Landgraabs later if desired
+    parent1: 'Nancy Landgraab (Disowned)',
+    parent2: 'Geoffrey Landgraab (Disowned)',
+    children: [],
+    skill1: 'Comedy',
+    skill1Lvl: 6,
+    skill2: 'Charisma',
+    skill2Lvl: 4,
+    skill3: 'Guitar',
+    skill3Lvl: 2,
+    traits: ['Outgoing', 'Goofball', 'Creative', 'Noncommittal'],
+    bonusTrait: 'Gregarious',
+    personalitySloppyNeat: 'Sloppy',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Pizza',
+    favoriteMusic: 'Electronica',
+    favoriteColor: 'Orange',
+    interest1: 'Comedy',
+    interest1Lvl: 8,
+    dislikedInterest1: 'Cleaning',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Performing',
+    skinColor: 'Light',
+    hairColor: 'Blonde',
+    fitness: 'Average',
+    eyeColor: 'Blue',
+    turnOn1: 'Good Sense of Humor',
+    turnOn2: 'Playful Sims',
+    turnOff: 'Serious Sims',
+    fullName: 'Johnny Zest'
+  },
+  {
+    id: 'sim-8',
+    firstName: 'Caleb',
+    name: 'Vatore',
+    household: 'Vatore household',
+    imageYoungAdult: 'https://placehold.co/200x250/2563EB/ffffff?text=Caleb+Vatore',
+    imageAdult: 'https://placehold.co/80x80/1D4ED8/ffffff?text=A',
+    title: 'Good Vampire',
+    bio: 'Caleb Vatore is a kind-hearted vampire who strives to be a good Sim and avoid the typical vampiric stereotypes. He prefers plasma packs over biting Sims and loves socializing, often trying to make new friends in Forgotten Hollow.',
+    notes: 'Secretly practices magic. Tries to convert Vladislaus to be good. Has a sister, Lilith Vatore.',
+    status: 'Alive',
+    occultStatus: 'Vampire',
+    gender: 'Male',
+    age: 'Young Adult',
+    zodiac: 'Cancer',
+    aspiration: 'Popularity',
+    lifetimeWish: 'Good Vampire',
+    aspirationSims4: 'Good Vampire',
+    career: 'Mixologist',
+    careerLvl: 5,
+    maritalStatus: 'Single',
+    partners: [],
+    siblings: ['Lilith Vatore'],
+    parent1: null,
+    parent2: null,
+    children: [],
+    skill1: 'Vampire Lore',
+    skill1Lvl: 8,
+    skill2: 'Charisma',
+    skill2Lvl: 7,
+    skill3: 'Mixology',
+    skill3Lvl: 6,
+    traits: ['Good', 'Brooding', 'Loves Outdoors', 'Perfectionist'],
+    bonusTrait: 'Kindly Vampire',
+    personalitySloppyNeat: 'Neat',
+    personalityShyOutgoing: 'Outgoing',
+    personalityLazyActive: 'Lazy',
+    personalitySeriousPlayful: 'Playful',
+    personalityGrouchyNice: 'Nice',
+    favoriteFood: 'Plasma Fruit Salad',
+    favoriteMusic: 'Blues',
+    favoriteColor: 'Blue',
+    interest1: 'Vampire Lore',
+    interest1Lvl: 7,
+    dislikedInterest1: 'Fighting',
+    dislikedInterest1Lvl: 1,
+    hobby: 'Reading',
+    skinColor: 'Pale',
+    hairColor: 'Dark Brown',
+    fitness: 'Fit',
+    eyeColor: 'Brown',
+    turnOn1: 'Nice Sims',
+    turnOn2: 'Intelligent Sims',
+    turnOff: 'Mean Sims',
+    fullName: 'Caleb Vatore'
+  },
+];
+
+// Mock data for news articles if CSV fetch fails or is empty
+const getMockNewsData = () => {
+  const filteredArticles = [
+    {
+      id: '0001',
+      headline: 'Rubber Duck Mystery Deepens in Willow Creek',
+      date: 'June 20, 2025',
+      content: 'Residents of Willow Creek are baffled by the sudden vanishing act of dozens of rubber ducks from local fountains and bathtubs. The police are investigating whether it\'s a prank, an odd art installation, or something more sinister. This incident has sparked a town-wide debate and a new fascination with bath toys.',
+      image: 'https://64.media.tumblr.com/cc945a084bfd292dea717d0abc574a7b/f21acf2c10ef62f4-1b/s1280x1920/885ea0f18be74b1a16ad7e436c61b71f74a2cfb1.pnj',
+    },
+    {
+      id: '0022',
+      headline: 'Olivia Pine Wins Newcrest Pie Contest with Secret Ingredient',
+      date: 'June 19, 2025',
+      content: 'Olivia Pine, a renowned local baker, won the annual Newcrest Pie Contest. Her secret ingredient, as she stated, "A pinch of magic and a whole lot of Sim-love!". This unexpected turn of events has everyone talking about her newfound culinary genius, leading to a surge in pie sales across the neighborhood.',
+      image: 'https://adamantnonsense.github.io/simgremlin/005.jpg',
+    },
+    {
+      id: '9000',
+      headline: 'Frank Cedars\' Garden Bursts into Operatic Song',
+      date: 'June 18, 2025',
+      content: 'Frank Cedars\' meticulously tended garden has literally taken on a life of its own, with his prize-winning roses and sunflowers spontaneously bursting into operatic arias, much to the delight and confusion of passersby. Scientists are baffled by this botanical phenomenon, and tourists are flocking to witness the singing garden.',
+      image: 'https://adamantnonsense.github.io/simgremlin/005.jpg',
+    },
+  ];
+
+  // Headlines to filter out (explicitly marked as "fake" by user)
+  const headlinesToFilter = [
+    'Dustin Broke Becomes Internet Sensation Overnight', // Covers "Dustin broke viral"
+    'New Occult Restaurant "Plasma Feast" Opens in Forgotten Hollow', // Covers "plasma fruit"
+    'Wellness Guru Introduces Llama Yoga to Willow Creek',
+    'Local Architect Builds Upside-Down House, Confounds Town Planners',
+  ];
+
+  return filteredArticles.filter(article => !headlinesToFilter.includes(article.headline));
+};
+
+
+// --- SearchBar Component ---
+const SearchBar = ({ onSearch, onToggleFullScreen, isFullScreen, searchResults, onResultClick }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchType, setSearchType] = useState('sim'); // 'sim' or 'family'
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    // Close dropdown if clicked outside
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+          inputRef.current && !inputRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleSearchChange = (e) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    setShowDropdown(term.length > 0); // Show dropdown only if there's a search term
+    onSearch(term, searchType);
+  };
+
+  const handleTypeChange = (e) => {
+    const type = e.target.value;
+    setSearchType(type);
+    onSearch(searchTerm, type); // Re-run search with new type
+    setShowDropdown(searchTerm.length > 0); // Keep dropdown visible if term exists
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setShowDropdown(false);
+    onSearch('', searchType); // Clear search results
+  };
+
+  const handleFullScreenToggle = () => {
+    onToggleFullScreen(!isFullScreen);
+    if (!isFullScreen) { // If going into full screen, clear search for fresh start
+      setSearchTerm('');
+      onSearch('', searchType);
+      setShowDropdown(false); // Hide dropdown initially in full screen
+    }
+  };
+
+  const handleInputFocus = () => {
+    if (isFullScreen && searchTerm.length > 0) {
+      setShowDropdown(true); // Show dropdown on focus if in full screen and has term
+    } else if (!isFullScreen) {
+      // For compact search bar, directly toggle full screen on focus
+      handleFullScreenToggle();
+    }
+  };
+
+  const handleDropdownItemClick = (item, type, allItems, index, e) => {
+    e.stopPropagation(); // Prevent modal from closing immediately after opening
+    onResultClick(item, type, allItems, index);
+    setSearchTerm(''); // Clear search term after selection
+    setShowDropdown(false); // Hide dropdown
+    onToggleFullScreen(false); // Exit full screen search
+  };
+
+
+  return (
+    <>
+      <div className={`relative flex items-center bg-gray-200 rounded-full py-2 px-4 shadow-inner cursor-pointer transition-all duration-300 ${isFullScreen ? 'hidden' : 'w-full max-w-sm'}`}
+           onClick={handleFullScreenToggle} // Clicking compact bar toggles full screen
+           ref={inputRef} // Assign ref to the compact input container
+      >
+        <input
+          type="text"
+          placeholder={`Search ${searchType}...`}
+          className="bg-transparent outline-none flex-grow text-gray-800 placeholder-gray-500 cursor-pointer"
+          readOnly // Make it read-only to force click for full screen
+          value={searchTerm} // Display current search term even when readOnly
+        />
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+
+      {isFullScreen && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-95 flex flex-col justify-center items-center z-50 p-4">
+          <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-6 relative">
+            <button
+              onClick={handleFullScreenToggle}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-4xl font-light leading-none"
+              aria-label="Close search"
+            >
+              &times;
+            </button>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Search Neighborhood</h2>
+
+            <div className="mb-6 relative">
+              <label htmlFor="search-input" className="sr-only">Search term</label>
+              <input
+                id="search-input"
+                type="text"
+                placeholder={`Search for a ${searchType} name...`}
+                className="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-blue-500 focus:border-blue-500 transition-all shadow-sm"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onFocus={handleInputFocus}
+                autoFocus
+              />
+              {showDropdown && searchResults && searchResults.length > 0 && (
+                <ul ref={dropdownRef} className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto z-10">
+                  {searchResults.map((result, index) => (
+                    <li
+                      key={result.id || index}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      onClick={(e) => handleDropdownItemClick(result, searchType, searchResults, index, e)}
+                    >
+                      {searchType === 'sim' ? result.fullName : result.name}
+                      {searchType === 'sim' && result.household && <span className="text-gray-500 text-sm ml-2">({result.household})</span>}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
+
+            <div className="flex justify-center items-center space-x-6 mb-8">
+              <label className="flex items-center text-lg cursor-pointer">
+                <input
+                  type="radio"
+                  name="searchType"
+                  value="sim"
+                  checked={searchType === 'sim'}
+                  onChange={handleTypeChange}
+                  className="form-radio h-5 w-5 text-blue-600 transition-colors"
+                />
+                <span className="ml-2 text-gray-700">Search Sims</span>
+              </label>
+              <label className="flex items-center text-lg cursor-pointer">
+                <input
+                  type="radio"
+                  name="searchType"
+                  value="family"
+                  checked={searchType === 'family'}
+                  onChange={handleTypeChange}
+                  className="form-radio h-5 w-5 text-blue-600 transition-colors"
+                />
+                <span className="ml-2 text-gray-700">Search Families</span>
+              </label>
+            </div>
+
+            <div className="flex justify-center">
+              <button
+                onClick={handleClearSearch}
+                className="bg-red-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-red-600 transition-colors text-lg"
+              >
+                Clear Search
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="main-content-area flex flex-col gap-3 flex-grow">
-            <div class="world-header p-6 rounded-lg text-center flex-shrink-0">
-                <h1 id="worldNameDisplay" class="text-4xl md:text-5xl font-extrabold text-center mb-2"></h1>
-                <p id="worldDescriptionDisplay" class="text-lg md:text-xl"></p>
-            </div>
-            
-            <div id="staticNavBar" class="static-nav-bar">
-                <button id="showNeighborhoodStoriesBtn" class="px-5 py-2 rounded-md font-bold">Neighborhood Stories</button>
-                <button id="showSpreadsheetBtn" class="px-5 py-2 rounded-md font-bold">All Sims</button>
-                <button id="showHomelessSimsBtn" class="px-5 py-2 rounded-md font-bold">Homeless Sims</button>
-                <button id="showGraveyardBtn" class="px-5 py-2 rounded-md font-bold">Graveyard</button>
-                <button id="showNotesBtn" class="px-5 py-2 rounded-md font-bold">Notes</button>
-            </div>
-            <div id="contentDisplayArea" class="flex-grow flex flex-col">
-                <div id="simDetailsCard" class="trading-card-redesign hidden flex-col flex-grow">
-                    <div class="card-header-redesign relative">
-                        <h2 id="simNameDisplay" class="sim-name-display-redesign text-3xl md:text-4xl font-extrabold mb-1"></h2>
-                        <p id="simTitleDisplay" class="sim-title-display text-lg md:text-2xl font-medium"></p>
-                    </div>
-                    <div class="card-content-redesign flex flex-col flex-grow">
-                        <div class="card-image-section-redesign rounded-md" onclick="openImageModal(document.getElementById('simImage').src)">
-                            <img id="simImage" src="https://via.placeholder.co/400x225/3182CE/C2D0E6?text=Sim+Image" alt="Sim Image">
-                        </div>
-                        <div id="simAgeIconsContainer" class="sim-age-icons-container">
-                        </div>
-                        <div class="sim-bio-box-redesign section-block-style">
-                            <h4 class="text-xl font-semibold mb-3 flex items-center"><i class="fas fa-book sim-stat-icon"></i> Bio</h4>
-                            <p id="simBioText" class="text-base leading-relaxed"></p>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow details-and-skills-grid">
-                            <div class="sim-details-section section-block-style">
-                                <h4 class="text-xl font-semibold mb-3 flex items-center"><i class="fas fa-info-circle sim-stat-icon"></i> Key Details</h4>
-                                <div class="sim-details-list flex flex-col gap-2">
-                                    <div class="sim-stat-item"><span class="sim-stat-label-redesign">Age:</span> <span id="simAge" class="sim-stat-value-redesign"></span></div>
-                                    <div class="sim-stat-item"><span class="sim-stat-label-redesign">Gender:</span> <span id="simGender" class="sim-stat-value-redesign"></span></div>
-                                    <div class="sim-stat-item"><span class="sim-stat-label-redesign">Status:</span> <span id="simStatus" class="sim-stat-value-redesign"></span></div>
-                                    <div class="sim-stat-item"><span class="sim-stat-label-redesign">Occult Status:</span> <span id="simOccultStatus" class="sim-stat-value-redesign"></span></div>
-                                    <div class="sim-stat-item"><span class="sim-stat-label-redesign">Career:</span> <span id="simCareer" class="sim-stat-value-redesign"></span></div>
-                                    <div class="sim-stat-item"><span class="sim-stat-label-redesign">Aspiration:</span> <span id="simAspiration" class="sim-stat-value-redesign"></span></div>
-                                    <div class="sim-stat-item"><span class="sim-stat-label-redesign">Zodiac:</span> <span id="simZodiac" class="sim-stat-value-redesign"></span></div>
-                                    <div class="sim-stat-item"><span class="sim-stat-label-redesign">Partner:</span> <span id="simPartners" class="sim-stat-value-redesign"></span></div>
-                                    <div class="sim-stat-item"><span class="sim-stat-label-redesign">Parents:</span> <span id="simParents" class="sim-stat-value-redesign"></span></div>
-                                    <div class="sim-stat-item"><span class="sim-stat-label-redesign">Children:</span> <span id="simChildren" class="sim-stat-value-redesign"></span></div>
-                                </div>
-                            </div>
-                            <div class="sim-skills-section section-block-style">
-                                <h4 class="text-xl font-semibold mb-3 flex items-center"><i class="fas fa-star sim-stat-icon"></i> Skills</h4>
-                                <div id="simSkillsList" class="sim-skills-list">
-                                </div>
-                            </div>
-                            <div id="simPersonalitySection" class="sim-personality-section section-block-style col-span-1 md:col-span-2">
-                                <h4 class="text-xl font-semibold mb-3 flex items-center"><i class="fas fa-smile sim-stat-icon"></i> Personality</h4>
-                                <div id="simPersonalityList" class="flex flex-col gap-2">
-                                </div>
-                            </div>
-                            <div class="sim-traits-section section-block-style col-span-1 md:col-span-2">
-                                <h4 class="text-xl font-semibold mb-3 flex items-center"><i class="fas fa-tags sim-stat-icon"></i> Traits</h4>
-                                <div id="simTraitList" class="sim-trait-list-redesign flex flex-wrap gap-2">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="sim-hobbies-section section-block-style">
-                            <h4 class="text-xl font-semibold mb-3 flex items-center"><i class="fas fa-gamepad sim-stat-icon"></i> Hobbies & Interests</h4>
-                            <ul id="simHobbiesList" class="hobbies-list list-none pl-0">
-                            </ul>
-                        </div>
-                        <div class="notes-section section-block-style">
-                            <h4 class="text-xl font-semibold mb-3 flex items-center"><i class="fas fa-clipboard sim-stat-icon"></i> Notes</h4>
-                            <div id="simNotesContent" class="text-base leading-relaxed"></div>
-                        </div>
-                    </div>
-                </div>
-                <div id="familyOverviewContent" class="family-overview-section hidden flex-col flex-grow">
-                    <h4 class="mb-4 flex items-center relative z-20">
-                        <i class="fas fa-home mr-2"></i> <span id="familyOverviewTitleName" class="family-name-in-header"></span>
-                    </h4>
-                    <img id="familyPhoto" src="" alt="Family Photo" class="w-full h-auto rounded-md mb-4 hidden">
-                    <p class="family-bio-detail mb-3 relative z-20">
-                        <span class="font-normal">Location:<br></span> <span id="familyLocation" class="detail-value"></span>
-                    </p>
-                    <p class="family-bio-detail mb-3 relative z-20">
-                        <span class="font-normal">Number of Members:<br></span> <span id="familyMemberCount" class="detail-value"></span>
-                    </p>
-                    <p class="family-bio-detail mb-3 relative z-20">
-                        <span class="font-normal">Funds:<br></span> <span id="familyFunds" class="detail-value"></span>
-                    </p>
-                    <div class="family-bio-text-content mt-6 relative z-20">
-                        <h5 class="text-xl font-semibold mb-2">Biography:</h5>
-                        <p id="familyBiography"></p>
-                    </div>
-                </div>
-                <div id="spreadsheetView" class="spreadsheet-container collapsed hidden flex-col flex-grow">
-                    <div class="collapsible-content scrollable max-h-0 overflow-hidden transition-all duration-400 ease-in-out relative z-20">
-                        <div class="overflow-x-auto">
-                            <table class="sims-table min-w-full bg-white bg-opacity-70 rounded-lg overflow-hidden">
-                                <thead>
-                                    <tr>
-                                        <th class="py-3 px-4 sortable-th" data-sort="name">Name<i class="fas fa-sort sort-icon"></i></th>
-                                        <th class="py-3 px-4 sortable-th" data-sort="family">Family<i class="fas fa-sort sort-icon"></i></th>
-                                        <th class="py-3 px-4 sortable-th" data-sort="age">Age<i class="fas fa-sort sort-icon"></i></th>
-                                        <th class="py-3 px-4 sortable-th" data-sort="status">Status<i class="fas fa-sort sort-icon"></i></th>
-                                        <th class="py-3 px-4 sortable-th" data-sort="career">Career<i class="fas fa-sort sort-icon"></i></th>
-                                        <th class="py-3 px-4 sortable-th" data-sort="aspiration">Aspiration<i class="fas fa-sort sort-icon"></i></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="simsTableBody">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div id="storyDisplayContent" class="sleek-panel hidden flex-col flex-grow">
-                    <h2 id="storyListHeader" class="text-2xl font-bold mb-4 flex items-center relative z-20">
-                        Neighborhood Stories
-                    </h2>
-                    <div id="storyListContainer" class="">
-                        <div id="storyList" class="story-list-in-card flex flex-col scrollable-list max-h-96">
-                        </div>
-                    </div>
-                    <div id="singleStoryContainer" class="hidden">
-                        <button class="story-back-button px-4 py-2 rounded-md" onclick="showStoryList()">
-                            <i class="fas fa-arrow-left mr-2"></i>Back to Stories
-                        </button>
-                        <h3 id="singleStoryHeadline" class="text-2xl font-bold mb-4 text-center"></h3>
-                        <div class="story-image-container" onclick="openImageModal(document.getElementById('storyImage').src)">
-                            <img id="storyImage" src="https://placehold.co/400x225/EF5350/E2E8F0?text=Story%20Image" alt="Story Image">
-                        </div>
-                        
-                        <div id="storyContent" class="story-single-content-in-card p-4 rounded-md text-base leading-relaxed">
-                        </div>
-                    </div>
-                </div>
-                <div id="graveyardSection" class="graveyard-section hidden flex-col flex-grow">
-                    <h3 class="text-2xl font-extrabold mb-4 flex items-center relative z-20"><i class="fas fa-cross sim-stat-icon mr-2"></i> The Graveyard</h3>
-                    <p class="text-center text-secondary text-lg mb-4 relative z-20">Here lie the dearly departed Sims of Newcrest.</p>
-                    <div id="graveyardGrid" class="graveyard-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-20">
-                    </div>
-                </div>
-                <div id="homelessSimsSection" class="homeless-sims-section hidden flex-col flex-grow">
-                    <h3 class="text-2xl font-extrabold mb-4 flex items-center relative z-20"><i class="fas fa-house-damage sim-stat-icon mr-2"></i> Homeless Sims</h3>
-                    <p class="text-center text-secondary text-lg mb-4 relative z-20">These Sims are currently without a permanent home.</p>
-                    <div id="homelessSimsGrid" class="homeless-sims-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-20">
-                    </div>
-                </div>
-                <div id="notesSection" class="sleek-panel hidden flex-col flex-grow">
-                    <h2 class="text-2xl font-bold mb-4 flex items-center relative z-20">
-                        <i class="fas fa-book-open mr-2"></i> Collected Notes
-                    </h2>
-                    <div id="notesContent" class="relative z-20">
-                    </div>
-                </div>
-            </div>
+      )}
+    </>
+  );
+};
+
+
+// Main App Component
+const App = () => {
+  const [currentPage, setCurrentPage] = useState('simBiographies'); // Default page
+  const [db, setDb] = useState(null); // Firestore instance
+  const [auth, setAuth] = useState(null); // Firebase Auth instance
+  const [simsData, setSimsData] = useState([]); // State to hold Sim Biographies data
+  const [newsData, setNewsData] = useState([]); // State to hold Neighborhood News data
+  const [expandedItem, setExpandedItem] = useState(null); // State for the currently expanded item (Sim, Family, News)
+
+  // Search States
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchType, setSearchType] = useState('sim');
+  const [isSearchFullScreen, setIsSearchFullScreen] = useState(false);
+
+  // Firebase Initialization and Authentication (Placeholder for actual Firebase integration)
+  useEffect(() => {
+    // Placeholder for userId (remove when Firebase is fully integrated)
+    setDb({}); // Mock db object
+    setAuth({}); // Mock auth object
+  }, []);
+
+  // CSV Parsing Function for Sims
+  const parseSimsCsv = (csvText) => {
+    const lines = csvText.split('\n').filter(line => line.trim() !== '');
+    if (lines.length === 0) return [];
+
+    const headers = lines[0].split(',').map(header => header.trim());
+    const data = lines.slice(1).map(line => {
+      const values = line.split(',').map(value => value.trim());
+      const row = {};
+      headers.forEach((header, index) => {
+        let cleanHeader = header
+          .replace(/[\s\.]/g, '')
+          .replace(/\(Sims4\)/g, 'Sims4');
+
+        if (cleanHeader.startsWith('Image_')) {
+          const parts = cleanHeader.split('_');
+          if (parts.length > 1 && parts[1]) {
+            const camelCasedPart = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
+            cleanHeader = `image${camelCasedPart}`;
+          } else {
+            cleanHeader = 'image';
+          }
+        } else {
+          cleanHeader = cleanHeader.charAt(0).toLowerCase() + cleanHeader.slice(1);
+        }
+        row[cleanHeader] = values[index];
+      });
+
+      row.traits = [
+        row.traits, row.trait2, row.trait3, row.trait4, row.trait5, row.bonusTrait
+      ].flat().filter(Boolean);
+
+      row.partners = row.partners ? row.partners.split(';').map(p => p.trim()).filter(Boolean) : [];
+      row.siblings = row.siblings ? row.siblings.split(';').map(s => s.trim()).filter(Boolean) : [];
+      row.children = row.children ? row.children.split(';').map(c => c.trim()).filter(Boolean) : [];
+
+      row.id = row.id || `${row.firstName}-${row.name}-${Math.random().toString(36).substr(2, 9)}`;
+      // Combine firstName and name for easier display in census
+      row.fullName = `${row.firstName || ''} ${row.name || ''}`.trim();
+
+      return row;
+    });
+    return data;
+  };
+
+  // CSV Parsing Function for News
+  const parseNewsCsv = (csvText) => {
+    const lines = csvText.split('\n').filter(line => line.trim() !== '');
+    if (lines.length === 0) return [];
+
+    const headers = lines[0].split(',').map(header => header.trim().toLowerCase());
+    const data = lines.slice(1).map(line => {
+      const values = line.split(',').map(value => value.trim());
+      const row = {};
+      headers.forEach((header, index) => {
+        row[header] = values[index];
+      });
+      // Ensure 'id' and 'image' fields are present, and 'date' is formatted
+      row.id = row.id || `news-${Math.random().toString(36).substr(2, 9)}`;
+      row.image = row.image || 'https://placehold.co/600x300/A0AEC0/ffffff?text=News';
+      row.date = row.date || new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      return row;
+    });
+
+    // Filter out specific "fake" headlines after parsing
+    const headlinesToFilter = [
+      'Dustin Broke Becomes Internet Sensation Overnight', // Covers "Dustin broke viral"
+      'New Occult Restaurant "Plasma Feast" Opens in Forgotten Hollow', // Covers "plasma fruit"
+      'Wellness Guru Introduces Llama Yoga to Willow Creek',
+      'Local Architect Builds Upside-Down House, Confounds Town Planners',
+      'Rubber Duck Mystery Deepens in Willow Creek',
+      'Elder Sim Discovers Hidden Talent for DJing',
+      'Alien Visitor Attempts to Understand "Human Humor"',
+      'Frank Cedars\' Garden Bursts into Operatic Song',
+      'Olivia Pine Wins Newcrest Pie Contest with Secret Ingredient',
+    ];
+
+    return data.filter(article => !headlinesToFilter.includes(article.headline));
+  };
+
+
+  // Fetch Sim Biographies data
+  useEffect(() => {
+    const fetchSimBiographies = async () => {
+      const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSs1l3tUbLZpKfZCUxSkdYYsRcneV_PsoF7yPLJ3YdZr_tsVSOo3qcH4idIjwmx-f4U7rMb7_nBDSuV/pub?gid=522782907&single=true&output=csv';
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const csvText = await response.text();
+        const parsedData = parseSimsCsv(csvText); // Use parseSimsCsv
+        setSimsData(parsedData);
+      } catch (error) {
+        console.error("Error fetching Sim Biographies data:", error);
+        // Fallback to mock data if fetching fails
+        setSimsData(getMockSimsData());
+      }
+    };
+
+    fetchSimBiographies();
+  }, []);
+
+  // Fetch Neighborhood News data (new useEffect)
+  useEffect(() => {
+    const fetchNeighborhoodNews = async () => {
+      // Mock CSV URL for News (replace with real if available)
+      const newsUrl = 'https://mock-data-url.com/neighborhood-news.csv'; // Placeholder URL
+      try {
+        const response = await fetch(newsUrl);
+        if (!response.ok) {
+          // If mock URL fails, fall back to hardcoded mock data
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const csvText = await response.text();
+        const parsedData = parseNewsCsv(csvText); // Use parseNewsCsv
+        setNewsData(parsedData);
+      } catch (error) {
+        console.warn("Could not fetch news data from CSV. Falling back to mock news data.", error);
+        setNewsData(getMockNewsData()); // Fallback to getMockNewsData
+      }
+    };
+
+    fetchNeighborhoodNews();
+  }, []);
+
+
+  const handleNavigationClick = (page) => {
+    setCurrentPage(page);
+    setExpandedItem(null); // Close any expanded view when changing pages
+  };
+
+  // New function to handle opening expanded view with all items and current index
+  const handleOpenExpandedView = (item, type, allItems = [], currentIndex = -1) => {
+    setExpandedItem({ item, type, allItems, currentIndex });
+  };
+
+  const handleCloseExpandedView = () => {
+    setExpandedItem(null);
+  };
+
+  const handleSearch = (term, type) => {
+    setSearchTerm(term);
+    setSearchType(type);
+  };
+
+  // Filtered data based on search term and type
+  const filteredSimsData = useMemo(() => {
+    if (!searchTerm) return simsData;
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    return simsData.filter(sim =>
+      sim.fullName.toLowerCase().includes(lowerCaseSearchTerm) ||
+      (sim.household && sim.household.toLowerCase().includes(lowerCaseSearchTerm))
+    );
+  }, [simsData, searchTerm]);
+
+  // Family data (currently mock, but now filtered)
+  const allFamiliesData = useMemo(() => {
+    const rawFamilyData = [
+      { householdName: 'Behr', funds: 10000, biography: 'The Behr household, home to the dynamic duo of Candy and Yuki. They are known for their love of music and their vibrant personalities, always ready to throw a dance party. Their modern home is filled with eccentric art and a professional DJ booth.', imgFamilyBio: 'https://placehold.co/400x200/C026D3/ffffff?text=Behr+Family' },
+      { householdName: 'BFF household', funds: 5000, biography: 'A group of inseparable friends living together: Summer Holiday, Travis Scott, and Liberty Lee. They are young, ambitious, and navigating the ups and downs of adulting, always supporting each other through career struggles and romantic misadventures. Their house is a hub of laughter and video games.', imgFamilyBio: 'https://placehold.co/400x200/9333EA/ffffff?text=BFF+Household' },
+      { householdName: 'Bjergsen', funds: 75000, biography: 'Bjorn and Clara Bjergsen, a seemingly perfect family with hidden depths. Their daughter Sofia is a talented musician. Despite their public image, Bjorn often feels distant, and Clara struggles to keep the family\'s facade intact. Their elegant home in Windenburg is a testament to their wealth and status.', imgFamilyBio: 'https://placehold.co/400x200/6D28D9/ffffff?text=Bjergsen+Family' },
+      { householdName: 'Bro', funds: 20000, biography: 'Three brothers who love gaming and living life to the fullest: Geoffrey, Travis, and John. Their bachelor pad is perpetually messy, filled with pizza boxes and gaming consoles. They are fiercely loyal to each other, even if their competitive streak sometimes gets the better of them.', imgFamilyBio: 'https://placehold.co/400x200/4C1D95/ffffff?text=Bro+Household' },
+      { householdName: 'Bun Ma family', funds: 15000, biography: 'A cozy family with a love for traditional cooking. They recently moved to San Myshuno and are enjoying the vibrant city life, bringing their grandmother\'s recipes to the local food festivals. Their apartment is always filled with the aroma of delicious spices.', imgFamilyBio: 'https://placehold.co/400x200/3B0764/ffffff?text=Bun+Ma+Family' },
+      { householdName: 'Cahil family', funds: 12000, biography: 'A family with a passion for the outdoors and adventure. They spend most weekends hiking, fishing, and camping in Granite Falls. Their home is filled with souvenirs from their travels and maps of unexplored territories.', imgFamilyBio: 'https://placehold.co/400x200/EC4899/ffffff?text=Cahil+Family' },
+      { householdName: 'Cahyaputri family', funds: 18000, biography: 'Known for their hospitality and artistic endeavors. They frequently host painting workshops and open mic nights in their backyard, bringing the community together with their creative spirit. Their vibrant garden is as colorful as their personalities.', imgFamilyBio: 'https://placehold.co/400x200/DB2777/ffffff?text=Cahyaputri+Family' },
+      { householdName: 'Eclectic Arts household', funds: 30000, biography: 'A vibrant household of creative Sims, always inspiring each other. This collective of painters, sculptors, and musicians thrives on collaboration and artistic expression. Their shared studio space is a chaotic but inspiring mess of ongoing projects.', imgFamilyBio: 'https://placehold.co/400x200/C026D3/ffffff?text=Eclectic+Arts' },
+      { householdName: 'Family Name', funds: 0, biography: 'This is a placeholder for a new family, ready for your stories to unfold.', imgFamilyBio: '' },
+      { householdName: 'Free Spirils', funds: 10000, biography: 'Embracing independence and unconventional lifestyles, this household lives life on their own terms. They are often found traveling, exploring new cultures, and expressing themselves through street art and performance. Their home is a temporary stop before their next adventure.', imgFamilyBio: 'https://placehold.co/400x200/9333EA/ffffff?text=Free+Spirits' },
+      { householdName: 'Fyres', funds: 45000, biography: 'A large, lively family with a knack for mischief and fun. Siobhan and Morgan Fyres lead a household of energetic Sims who love pranks and outdoor activities. Their annual camping trips are legendary for their wild stories and unexpected twists.', imgFamilyBio: 'https://placehold.co/400x200/6D28D9/ffffff?text=Fyres+Family' },
+      { householdName: 'Goth family', funds: 999999, biography: 'The mysterious and wealthy Goth family, steeped in history and gothic charm. Mortimer, Bella, Cassandra, and Alexander reside in their grand mansion, where secrets and shadows linger around every corner. They are known for their intelligence, elegance, and occasional encounters with the supernatural.', imgFamilyBio: 'https://placehold.co/400x200/F87171/ffffff?text=Goth+Family' },
+      { householdName: 'Hoapil', funds: 25000, biography: 'A warm and welcoming island family. The Hoapil family are deeply connected to the culture and traditions of Sulani. They are environmentally conscious, love the ocean, and enjoy teaching others about island living. Their beachfront home is always open to friends and family.', imgFamilyBio: 'https://placehold.co/400x200/22C55E/ffffff?text=Hoapil+Family' },
+      { householdName: 'Jaleel household', funds: 8000, biography: 'A small family focused on community and learning. They are often found volunteering at the local library or organizing neighborhood clean-up events. Their quiet demeanor hides a fierce dedication to improving their community and fostering education.', imgFamilyBio: 'https://placehold.co/400x200/3B82F6/ffffff?text=Jaleel+Household' },
+      { householdName: 'Kahanani', funds: 17000, biography: 'Known for their strong family bonds and love for the ocean. The Kahanani family are master fishermen and storytellers, preserving ancient island legends. They spend most of their days by the water, living a peaceful life in harmony with nature.', imgFamilyBio: 'https://placehold.co/400x200/2563EB/ffffff?text=Kahanani' },
+      { householdName: 'Keacha', funds: 9000, biography: 'A family of talented musicians and performers. They dream of forming a successful band and touring the world. Their garage is a makeshift recording studio, and their evenings are filled with jam sessions and songwriting. They are always ready to put on a show.', imgFamilyBio: 'https://placehold.co/400x200/1D4ED8/ffffff?text=Keacha+Family' },
+      { householdName: 'Laurent family', funds: 35000, biography: 'A sophisticated family with a love for fine arts and culture. They are patrons of the arts, frequently hosting exclusive gallery openings and classical music concerts. Their lavish mansion is filled with priceless art pieces and rare antique furniture, reflecting their refined tastes.', imgFamilyBio: 'https://placehold.co/400x200/1E3A8A/ffffff?text=Laurent+Family' },
+      { householdName: 'Linh household', funds: 11000, biography: 'A quiet and studious household, always seeking knowledge. The Linh family values education above all else, with every member dedicated to academic pursuits or scientific research. Their home library is vast, and intellectual discussions are a daily occurrence.', imgFamilyBio: 'https://placehold.co/400x200/172554/ffffff?text=Linh+Household' },
+      { householdName: 'Linh-Sacya family', funds: 22000, biography: 'A blended family finding harmony and shared passions. The Linh-Sacya household has successfully merged two distinct backgrounds into a loving and supportive unit. They often combine their cultural traditions in unique and beautiful ways, creating a rich tapestry of experiences.', imgFamilyBio: 'https://placehold.co/400x200/0F172A/ffffff?text=Linh-Sacya+Family' },
+      { householdName: 'Markovic family', funds: 14000, biography: 'Known for their culinary skills and delicious family recipes. The Markovics run a popular local diner, serving up comfort food with a secret family twist. They believe that food is love and their kitchen is the heart of their home, always bustling with activity.', imgFamilyBio: 'https://placehold.co/400x200/3B0764/ffffff?text=Markovic+Family' },
+      { householdName: 'Michaelson family', funds: 28000, biography: 'A family of inventors and tech enthusiasts, always innovating. Their home is a workshop filled with half-finished gadgets and experimental robots. They are constantly trying to build the next big thing, often resulting in hilarious (and sometimes explosive) failures.', imgFamilyBio: 'https://placehold.co/400x200/EC4899/ffffff?text=Michaelson+Family' },
+      { householdName: 'Munch', funds: 16000, biography: 'The lively Munch siblings, navigating life together in Windenburg. Mika, Lucas, and Elsa Munch are a tight-knit trio facing the challenges of adolescence and young adulthood. Despite their arguments, they always have each other\'s backs.', imgFamilyBio: 'https://placehold.co/400x200/DB2777/ffffff?text=Munch+Family' },
+      { householdName: 'Ngala', funds: 19000, biography: 'A vibrant family with deep roots in their community. The Ngalas are known for their storytelling, music, and festive gatherings. They play an active role in local events, sharing their rich heritage and bringing joy to everyone around them.', imgFamilyBio: 'https://placehold.co/400x200/C026D3/ffffff?text=Ngala+Family' },
+      { householdName: 'Pancakes family', funds: 7000, biography: 'Bob and Eliza Pancake, a couple with a complicated but endearing relationship. While Bob loves cooking and staying home, Eliza is ambitious and yearns for more. Their suburban home often feels like a battlefield of conflicting desires, but they secretly cherish their unique bond.', imgFamilyBio: 'https://placehold.co/400x200/6EE7B7/ffffff?text=Pancakes+Family' },
+      { householdName: 'Partihaus', funds: 25000, biography: 'The ultimate party animals, always hosting the best gatherings in Windenburg. This household, led by the charismatic Ulrike Faust, believes life is meant to be celebrated. Their home is a perpetual party zone, with music, laughter, and Sims from all walks of life.', imgFamilyBio: 'https://placehold.co/400x200/9333EA/ffffff?text=Partihaus' },
+      { householdName: 'Robles family', funds: 13000, biography: 'A family of nature lovers, dedicated to preserving the environment. They live off the grid as much as possible, tending to their large garden and advocating for sustainable living. Their home is a green oasis, filled with plants and the gentle hum of self-sufficiency.', imgFamilyBio: 'https://placehold.co/400x200/6D28D9/ffffff?text=Robles+Family' },
+      { householdName: 'Roswell family', funds: 21000, biography: 'An enigmatic family with rumored alien connections. They moved to Oasis Springs under mysterious circumstances, and their behavior often raises eyebrows. They have an unusual affinity for stargazing and a peculiar diet, leading many to wonder about their true origins.', imgFamilyBio: 'https://placehold.co/400x200/4C1D95/ffffff?text=Roswell+Family' },
+      { householdName: 'Sigworth family', funds: 10000, biography: 'A family of explorers, always seeking new adventures. They are rarely found at home, preferring to trek through jungles, uncover ancient ruins, and discover hidden worlds. Their lives are a continuous journey of discovery and thrill-seeking.', imgFamilyBio: 'https://placehold.co/400x200/3B0764/ffffff?text=Sigworth+Family' },
+      { householdName: '8000 family', funds: 8000, biography: 'A modern family embracing technology and innovation. They are early adopters of every new gadget, and their home is a smart house run by AI. They believe technology holds the key to a better future, constantly upgrading their lives with the latest advancements.', imgFamilyBio: 'https://placehold.co/400x200/EC4899/ffffff?text=8000+Family' },
+      { householdName: 'Spencer-Kim-Lewis family', funds: 40000, biography: 'A large, busy household with diverse personalities. Dennis Kim, Alice Spencer-Kim, and their children Olivia and Eric, along with Eric\'s parents, make for a lively, often chaotic, but loving home. Juggling careers, school, and family drama is their daily routine.', imgFamilyBio: 'https://placehold.co/400x200/DB2777/ffffff?text=Spencer-Kim-Lewis' },
+      { householdName: 'Villareal', funds: 50000, biography: 'The wealthy and influential Villareal family, known for their elaborate home and a father with a penchant for mischief. Jacques Villareal and his children Hugo and Luna lead a life of luxury, but beneath the surface, family dynamics are complex and full of secrets. Their sprawling estate hosts many clandestine meetings.', imgFamilyBio: 'https://placehold.co/400x200/C026D3/ffffff?text=Villareal+Family' },
+    ];
+    return rawFamilyData.map((data, index) => ({
+      id: `family-${index}`,
+      name: data.householdName,
+      description: data.biography || 'No biography available for this family yet.',
+      funds: data.funds || 0,
+      members: [],
+      image: data.imgFamilyBio || `https://placehold.co/400x200/A0AEC0/ffffff?text=${encodeURIComponent(data.householdName)}+Family`,
+    }));
+  }, []);
+
+  const filteredFamilyData = useMemo(() => {
+    if (!searchTerm) return allFamiliesData;
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    return allFamiliesData.filter(family =>
+      family.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+      family.description.toLowerCase().includes(lowerCaseSearchTerm)
+    );
+  }, [allFamiliesData, searchTerm]);
+
+  const filteredNewsData = useMemo(() => {
+    if (!searchTerm) return newsData;
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    return newsData.filter(article =>
+      article.headline.toLowerCase().includes(lowerCaseSearchTerm) ||
+      article.content.toLowerCase().includes(lowerCaseSearchTerm)
+    );
+  }, [newsData, searchTerm]);
+
+  // Calculate alive population count
+  const alivePopulationCount = useMemo(() => {
+    return simsData.filter(sim => sim.status === 'Alive').length;
+  }, [simsData]);
+
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'simBiographies':
+        return <SimBiographies simsData={filteredSimsData} getMockSimsData={getMockSimsData} onExpand={handleOpenExpandedView} />;
+      case 'familyBiographies':
+        return <FamilyBiographies filteredFamilyData={filteredFamilyData} onExpand={handleOpenExpandedView} />; // Pass filtered data
+      case 'neighborhoodNews':
+        return <NeighborhoodNews newsData={filteredNewsData} onExpand={handleOpenExpandedView} />; // Pass filtered data
+      case 'population':
+        return <PopulationStats simsData={filteredSimsData} alivePopulationCount={alivePopulationCount} />; // Pass filtered data and count
+      case 'notes':
+        return <NotesSection />;
+      default:
+        return <SimBiographies simsData={filteredSimsData} getMockSimsData={getMockSimsData} onExpand={handleOpenExpandedView} />;
+    }
+  };
+
+  // Determine search results to pass to SearchBar
+  const currentSearchResults = useMemo(() => {
+    if (searchType === 'sim') {
+      return filteredSimsData.map(sim => ({ id: sim.id, fullName: sim.fullName, household: sim.household, item: sim }));
+    } else if (searchType === 'family') {
+      return filteredFamilyData.map(family => ({ id: family.id, name: family.name, item: family }));
+    }
+    return [];
+  }, [searchType, filteredSimsData, filteredFamilyData]);
+
+
+  return (
+    <div className="min-h-screen bg-gray-100 font-sans antialiased text-gray-800">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 shadow-lg">
+        <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+          <h1 className="text-white text-3xl font-bold mb-2 sm:mb-0">Sims Neighborhood Portal</h1>
+          <SearchBar
+            onSearch={handleSearch}
+            onToggleFullScreen={setIsSearchFullScreen}
+            isFullScreen={isSearchFullScreen}
+            searchResults={currentSearchResults}
+            onResultClick={(result, type) => handleOpenExpandedView(result.item, type, (type === 'sim' ? filteredSimsData : filteredFamilyData), (type === 'sim' ? filteredSimsData : filteredFamilyData).findIndex(item => item.id === result.id))}
+          />
         </div>
+      </header>
+
+      {/* Navigation */}
+      <nav className="bg-white shadow-md py-3 sticky top-0 z-10">
+        <div className="container mx-auto flex flex-wrap justify-center sm:justify-start gap-2 px-2">
+          <NavLink onClick={() => handleNavigationClick('simBiographies')} isActive={currentPage === 'simBiographies'}>
+            Sim Biographies
+          </NavLink>
+          <NavLink onClick={() => handleNavigationClick('familyBiographies')} isActive={currentPage === 'familyBiographies'}>
+            Family Biographies
+          </NavLink>
+          <NavLink onClick={() => handleNavigationClick('neighborhoodNews')} isActive={currentPage === 'neighborhoodNews'}>
+            Neighborhood News
+          </NavLink>
+          <NavLink onClick={() => handleNavigationClick('population')} isActive={currentPage === 'population'}>
+            Population
+          </NavLink>
+          <NavLink onClick={() => handleNavigationClick('notes')} isActive={currentPage === 'notes'}>
+            Notes
+          </NavLink>
+        </div>
+      </nav>
+
+      {/* Main Content Area */}
+      <main className="container mx-auto p-4 py-8">
+        {renderPage()}
+      </main>
+
+      {/* Expanded View Modal */}
+      {expandedItem && (
+        <ExpandedViewModal
+          item={expandedItem.item}
+          type={expandedItem.type}
+          allItems={expandedItem.allItems}
+          currentIndex={expandedItem.currentIndex}
+          onClose={handleCloseExpandedView}
+          onNavigate={handleOpenExpandedView} // Pass the navigation function
+        />
+      )}
+
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white p-4 text-center text-sm mt-8">
+        <div className="container mx-auto">
+          &copy; {new Date().getFullYear()} Sims Neighborhood Portal. All rights reserved.
+        </div>
+      </footer>
     </div>
-    <div id="imageModal" class="image-modal-overlay">
-        <div class="image-modal-content">
-            <img id="modalImage" src="" alt="Full size image">
-            <button class="image-modal-close" onclick="closeImageModal()">X</button>
+  );
+};
+
+// Reusable Navigation Link Component
+const NavLink = ({ children, onClick, isActive }) => (
+  <button
+    onClick={onClick}
+    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ease-in-out
+      ${isActive
+        ? 'bg-blue-500 text-white shadow-lg'
+        : 'text-gray-700 hover:bg-gray-200 hover:text-blue-600'
+      }`}
+  >
+    {children}
+  </button>
+);
+
+// --- Expanded View Modal Component ---
+const ExpandedViewModal = ({ item, type, allItems, currentIndex, onClose, onNavigate }) => {
+  const [fullScreenImage, setFullScreenImage] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0); // For image carousel within modal
+
+  // Reset image index when item changes
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [item]);
+
+  if (!item) return null;
+
+  let title = '';
+  let mainContent = null;
+  let imagesForDisplay = []; // Images for the internal carousel/gallery within the modal
+  let enableContentNavigation = false; // For News articles
+
+  if (type === 'sim') {
+    title = `${item.firstName} ${item.name}`;
+    mainContent = (
+      <div className="space-y-4 text-gray-800 text-base leading-relaxed">
+        <p className="text-lg font-normal mb-4">{item.bio || 'No biography available.'}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div><span className="font-semibold">Career:</span> {item.career || 'N/A'} (Level {item.careerLvl || 'N/A'})</div>
+          <div><span className="font-semibold">Aspiration:</span> {item.aspirationSims4 || item.aspiration || 'N/A'}</div>
+          <div><span className="font-semibold">Zodiac:</span> {item.zodiac || 'N/A'}</div>
+          <div><span className="font-semibold">Favorite Food:</span> {item.favoriteFood || 'N/A'}</div>
+          <div><span className="font-semibold">Marital Status:</span> {item.maritalStatus || 'N/A'}</div>
+          {item.occultStatus && item.occultStatus !== 'None' && <div><span className="font-semibold">Occult:</span> {item.occultStatus}</div>}
         </div>
+        {item.traits && item.traits.length > 0 && (
+          <div>
+            <h4 className="font-semibold text-gray-800 text-base mb-1">Traits:</h4>
+            <div className="flex flex-wrap gap-1 text-sm text-gray-700">
+              {item.traits.map((trait, index) => (
+                <span key={index} className="bg-gray-100 px-2 py-0.5 rounded-full">{trait}</span>
+              ))}
+            </div>
+          </div>
+        )}
+        {item.notes && (
+          <div>
+            <h4 className="font-semibold text-gray-800 text-base mb-1">Notes:</h4>
+            <p className="text-sm text-gray-700 italic">{item.notes}</p>
+          </div>
+        )}
+        {/* Relations */}
+        { (item.partners && item.partners.length > 0) || (item.siblings && item.siblings.length > 0) || (item.children && item.children.length > 0) ? (
+          <div>
+            <h4 className="font-semibold text-gray-800 text-base mb-1">Relationships:</h4>
+            {item.partners && item.partners.length > 0 && <p className="text-sm text-gray-700"><span className="font-semibold">Partners:</span> {item.partners.join(', ')}</p>}
+            {item.siblings && item.siblings.length > 0 && <p className="text-sm text-gray-700"><span className="font-semibold">Siblings:</span> {item.siblings.join(', ')}</p>}
+            {item.children && item.children.length > 0 && <p className="text-sm text-gray-700"><span className="font-semibold">Children:</span> {item.children.join(', ')}</p>}
+          </div>
+        ) : null}
+      </div>
+    );
+    imagesForDisplay = [
+      item.imageYoungAdult, item.imageAdult, item.imageTeen,
+      item.imageChild, item.imageToddler, item.imageBaby, item.imageElder
+    ].filter(Boolean);
+  } else if (type === 'family') {
+    title = item.name;
+    mainContent = (
+      <div className="space-y-4 text-gray-800 text-base leading-relaxed">
+        <p className="text-lg font-normal mb-4">{item.description || 'No biography available.'}</p>
+        <div className="text-base text-gray-700 mb-3">
+          <span className="font-semibold">Household Funds:</span> §{item.funds.toLocaleString()}
+        </div>
+        {item.members && item.members.length > 0 && (
+          <div>
+            <h4 className="font-semibold text-gray-800 text-base mb-1">Members:</h4>
+            <ul className="list-disc list-inside text-base text-gray-700">
+              {item.members.map((member, index) => (
+                <li key={index}>{member}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    );
+    imagesForDisplay = [item.image].filter(Boolean);
+  } else if (type === 'news') {
+    title = item.title;
+    mainContent = (
+      <div className="space-y-4 text-gray-800 text-base leading-relaxed">
+        <p className="text-base text-gray-500 mb-3">{item.date}</p>
+        <p className="text-lg font-normal leading-relaxed">{item.content || 'No content available.'}</p>
+      </div>
+    );
+    imagesForDisplay = [item.image].filter(Boolean);
+    enableContentNavigation = true; // Enable article navigation for news
+  }
+
+  const openFullScreenImage = (src) => {
+    setFullScreenImage(src);
+  };
+
+  const closeFullScreenImage = () => {
+    setFullScreenImage(null);
+  };
+
+  // Handlers for image carousel within Sim/Family/News modal
+  const handlePrevImage = (e) => {
+    e.stopPropagation(); // Prevent modal close
+    setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? imagesForDisplay.length - 1 : prevIndex - 1));
+  };
+
+  const handleNextImage = (e) => {
+    e.stopPropagation(); // Prevent modal close
+    setCurrentImageIndex((prevIndex) => (prevIndex === imagesForDisplay.length - 1 ? 0 : prevIndex + 1));
+  };
+
+  // Handlers for news article navigation
+  const handlePrevContent = (e) => {
+    e.stopPropagation(); // Prevent modal close
+    const prevIndex = (currentIndex === 0 ? allItems.length - 1 : currentIndex - 1);
+    onNavigate(allItems[prevIndex], type, allItems, prevIndex);
+  };
+
+  const handleNextContent = (e) => {
+    e.stopPropagation(); // Prevent modal close
+    const nextIndex = (currentIndex === allItems.length - 1 ? 0 : currentIndex + 1);
+    onNavigate(allItems[nextIndex], type, allItems, nextIndex);
+  };
+
+
+  return (
+    <div
+      className="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center p-4 z-50 overflow-y-auto"
+      onClick={onClose} // Close modal when clicking outside
+    >
+      <div
+        className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto flex flex-col"
+        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal content
+      >
+        {/* Modal Header */}
+        <div className="p-5 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+          <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 text-3xl font-light leading-none"
+            aria-label="Close modal"
+          >
+            &times;
+          </button>
+        </div>
+
+        {/* Modal Body - Main Content */}
+        <div className="p-5 flex-grow">
+          {/* Main Image (with carousel for multiple images) */}
+          {imagesForDisplay.length > 0 && (
+            <div className="mb-4 flex flex-col items-center">
+              <div className="relative w-full max-w-sm mx-auto">
+                <img
+                  src={imagesForDisplay[currentImageIndex]}
+                  alt={`${title} image`}
+                  className="w-full h-auto rounded-lg shadow-md cursor-pointer mb-2"
+                  onClick={() => openFullScreenImage(imagesForDisplay[currentImageIndex])}
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/300x200/E2E8F0/ffffff?text=Image'; }}
+                />
+                {imagesForDisplay.length > 1 && (
+                  <>
+                    <button
+                      onClick={handlePrevImage}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label="Previous image"
+                    >
+                      &#10094;
+                    </button>
+                    <button
+                      onClick={handleNextImage}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label="Next image"
+                    >
+                      &#10095;
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {mainContent}
+
+          {/* Navigation for News Articles (Previous/Next) - only for news type and multiple items */}
+          {enableContentNavigation && allItems && allItems.length > 1 && (
+            <div className="flex justify-between mt-6 border-t pt-4">
+              <button
+                onClick={handlePrevContent}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={currentIndex === 0}
+              >
+                &#9664; Previous
+              </button>
+              <button
+                onClick={handleNextContent}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={currentIndex === allItems.length - 1}
+              >
+                Next &#9654;
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Full-screen Image Overlay */}
+      {fullScreenImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-[60]"
+          onClick={closeFullScreenImage}
+        >
+          <img
+            src={fullScreenImage}
+            alt="Full screen view"
+            className="max-w-[90%] max-h-[90%] object-contain rounded-lg shadow-xl"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking on the image itself
+          />
+          <button
+            onClick={closeFullScreenImage}
+            className="absolute top-4 right-4 text-white text-5xl font-light leading-none z-highest"
+            aria-label="Close full screen image"
+          >
+            &times;
+          </button>
+        </div>
+      )}
     </div>
-    <script>
-        // --- CONFIGURATION: REPLACE THESE WITH YOUR GOOGLE SHEET DETAILS ---
-        const GOOGLE_SHEET_ID = '2PACX-1vSs1l3tUbLZpKfZCUxSkdYYsRcneV_PsoF7yPLJ3YdZr_tsVSOo3qcH4idIjwmx-f4U7rMb7_nBDSuV'; // Your main Google Sheet ID
-
-        // GIDs for each specific sheet within the spreadsheet
-        const WORLD_INFO_GID = '1046330091';
-        const SIM_BIO_GID = '522782907';
-        const FAMILY_BIO_GID = '75505924';
-        const STORIES_GID = '1540825772';
-        // -------------------------------------------------------------------
-
-        // Default data: Used only as fallback if CSV loading fails for a specific sheet.
-        // All primary data for families and sims will now come ONLY from the Google Sheets.
-        const defaultSimData = {
-            "worldInfo": {
-                name: "Newcrest (Default Data)",
-                description: "This is a demo of your Sims' notes. Connect your Google Sheets to load your own data!"
-            },
-            "homelessSims": [] // This will be populated from Sim Bio CSV or remain empty
-        };
-
-        const defaultNeighborhoodStories = []; // This will be populated from Stories CSV
-
-        // Global data store for Sims and Families (will be populated by CSV)
-        let simData = {}; // Initialize as empty, will be populated by loadAllData
-        let neighborhoodStories = [];
-
-        let currentSelectedFamily = null;
-        let currentSelectedSim = null;
-        let collectedSimNotes = new Map();
-
-        // Global state for spreadsheet sorting
-        let currentSortColumn = null;
-        let currentSortDirection = 'asc';
-
-        // Define lifeStagesIcons for the age icons
-        const lifeStagesIcons = {
-            "Baby": "🍼",
-            "Toddler": "🧸",
-            "Child": "🎨",
-            "Teen": "📱",
-            "Young Adult": "🎓",
-            "Adult": "💼",
-            "Elder": "🌳"
-        };
-
-        // --- Helper Functions (defined before they are used in initializeDisplay and CSV parsing) ---
-
-        // Function to hide all content sections
-        function hideAllContentSections() {
-            document.getElementById('simDetailsCard').classList.add('hidden');
-            document.getElementById('simDetailsCard').classList.remove('flex');
-            document.getElementById('familyOverviewContent').classList.add('hidden');
-            document.getElementById('familyOverviewContent').classList.remove('flex');
-            document.getElementById('spreadsheetView').classList.add('hidden');
-            document.getElementById('spreadsheetView').classList.add('collapsed');
-            const spreadsheetCollapsibleContent = document.getElementById('spreadsheetView').querySelector('.collapsible-content');
-            if (spreadsheetCollapsibleContent) {
-                spreadsheetCollapsibleContent.classList.add('collapsed');
-                spreadsheetCollapsibleContent.style.maxHeight = '0';
-            }
-            document.getElementById('storyDisplayContent').classList.add('hidden');
-            document.getElementById('storyDisplayContent').classList.remove('flex');
-            document.getElementById('graveyardSection').classList.add('hidden');
-            document.getElementById('graveyardSection').classList.remove('flex');
-            document.getElementById('homelessSimsSection').classList.add('hidden');
-            document.getElementById('homelessSimsSection').classList.remove('flex');
-            document.getElementById('notesSection').classList.add('hidden');
-            document.getElementById('notesSection').classList.remove('flex');
-        }
-
-        // Utility to find a sim by name across all families and homeless sims
-        function findSimByName(simName) {
-            for (const familyKey in simData) {
-                if (familyKey === "worldInfo" || familyKey === "homelessSims") continue; // Skip worldInfo and homelessSims for family iteration
-                const familyMembers = simData[familyKey].members;
-                if (familyMembers) {
-                    const foundSim = familyMembers.find(sim => sim.name === simName);
-                    if (foundSim) {
-                        return foundSim;
-                    }
-                }
-            }
-            // Check homeless sims separately
-            if (simData.homelessSims) {
-                const foundHomelessSim = simData.homelessSims.find(sim => sim.name === simName);
-                if (foundHomelessSim) {
-                    return foundHomelessSim;
-                }
-            }
-            return null;
-        }
-
-        function updateSimImageForAge(sim, age) {
-            const simImageElement = document.getElementById('simImage');
-            const encodedSimName = encodeURIComponent(sim.name);
-            const encodedAge = encodeURIComponent(age);
-            let selectedImageUrl = '';
-
-            // 1. Check if there's a specific image URL for this age stage in sim.images (from CSV columns like Image_Baby)
-            // The sim.images object stores these if parsed from CSV.
-            if (sim.images && sim.images[age]) {
-                selectedImageUrl = sim.images[age];
-            }
-            // 2. Fallback to the primary 'image' URL from CSV (the 'Image' column) if no specific age image is found
-            if (!selectedImageUrl && sim.image) {
-                selectedImageUrl = sim.image;
-            }
-            // 3. Fallback to a placeholder image if no image URL is found at all for the sim or specific age
-            if (!selectedImageUrl) {
-                selectedImageUrl = `https://placehold.co/400x225/${encodeURIComponent('DCDCDC')}/${encodeURIComponent('202122')}?text=${encodedSimName}%20-%20${encodedAge}`;
-            }
-            
-            simImageElement.src = selectedImageUrl;
-
-            // Update active state for age icons
-            const ageIcons = document.querySelectorAll('#simAgeIconsContainer .age-icon');
-            ageIcons.forEach(icon => {
-                if (icon.dataset.age === age) {
-                    icon.classList.add('active-age-icon');
-                } else {
-                    icon.classList.remove('active-age-icon');
-                }
-            });
-        }
-
-        function displaySimDetails(sim) {
-            if (!sim) {
-                console.error("Attempted to display sim details for an undefined sim object.");
-                hideAllContentSections();
-                return;
-            }
-
-            const simDetailsCard = document.getElementById('simDetailsCard');
-            simDetailsCard.classList.remove('hidden');
-            simDetailsCard.classList.add('flex');
-
-            document.getElementById('simNameDisplay').textContent = sim.name;
-            document.getElementById('simTitleDisplay').textContent = sim.title || 'N/A';
-            
-            // Set initial image based on the sim's default age from CSV
-            updateSimImageForAge(sim, sim.age || 'Young Adult');
-
-            document.getElementById('simBioText').textContent = sim.bio || 'No biography provided.';
-            document.getElementById('simAge').textContent = sim.age || 'N/A';
-            document.getElementById('simGender').textContent = sim.gender || 'N/A';
-
-            const simStatusElement = document.getElementById('simStatus');
-            simStatusElement.textContent = sim.status || 'Unknown';
-            simStatusElement.className = '';
-            simStatusElement.classList.add((sim.status && sim.status.toLowerCase() === 'alive') ? 'status-alive' : 'status-dead');
-
-            document.getElementById('simOccultStatus').textContent = sim.occultStatus || 'Human';
-            document.getElementById('simCareer').textContent = `${sim.career || 'Unemployed'} (Level ${sim.careerLevel || 'N/A'})`;
-            document.getElementById('simAspiration').textContent = sim.aspiration || 'N/A';
-            document.getElementById('simZodiac').textContent = sim.zodiac || 'N/A';
-
-            function populateRelationship(elementId, relationshipArray) {
-                const element = document.getElementById(elementId);
-                element.innerHTML = '';
-                if (relationshipArray && relationshipArray.length > 0) {
-                    relationshipArray.forEach((name, index) => {
-                        const link = document.createElement('span');
-                        link.classList.add('partner-link');
-                        link.textContent = name;
-                        link.onclick = (event) => {
-                            event.stopPropagation();
-                            selectSim(name);
-                        };
-                        element.appendChild(link);
-                        if (index < relationshipArray.length - 1) {
-                            element.append(', ');
-                        }
-                    });
-                } else {
-                    element.textContent = 'None';
-                }
-            }
-            populateRelationship('simPartners', sim.partners);
-            populateRelationship('simParents', sim.parents);
-            populateRelationship('simChildren', sim.children);
-
-            const traitsList = document.getElementById('simTraitList');
-            traitsList.innerHTML = '';
-            if (sim.traits && sim.traits.length > 0) {
-                sim.traits.forEach(trait => {
-                    const span = document.createElement('span');
-                    span.classList.add('sim-trait-item-redesign');
-                    span.textContent = trait;
-                    traitsList.appendChild(span);
-                });
-            } else {
-                traitsList.innerHTML = '<span class="text-gray-500">No traits listed.</span>';
-            }
-            
-            const hobbiesList = document.getElementById('simHobbiesList');
-            hobbiesList.innerHTML = '';
-            if (sim.hobbies && sim.hobbies.length > 0) {
-                sim.hobbies.forEach(hobby => {
-                    const li = document.createElement('li');
-                    li.textContent = hobby;
-                    hobbiesList.appendChild(li);
-                });
-            } else {
-                hobbiesList.innerHTML = '<li class="text-gray-500">No hobbies listed.</li>';
-            }
-            
-            // Notes section with split functionality
-            const simNotesContentDiv = document.getElementById('simNotesContent');
-            simNotesContentDiv.innerHTML = ''; // Clear previous notes
-
-            if (sim.notes && sim.notes.trim() !== '') {
-                const notesArray = sim.notes.split('---').map(note => note.trim()).filter(note => note.length > 0);
-                if (notesArray.length > 0) {
-                    notesArray.forEach(note => {
-                        const noteP = document.createElement('p');
-                        noteP.classList.add('text-base', 'leading-relaxed', 'mb-2'); // Add some spacing between notes
-                        noteP.textContent = note;
-                        simNotesContentDiv.appendChild(noteP);
-                    });
-                    document.querySelector('#simDetailsCard .notes-section').classList.remove('hidden');
-                } else {
-                    simNotesContentDiv.innerHTML = '<p class="text-base leading-relaxed">No specific notes yet.</p>';
-                    document.querySelector('#simDetailsCard .notes-section').classList.add('hidden');
-                }
-            } else {
-                simNotesContentDiv.innerHTML = '<p class="text-base leading-relaxed">No specific notes yet.</p>';
-                document.querySelector('#simDetailsCard .notes-section').classList.add('hidden');
-            }
-
-            const simAgeIconsContainer = document.getElementById('simAgeIconsContainer');
-            simAgeIconsContainer.innerHTML = '';
-            const lifeStagesForIcons = ["Baby", "Toddler", "Child", "Teen", "Young Adult", "Adult", "Elder"];
-            lifeStagesForIcons.forEach(stage => {
-                const iconSpan = document.createElement('span');
-                iconSpan.classList.add('age-icon');
-                iconSpan.textContent = lifeStagesIcons[stage] || '';
-                iconSpan.dataset.age = stage;
-                iconSpan.onclick = () => updateSimImageForAge(sim, stage);
-                simAgeIconsContainer.appendChild(iconSpan);
-            });
-            // Re-apply active state based on the current sim's age after all icons are created
-            updateSimImageForAge(sim, sim.age || 'Young Adult');
-
-
-            const simSkillsList = document.getElementById('simSkillsList');
-            simSkillsList.innerHTML = '';
-            if (sim.skills && Object.keys(sim.skills).length > 0) {
-                for (const skillName in sim.skills) {
-                    const skillLevel = sim.skills[skillName];
-                    const skillItem = document.createElement('div');
-                    skillItem.classList.add('sim-skills-list-item');
-                    skillItem.innerHTML = `
-                        <span class="sim-skills-list-item-label relative z-20">${skillName}:</span>
-                        <span class="sim-skills-list-item-value relative z-20">${skillLevel}/10</span>
-                    `;
-                    simSkillsList.appendChild(skillItem);
-                }
-            } else {
-                simSkillsList.innerHTML = '<p class="text-gray-500">No skills listed.</p>';
-            }
-
-            const simPersonalitySection = document.getElementById('simPersonalitySection');
-            const simPersonalityList = document.getElementById('simPersonalityList');
-            simPersonalityList.innerHTML = '';
-
-            if (!sim.personality || Object.keys(sim.personality).length === 0) {
-                simPersonalitySection.classList.add('hidden');
-            } else {
-                simPersonalitySection.classList.remove('hidden');
-                const personalityMapping = {
-                    "sloppyNeat": { label: "Sloppy - Neat" },
-                    "shyOutgoing": { label: "Shy - Outgoing" },
-                    "lazyActive": { label: "Lazy - Active" },
-                    "seriousPlayful": { label: "Serious - Playful" },
-                    "grouchyNice": { label: "Grouchy - Nice" }
-                };
-
-                for (const key in personalityMapping) {
-                    if (sim.personality.hasOwnProperty(key)) {
-                        const value = sim.personality[key];
-                        const label = personalityMapping[key].label;
-                        const itemDiv = document.createElement('div');
-                        itemDiv.classList.add('personality-item');
-                        let valueClass = 'personality-item-value';
-                        if (value >= 1 && value <= 4) {
-                            valueClass += ' low';
-                        } else if (value >= 7 && value <= 10) {
-                            valueClass += ' high';
-                        } else {
-                            valueClass += ' balanced';
-                        }
-                        itemDiv.innerHTML = `
-                            <span class="personality-item-label relative z-20">${label}:</span>
-                            <span class="${valueClass} relative z-20">${value}</span>
-                        `;
-                        simPersonalityList.appendChild(itemDiv);
-                    }
-                }
-            }
-        }
-
-        function displayFamilyOverview(familyNameKey) {
-            const family = simData[familyNameKey];
-            if (family && family.familyBio) {
-                document.getElementById('familyOverviewContent').classList.remove('hidden');
-                document.getElementById('familyOverviewContent').classList.add('flex');
-
-                document.getElementById('familyOverviewTitleName').textContent = family.familyBio.name || 'N/A';
-                document.getElementById('familyLocation').textContent = family.familyBio.location || 'N/A';
-                document.getElementById('familyMemberCount').textContent = family.members ? family.members.length : 0;
-                document.getElementById('familyFunds').textContent = family.familyBio.funds || '$0';
-                document.getElementById('familyBiography').textContent = family.familyBio.biography || 'No biography provided.';
-
-                const familyPhotoElement = document.getElementById('familyPhoto');
-                if (family.familyBio.familyImageUrl) { // Check for the new column 'familyImageUrl'
-                    familyPhotoElement.src = family.familyBio.familyImageUrl;
-                    familyPhotoElement.classList.remove('hidden');
-                } else {
-                    familyPhotoElement.classList.add('hidden');
-                    familyPhotoElement.src = ''; // Clear src if no image
-                }
-
-            } else {
-                document.getElementById('familyOverviewContent').classList.add('hidden');
-                document.getElementById('familyOverviewContent').classList.remove('flex');
-            }
-        }
-
-        function getAllSims() {
-            let allSims = [];
-            for (const familyKey in simData) {
-                if (familyKey === "worldInfo") continue; // Skip worldInfo
-                if (familyKey === "homelessSims") {
-                    if (simData[familyKey]) { // Ensure homelessSims array exists
-                        simData[familyKey].forEach(sim => {
-                            allSims.push({ ...sim, family: 'Homeless' });
-                        });
-                    }
-                } else {
-                    const family = simData[familyKey];
-                    if (family && family.members) {
-                        family.members.forEach(sim => {
-                            allSims.push({ ...sim, family: family.familyBio.name.replace(' Family', '') });
-                        });
-                    }
-                }
-            }
-            return allSims;
-        }
-
-        function populateSpreadsheet(sortColumn = currentSortColumn, sortDirection = currentSortDirection) {
-            const simsTableBody = document.getElementById('simsTableBody');
-            simsTableBody.innerHTML = '';
-            let allSims = getAllSims();
-
-            if (allSims.length === 0) {
-                simsTableBody.innerHTML = '<tr><td colspan="6" class="py-2 px-4 text-center text-gray-500">No Sims found.</td></tr>';
-                return;
-            }
-
-            currentSortColumn = sortColumn;
-            currentSortDirection = sortDirection;
-
-            if (sortColumn) {
-                allSims.sort((a, b) => {
-                    let valA = a[sortColumn];
-                    let valB = b[sortColumn];
-
-                    if (sortColumn === 'age') {
-                        const ageOrder = {
-                            "Baby": 0, "Toddler": 1, "Child": 2, "Teen": 3,
-                            "Young Adult": 4, "Adult": 5, "Elder": 6
-                        };
-                        valA = ageOrder[valA] !== undefined ? ageOrder[valA] : 99;
-                        valB = ageOrder[valB] !== undefined ? ageOrder[valB] : 99;
-                    } else if (sortColumn === 'status') {
-                        valA = valA === 'Alive' ? 0 : 1;
-                        valB = valB === 'Alive' ? 0 : 1;
-                    } else {
-                        if (typeof valA === 'string') valA = valA.toLowerCase();
-                        if (typeof valB === 'string') valB = valB.toLowerCase();
-                    }
-
-                    if (valA < valB) {
-                        return sortDirection === 'asc' ? -1 : 1;
-                    }
-                    if (valA > valB) {
-                        return sortDirection === 'asc' ? 1 : -1;
-                    }
-                    return 0;
-                });
-            }
-
-            allSims.forEach(sim => {
-                const row = document.createElement('tr');
-                simsTableBody.appendChild(row);
-                row.innerHTML = `
-                    <td class="py-2 px-4"><span class="clickable-sim-name" onclick="selectSim('${sim.name}')">${sim.name || 'N/A'}</span></td>
-                    <td class="py-2 px-4">${sim.family || 'N/A'}</td>
-                    <td class="py-2 px-4">${sim.age || 'N/A'}</td>
-                    <td class="py-2 px-4"><span class="${(sim.status && sim.status.toLowerCase() === 'alive') ? 'status-alive' : 'status-dead'}">${sim.status || 'N/A'}</span></td>
-                    <td class="py-2 px-4">${sim.career || 'N/A'} (Level ${sim.careerLevel || 'N/A'})</td>
-                    <td class="py-2 px-4">${sim.aspiration || 'N/A'}</td>
-                `;
-            });
-
-            document.querySelectorAll('.sortable-th').forEach(th => {
-                th.classList.remove('asc', 'desc');
-                if (th.dataset.sort === sortColumn) {
-                    th.classList.add(sortDirection);
-                }
-            });
-        }
-
-        function showSpreadsheet() {
-            hideAllContentSections();
-            document.getElementById('spreadsheetView').classList.remove('hidden');
-            document.getElementById('spreadsheetView').classList.remove('collapsed');
-            document.getElementById('spreadsheetView').classList.add('flex');
-            document.getElementById('spreadsheetView').querySelector('.collapsible-content').classList.remove('collapsed');
-            requestAnimationFrame(() => {
-                document.getElementById('spreadsheetView').querySelector('.collapsible-content').style.maxHeight = document.getElementById('spreadsheetView').querySelector('.collapsible-content').scrollHeight + 'px';
-            });
-            populateSpreadsheet(currentSortColumn, currentSortDirection);
-        }
-
-        function displayNeighborhoodStories() {
-            hideAllContentSections();
-            const storyDisplayContent = document.getElementById('storyDisplayContent');
-            const storyList = document.getElementById('storyList');
-            const storyListContainer = document.getElementById('storyListContainer');
-            const singleStoryContainer = document.getElementById('singleStoryContainer');
-            const storyListHeader = document.getElementById('storyListHeader');
-
-            storyDisplayContent.classList.remove('hidden');
-            storyDisplayContent.classList.add('flex');
-            storyListContainer.classList.remove('hidden');
-            singleStoryContainer.classList.add('hidden');
-            storyListHeader.textContent = "Neighborhood Stories"; // Ensure list header is correct
-            storyListHeader.classList.remove('hidden');
-            document.getElementById('singleStoryHeadline').classList.add('hidden'); // Hide single story headline
-
-            storyList.innerHTML = '';
-
-            if (neighborhoodStories && neighborhoodStories.length > 0) {
-                neighborhoodStories.forEach((story) => {
-                    const storyItem = document.createElement('div');
-                    storyItem.classList.add('story-list-item', 'px-4', 'py-2', 'rounded-md', 'shadow-sm', 'cursor-pointer');
-                    storyItem.innerHTML = `<span class="relative z-20">${story.headline}</span>`;
-                    storyItem.onclick = () => showSingleStory(story);
-                    storyList.appendChild(storyItem);
-                });
-            } else {
-                storyList.innerHTML = '<p class="text-center text-muted-dark relative z-20">No neighborhood stories yet!</p>';
-            }
-
-            storyList.classList.add('max-h-96', 'scrollable-list');
-        }
-
-        function showSingleStory(story) {
-            document.getElementById('storyListContainer').classList.add('hidden');
-            document.getElementById('singleStoryContainer').classList.remove('hidden');
-            document.getElementById('storyListHeader').classList.add('hidden'); // Hide general list header
-
-            const singleStoryHeadline = document.getElementById('singleStoryHeadline');
-            singleStoryHeadline.textContent = story.headline; // Set headline to article name
-            singleStoryHeadline.classList.remove('hidden'); // Show story headline
-
-            const storyImageContainer = document.querySelector('#singleStoryContainer .story-image-container');
-            storyImageContainer.onclick = () => openImageModal(document.getElementById('storyImage').src);
-            const storyImageElement = document.getElementById('storyImage');
-            
-            let imageUrlToDisplay = '';
-            if (story.imageUrl169) {
-                imageUrlToDisplay = story.imageUrl169;
-            } else {
-                // Fallback to a placeholder if no specific image URL is provided in story data
-                const encodedHeadlineForImage = encodeURIComponent(story.headline);
-                imageUrlToDisplay = `https://placehold.co/400x225/${encodeURIComponent('DCC29F')}/${encodeURIComponent('3A3A3A')}?text=Story%20Image%0A${encodedHeadlineForImage.substring(0, 30)}...`;
-            }
-            
-            storyImageElement.src = imageUrlToDisplay;
-            storyImageElement.alt = story.headline;
-            storyImageElement.classList.remove('hidden');
-
-            // Removed the "View Full Size Image" link completely as requested.
-            
-            document.getElementById('storyContent').textContent = story.content;
-            
-            document.getElementById('storyList').classList.remove('max-h-96', 'scrollable-list');
-        }
-
-        function showStoryList() {
-            document.getElementById('storyListContainer').classList.remove('hidden');
-            document.getElementById('singleStoryContainer').classList.add('hidden');
-            document.getElementById('storyListHeader').textContent = "Neighborhood Stories"; // Revert to general list header
-            document.getElementById('storyListHeader').classList.remove('hidden');
-            document.getElementById('singleStoryHeadline').classList.add('hidden'); // Hide single story headline
-            // Also hide the image link if it was ever shown
-            // document.getElementById('storyImageLink').classList.add('hidden'); // This line is now effectively removed with the element
-
-            document.getElementById('storyList').classList.add('max-h-96', 'scrollable-list');
-        }
-
-        function populateGraveyard() {
-            const graveyardGrid = document.getElementById('graveyardGrid');
-            graveyardGrid.innerHTML = '';
-            let deadSimsFound = false;
-
-            const allSims = getAllSims();
-
-            allSims.forEach(sim => {
-                if (sim.status && sim.status.toLowerCase() === "dead") {
-                    deadSimsFound = true;
-                    const graveyardItem = document.createElement('div');
-                    graveyardItem.classList.add('graveyard-item');
-                    graveyardItem.onclick = () => selectSim(sim.name);
-                    graveyardItem.innerHTML = `
-                        <div class="graveyard-icon relative z-20">🪦 </div>
-                        <div class="relative z-20">
-                            <h5>${sim.name || 'N/A'}</h5>
-                            <p>${sim.title || 'N/A'}</p>
-                        </div>
-                    `;
-                    graveyardGrid.appendChild(graveyardItem);
-                }
-            });
-
-            if (!deadSimsFound) {
-                graveyardGrid.innerHTML = '<p class="col-span-full text-center text-muted-dark relative z-20">No Sims in the graveyard... yet.</p>';
-            }
-        }
-
-        function showGraveyard() {
-            hideAllContentSections();
-            document.getElementById('graveyardSection').classList.remove('hidden');
-            document.getElementById('graveyardSection').classList.add('flex');
-            populateGraveyard();
-        }
-
-        function populateHomelessSims() {
-            const homelessSimsGrid = document.getElementById('homelessSimsGrid');
-            homelessSimsGrid.innerHTML = '';
-
-            if (simData.homelessSims && simData.homelessSims.length > 0) {
-                simData.homelessSims.forEach(sim => {
-                    const homelessSimItem = document.createElement('div');
-                    homelessSimItem.classList.add('homeless-sim-item');
-                    homelessSimItem.onclick = () => selectSim(sim.name);
-                    homelessSimItem.innerHTML = `
-                        <div class="graveyard-icon sim-stat-icon relative z-20">🏡 </div>
-                        <div class="relative z-20">
-                            <h5>${sim.name || 'N/A'}</h5>
-                            <p>${sim.title || 'N/A'}</p>
-                        </div>
-                    `;
-                    homelessSimsGrid.appendChild(homelessSimItem);
-                });
-            } else {
-                homelessSimsGrid.innerHTML = '<p class="col-span-full text-center text-muted-dark relative z-20">No homeless Sims found.</p>';
-            }
-        }
-
-        function showHomelessSims() {
-            hideAllContentSections();
-            document.getElementById('homelessSimsSection').classList.remove('hidden');
-            document.getElementById('homelessSimsSection').classList.add('flex');
-            populateHomelessSims();
-        }
-
-        function displayNotesSection() {
-            hideAllContentSections();
-            const notesSection = document.getElementById('notesSection');
-            notesSection.classList.remove('hidden');
-            notesSection.classList.add('flex');
-            const notesContentDiv = document.getElementById('notesContent');
-            notesContentDiv.innerHTML = '';
-
-            if (collectedSimNotes.size === 0) {
-                notesContentDiv.innerHTML = '<p class="text-center text-muted-dark relative z-20">No notes collected yet. Visit a Sim\'s biography to add their notes here!</p>';
-            } else {
-                collectedSimNotes.forEach((note, simName) => {
-                    const noteEntry = document.createElement('div');
-                    noteEntry.classList.add('section-block-style', 'relative', 'z-20', 'mb-4');
-                    // This section already correctly splits notes by '---' based on previous logic.
-                    const notesArray = note.split('---').map(n => n.trim()).filter(n => n.length > 0);
-                    let noteHtml = `<h5 class="text-xl font-semibold mb-2 relative z-20">${simName}'s Notes:</h5>`;
-                    notesArray.forEach(singleNote => {
-                        noteHtml += `<p class="text-base leading-relaxed relative z-20 mb-2">${singleNote}</p>`;
-                    });
-                    noteEntry.innerHTML = noteHtml;
-                    notesContentDiv.appendChild(noteEntry);
-                });
-            }
-        }
-
-        // Image Modal Functions
-        function openImageModal(imgSrc) {
-            document.getElementById('modalImage').src = imgSrc;
-            document.getElementById('imageModal').classList.add('visible');
-        }
-
-        function closeImageModal() {
-            document.getElementById('imageModal').classList.remove('visible');
-            document.getElementById('modalImage').src = '';
-        }
-
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeImageModal();
-            }
-        });
-
-        // Theme Toggle Logic
-        function applyTheme(theme) {
-            const body = document.body;
-            const toggleIcon = document.getElementById('themeToggle').querySelector('i');
-            if (theme === 'dark') {
-                body.classList.add('dark-theme');
-                toggleIcon.classList.remove('fa-sun');
-                toggleIcon.classList.add('fa-moon');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                body.classList.remove('dark-theme');
-                toggleIcon.classList.remove('fa-moon');
-                toggleIcon.classList.add('fa-sun');
-                localStorage.setItem('theme', 'light');
-            }
-        }
-
-        function toggleTheme() {
-            const currentTheme = localStorage.getItem('theme') || 'light';
-            if (currentTheme === 'light') {
-                applyTheme('dark');
-            } else {
-                applyTheme('light');
-            }
-        }
-
-        // --- CSV Parsing Functions for each specific sheet ---
-
-        // Generic CSV parsing helper
-        function parseCsvGeneric(csvText, expectedHeaders) {
-            const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
-            if (lines.length <= 1) {
-                return [];
-            }
-
-            const headers = lines[0].split(',').map(header => header.trim());
-            const data = [];
-
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                const rowData = {};
-                headers.forEach((header, index) => {
-                    let value = values[index] ? values[index].trim().replace(/^"|"$/g, '') : '';
-                    rowData[header.trim()] = value;
-                });
-                data.push(rowData);
-            }
-            return data;
-        }
-
-        async function fetchWorldInfoCsv() {
-            const csvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEET_ID}/pub?gid=${WORLD_INFO_GID}&single=true&output=csv`;
-            try {
-                const response = await fetch(csvUrl);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for World Info Sheet (GID: ${WORLD_INFO_GID})`);
-                const csvText = await response.text();
-                const data = parseCsvGeneric(csvText, ['World Name', 'World Description']);
-                if (data.length > 0) {
-                    return {
-                        name: data[0]['World Name'] || defaultSimData.worldInfo.name,
-                        description: data[0]['World Description'] || defaultSimData.worldInfo.description
-                    };
-                }
-            } catch (error) {
-                console.error("Error loading World Information CSV:", error);
-            }
-            return defaultSimData.worldInfo;
-        }
-
-        async function fetchFamilyBiographiesCsv() {
-            const csvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEET_ID}/pub?gid=${FAMILY_BIO_GID}&single=true&output=csv`;
-            const families = {};
-            try {
-                const response = await fetch(csvUrl);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for Family Bio Sheet (GID: ${FAMILY_BIO_GID})`);
-                const csvText = await response.text();
-                // Added 'Family Image URL' to the expected headers
-                const data = parseCsvGeneric(csvText, ['Family Name', 'Family Location', 'Family Funds', 'Family Biography', 'Family Image URL']);
-                
-                data.forEach(row => {
-                    if (row['Family Name']) {
-                        const familyNameKey = row['Family Name'].replace(/ /g, '').replace(/'/g, '');
-                        families[familyNameKey] = {
-                            familyBio: {
-                                name: row['Family Name'],
-                                location: row['Family Location'] || 'Unknown',
-                                funds: row['Family Funds'] || '$0',
-                                biography: row['Family Biography'] || 'No biography provided.',
-                                familyImageUrl: row['Family Image URL'] || '', // Store the new image URL
-                                memberCount: 0
-                            },
-                            members: []
-                        };
-                    }
-                });
-            } catch (error) {
-                console.error("Error loading Family Biography CSV:", error);
-            }
-            return families;
-        }
-
-        async function fetchSimBiographiesCsv(existingFamilies) {
-            const csvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEET_ID}/pub?gid=${SIM_BIO_GID}&single=true&output=csv`;
-            const sims = {};
-            const homelessSimsList = [];
-
-            // Initialize sims object with existing family bios structure
-            for(const key in existingFamilies) {
-                sims[key] = { ...existingFamilies[key], members: [] }; // Deep copy existing family bios
-            }
-
-            try {
-                const response = await fetch(csvUrl);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for Sim Bio Sheet (GID: ${SIM_BIO_GID})`);
-                const csvText = await response.text();
-                const data = parseCsvGeneric(csvText, [
-                    'Name', 'Title', 'Image', 'Bio', 'Age', 'Gender', 'Status', 'Occult Status',
-                    'Career', 'Career Level', 'Aspiration', 'Zodiac', 'Partners', 'Parents',
-                    'Children', 'Skills', 'Traits', 'Hobbies', 'Notes', 'Personality', 'Family Name',
-                    'Image_Baby', 'Image_Toddler', 'Image_Child', 'Image_Teen', 'Image_YoungAdult', 'Image_Adult', 'Image_Elder'
-                ]);
-
-                data.forEach(row => {
-                    const sim = {
-                        name: row['Name'],
-                        title: row['Title'],
-                        image: row['Image'],
-                        bio: row['Bio'],
-                        age: row['Age'],
-                        gender: row['Gender'],
-                        status: row['Status'],
-                        occultStatus: row['Occult Status'] || 'Human',
-                        career: row['Career'],
-                        careerLevel: parseInt(row['Career Level'], 10) || 'N/A',
-                        aspiration: row['Aspiration'],
-                        zodiac: row['Zodiac'],
-                        partners: row['Partners'] ? row['Partners'].split(';').map(s => s.trim()).filter(s => s) : [],
-                        parents: row['Parents'] ? row['Parents'].split(';').map(s => s.trim()).filter(s => s) : [],
-                        children: row['Children'] ? row['Children'].split(';').map(s => s.trim()).filter(s => s) : [],
-                        skills: {},
-                        traits: row['Traits'] ? row['Traits'].split(';').map(s => s.trim()).filter(s => s) : [],
-                        hobbies: row['Hobbies'] ? row['Hobbies'].split(';').map(s => s.trim()).filter(s => s) : [],
-                        notes: row['Notes'],
-                        personality: {}
-                    };
-
-                    if (row['Skills']) {
-                        row['Skills'].split(';').forEach(skillPair => {
-                            const [skillName, skillLevel] = skillPair.split(':').map(s => s.trim());
-                            if (skillName && skillLevel) sim.skills[skillName] = parseInt(skillLevel, 10);
-                        });
-                    }
-
-                    if (row['Personality']) {
-                        row['Personality'].split(';').forEach(traitPair => {
-                            const [traitName, traitValue] = traitPair.split(':').map(s => s.trim());
-                            if (traitName && traitValue) sim.personality[traitName] = parseInt(traitValue, 10);
-                        });
-                    }
-
-                    // Collect other age specific images if they exist in CSV (e.g., "Image_Baby")
-                    sim.images = sim.images || {}; // Ensure sim.images object exists
-                    ['Baby', 'Toddler', 'Child', 'Teen', 'Young Adult', 'Adult', 'Elder'].forEach(stage => {
-                        const colName = 'Image_' + stage.replace(' ', ''); // e.g., 'Image_YoungAdult'
-                        if (row[colName]) {
-                            sim.images[stage] = row[colName];
-                        }
-                    });
-
-                    if (sim.name) {
-                        if (row['Family Name'] && row['Family Name'].toLowerCase() === 'homeless') {
-                            homelessSimsList.push(sim);
-                        } else {
-                            const familyNameKey = row['Family Name'] ? row['Family Name'].replace(/ /g, '').replace(/'/g, '') : 'UnknownFamily';
-                            if (!sims[familyNameKey]) {
-                                // This case should ideally be handled by fetchFamilyBiographiesCsv first.
-                                // If a sim lists a family not defined in the family sheet, create a basic placeholder.
-                                console.warn(`Sim '${sim.name}' belongs to family '${row['Family Name']}' not found in Family Biography Sheet. Creating a placeholder entry.`);
-                                sims[familyNameKey] = {
-                                    familyBio: {
-                                        name: row['Family Name'] || 'Unknown Family',
-                                        location: 'Unknown',
-                                        funds: '$0',
-                                        biography: 'No biography provided in Family Sheet.',
-                                        memberCount: 0
-                                    },
-                                    members: []
-                                };
-                            }
-                            sims[familyNameKey].members.push(sim);
-                        }
-                    }
-                });
-
-                // Update member counts after all sims are added
-                for (const familyKey in sims) {
-                    if (sims.hasOwnProperty(familyKey) && sims[familyKey].members) {
-                        sims[familyKey].familyBio.memberCount = sims[familyKey].members.length;
-                    }
-                }
-
-            } catch (error) {
-                console.error("Error loading Sim Biography CSV:", error);
-                // Return existing families and default homeless sims if this sheet fails
-                return { families: existingFamilies, homelessSims: defaultSimData.homelessSims };
-            }
-            return { families: sims, homelessSims: homelessSimsList };
-        }
-
-        async function fetchNeighborhoodStoriesCsv() {
-            const csvUrl = `https://docs.google.com/spreadsheets/d/e/${GOOGLE_SHEET_ID}/pub?gid=${STORIES_GID}&single=true&output=csv`;
-            try {
-                const response = await fetch(csvUrl);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for Stories Sheet (GID: ${STORIES_GID})`);
-                const csvText = await response.text();
-                const data = parseCsvGeneric(csvText, ['Story Headline', 'Story Content', 'Story Image 16:9 URL']);
-                return data.map(row => ({
-                    headline: row['Story Headline'],
-                    content: row['Story Content'],
-                    imageUrl169: row['Story Image 16:9 URL'] || '' // New field for the 16:9 image
-                })).filter(story => story.headline && story.content); // Filter out empty stories
-            } catch (error) {
-                console.error("Error loading Neighborhood Stories CSV:", error);
-            }
-            return defaultNeighborhoodStories; // Return default if fetch or parse fails
-        }
-
-        // --- Main Data Loading Function ---
-        async function loadAllData() {
-            let loadingError = false;
-            let errorMessage = "Errors occurred while loading data. Showing default demo data.";
-
-            // Step 1: Initialize global simData based on default structure (empty families)
-            simData = { ...defaultSimData };
-
-            // Step 2: Load World Info
-            try {
-                simData.worldInfo = await fetchWorldInfoCsv();
-                document.getElementById('worldNameDisplay').textContent = simData.worldInfo.name;
-                document.getElementById('worldDescriptionDisplay').textContent = simData.worldInfo.description;
-            } catch (e) {
-                loadingError = true;
-                errorMessage += `\n- World Info: ${e.message}`;
-            }
-
-            // Step 3: Load Family Biographies (these define the family structures)
-            let loadedFamilies = {};
-            try {
-                loadedFamilies = await fetchFamilyBiographiesCsv();
-            } catch (e) {
-                loadingError = true;
-                errorMessage += `\n- Family Bios: ${e.message}`;
-            }
-
-            // Step 4: Load Sim Biographies (these populate the members of the families)
-            let loadedSimsAndHomeless = { families: {}, homelessSims: [] };
-            try {
-                // Pass loadedFamilies to ensure sims are added to existing family structures
-                loadedSimsAndHomeless = await fetchSimBiographiesCsv(loadedFamilies);
-                
-                // Now, merge the loaded sim data into the global simData structure
-                // This ensures that simData only contains families explicitly defined in the CSVs
-                simData = {
-                    "worldInfo": simData.worldInfo, // Keep worldInfo
-                    ...loadedSimsAndHomeless.families, // Add all families with their members
-                    "homelessSims": loadedSimsAndHomeless.homelessSims // Add homeless sims
-                };
-
-                // Sort family keys for consistent display in the sidebar
-                const sortedFamilyKeys = Object.keys(simData)
-                    .filter(k => k !== "worldInfo" && k !== "homelessSims")
-                    .sort((a, b) => {
-                        // Ensure familyBio.name exists for comparison
-                        const nameA = (simData[a] && simData[a].familyBio && simData[a].familyBio.name) ? simData[a].familyBio.name : '';
-                        const nameB = (simData[b] && simData[b].familyBio && simData[b].familyBio.name) ? simData[b].familyBio.name : '';
-                        return nameA.localeCompare(nameB);
-                    });
-
-                // Reconstruct simData with sorted families and homeless sims at the end
-                const orderedSimData = {
-                    "worldInfo": simData.worldInfo,
-                    ...sortedFamilyKeys.reduce((obj, key) => {
-                        obj[key] = simData[key];
-                        return obj;
-                    }, {}),
-                    "homelessSims": simData.homelessSims
-                };
-                simData = orderedSimData;
-
-            } catch (e) {
-                loadingError = true;
-                errorMessage += `\n- Sim Bios: ${e.message}`;
-            }
-
-            // Step 5: Load Neighborhood Stories
-            try {
-                neighborhoodStories = await fetchNeighborhoodStoriesCsv();
-            } catch (e) {
-                loadingError = true;
-                errorMessage += `\n- Stories: ${e.message}`;
-            }
-
-            // Log final parsed data (for debugging)
-            console.log("Final simData after loading:", simData);
-            console.log("Final neighborhoodStories after loading:", neighborhoodStories);
-
-            if (loadingError) {
-                const contentDisplayArea = document.getElementById('contentDisplayArea');
-                contentDisplayArea.innerHTML = `<div class="sleek-panel p-6 text-center text-red-600">
-                    <h3 class="text-xl font-bold mb-2">Error Loading Some Data from Google Sheets</h3>
-                    <p class="mb-4">The site is currently showing default demo data or incomplete data because some sheets failed to load.</p>
-                    <p>Please ensure all your Google Sheets are:</p>
-                    <ul class="list-disc list-inside text-left mx-auto max-w-sm mt-4">
-                        <li>Correctly published to the web as CSV (File > Share > Publish to web > Select Sheet > Format: Comma-separated values (.csv) > Publish).</li>
-                        <li>The GIDs in the script's configuration match the GIDs in your sheet URLs.</li>
-                        <li>There are no typos in the sheet headers.</li>
-                    </ul>
-                    <p class="mt-4 text-sm text-gray-500">Details: ${errorMessage}</p>
-                </div>`;
-            }
-
-            // Always initialize display regardless of loading success
-            initializeDisplay();
-        }
-
-        // Initialize display and event listeners
-        function initializeDisplay() {
-            // Set initial world info based on loaded data (or default)
-            document.getElementById('worldNameDisplay').textContent = simData.worldInfo.name;
-            document.getElementById('worldDescriptionDisplay').textContent = simData.worldInfo.description;
-
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(savedTheme);
-
-            document.getElementById('showNeighborhoodStoriesBtn').addEventListener('click', displayNeighborhoodStories);
-            document.getElementById('showSpreadsheetBtn').addEventListener('click', showSpreadsheet);
-            document.getElementById('showHomelessSimsBtn').addEventListener('click', showHomelessSims);
-            document.getElementById('showGraveyardBtn').addEventListener('click', showGraveyard);
-            document.getElementById('showNotesBtn').addEventListener('click', displayNotesSection);
-            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
-            document.querySelectorAll('.sortable-th').forEach(header => {
-                header.addEventListener('click', () => {
-                    const column = header.dataset.sort;
-                    let direction = 'asc';
-                    if (currentSortColumn === column && currentSortDirection === 'asc') {
-                        direction = 'desc';
-                    }
-                    populateSpreadsheet(column, direction);
-                });
-            });
-
-            updateFamilyList();
-            // Set Neighborhood Stories as the default section on page load
-            displayNeighborhoodStories();
-        }
-
-        // Call loadAllData automatically on window load
-        window.onload = loadAllData;
-
-        // Function to update the family list in the sidebar (kept at the end for logical flow)
-        function updateFamilyList() {
-            const familyListElement = document.getElementById('familyList');
-            familyListElement.innerHTML = '';
-
-            const familyNames = Object.keys(simData).filter(k => k !== "worldInfo" && k !== "homelessSims");
-            if (familyNames.length === 0) {
-                familyListElement.innerHTML = '<p class="text-center text-muted-dark relative z-20">No families found.</p>';
-                return;
-            }
-
-            familyNames.forEach(familyNameKey => {
-                const family = simData[familyNameKey];
-                const isSelectedFamily = familyNameKey === currentSelectedFamily;
-                const familyItemClass = isSelectedFamily ? 'family-item selected-family' : 'family-item';
-                const displayFamilyName = family.familyBio.name.replace(' Family', '');
-
-                let familyHtml = `
-                    <div class="${familyItemClass} p-2 rounded-md shadow-sm flex items-center justify-between" onclick="selectFamily('${familyNameKey}')">
-                        <h3 class="text-lg font-semibold relative z-20">${displayFamilyName}</h3>
-                        <i class="fas fa-chevron-right expand-icon text-sm relative z-20"></i>
-                    </div>
-                    <div class="sims-list ml-4 mt-1 ${isSelectedFamily ? 'expanded' : ''}">
-                `;
-
-                if (family.members && family.members.length > 0) {
-                    // Show all members, but differentiate by status
-                    // Sort members alphabetically by name
-                    family.members.sort((a, b) => a.name.localeCompare(b.name));
-                    
-                    family.members.forEach(sim => {
-                        const isSelectedSim = isSelectedFamily && currentSelectedSim && sim.name === currentSelectedSim.name;
-                        let simButtonClass = isSelectedSim ? 'sim-button selected-sim' : 'sim-button';
-                        // Add classes for dead sims: grey out and strike-through
-                        let simStatusTextClass = (sim.status && sim.status.toLowerCase() === 'alive') ? '' : 'text-gray-500 line-through';
-                        
-                        familyHtml += `<button class="${simButtonClass} px-3 py-1 rounded-full text-sm block w-full text-left" onclick="selectSim('${sim.name}')">
-                            <span class="relative z-20 ${simStatusTextClass}">${sim.name}</span>
-                        </button>`;
-                    });
-                } else {
-                    familyHtml += `<p class="px-3 py-1 text-sm text-gray-500">No members listed.</p>`;
-                }
-                familyHtml += `</div>`;
-                familyListElement.innerHTML += familyHtml;
-            });
-
-            // Ensure the currently selected family's expand icon and max-height are correct on initial load or list update
-            const selectedFamilyElement = document.querySelector(`.family-item.selected-family`);
-            if (selectedFamilyElement) {
-                const expandIcon = selectedFamilyElement.querySelector('.expand-icon');
-                if (expandIcon) {
-                    expandIcon.style.transform = 'rotate(90deg)';
-                }
-                const simsList = selectedFamilyElement.nextElementSibling;
-                if (simsList && simsList.classList.contains('sims-list')) {
-                    simsList.style.maxHeight = simsList.scrollHeight + 'px';
-                }
-            }
-        }
-
-        function selectFamily(familyNameKey) {
-            const prevSelectedFamilyElement = document.querySelector(`.family-item.selected-family`);
-            if (prevSelectedFamilyElement) {
-                const prevSimsList = prevSelectedFamilyElement.nextElementSibling;
-                if (prevSimsList && prevSimsList.classList.contains('sims-list')) {
-                    prevSimsList.classList.remove('expanded');
-                    prevSimsList.style.maxHeight = '0';
-                    prevSelectedFamilyElement.classList.remove('selected-family');
-                    const prevExpandIcon = prevSelectedFamilyElement.querySelector('.expand-icon');
-                    if(prevExpandIcon) prevExpandIcon.style.transform = 'rotate(0deg)';
-                }
-            }
-
-            if (familyNameKey === currentSelectedFamily && document.querySelector(`.family-item[onclick="selectFamily('${familyNameKey}')"]`).classList.contains('selected-family')) {
-                currentSelectedFamily = null;
-                hideAllContentSections();
-                return;
-            }
-
-            currentSelectedFamily = familyNameKey;
-            currentSelectedSim = null;
-
-            const newSelectedFamilyElement = document.querySelector(`.family-item[onclick="selectFamily('${familyNameKey}')"]`);
-            if (newSelectedFamilyElement) {
-                const newSimsList = newSelectedFamilyElement.nextElementSibling;
-                if (newSimsList && newSimsList.classList.contains('sims-list')) {
-                    newSimsList.classList.add('expanded');
-                    newSimsList.style.maxHeight = newSimsList.scrollHeight + 'px';
-                    newSelectedFamilyElement.classList.add('selected-family');
-                    const newExpandIcon = newSelectedFamilyElement.querySelector('.expand-icon');
-                    if(newExpandIcon) newExpandIcon.style.transform = 'rotate(90deg)';
-                }
-            }
-            updateFamilyList();
-            hideAllContentSections();
-            displayFamilyOverview(familyNameKey);
-        }
-
-        function selectSim(simName) {
-            let foundSim = findSimByName(simName);
-            
-            if (!foundSim) {
-                console.error(`Sim with name '${simName}' not found.`);
-                hideAllContentSections();
-                return;
-            }
-            
-            currentSelectedSim = foundSim;
-            // Find the family key of the selected sim to ensure correct highlighting in the sidebar
-            for (const familyKey in simData) {
-                if (familyKey === "worldInfo") continue;
-                if (familyKey === "homelessSims") {
-                    if (simData[familyKey] && simData[familyKey].find(s => s.name === simName)) {
-                        currentSelectedFamily = "homelessSims"; // Special key for homeless
-                        break;
-                    }
-                } else if (simData[familyKey].members && simData[familyKey].members.find(s => s.name === simName)) {
-                    currentSelectedFamily = familyKey;
-                    break;
-                }
-            }
-
-            updateFamilyList(); // Re-render the family list to apply selected states
-            hideAllContentSections();
-            displaySimDetails(currentSelectedSim);
-        }
-    </script>
-</body>
-</html>
+  );
+};
+
+
+// --- Sim Biographies Section ---
+const SimBiographies = ({ simsData, getMockSimsData, onExpand }) => {
+  // Determine which data to display: fetched data if available and not empty, otherwise mock data.
+  const dataToDisplay = simsData && simsData.length > 0 ? simsData : getMockSimsData();
+
+  return (
+    <section className="bg-white p-6 rounded-xl shadow-lg">
+      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Sim Biographies</h2>
+      <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
+        Explore the detailed lives of your Sims neighborhood residents. Click on a Sim's card to imagine more details!
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {dataToDisplay.map((sim, index) => ( // Pass index to SimCard for navigation within modal
+          <SimCard key={sim.id || `${sim.firstName}-${sim.name}`} sim={sim} onExpand={onExpand} allSims={dataToDisplay} simIndex={index} />
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// Component to display an individual Sim's card
+const SimCard = ({ sim, onExpand, allSims, simIndex }) => {
+  const [currentLifeStageImage, setCurrentLifeStageImage] = useState('');
+
+  // Map age string to corresponding image property
+  const getInitialImage = (sim) => {
+    const ageImages = {
+      'Baby': sim.imageBaby,
+      'Toddler': sim.imageToddler,
+      'Child': sim.imageChild,
+      'Teen': sim.imageTeen,
+      'Young Adult': sim.imageYoungAdult,
+      'Adult': sim.imageAdult,
+      'Elder': sim.imageElder,
+    };
+    return ageImages[sim.age] || sim.imageYoungAdult || 'https://placehold.co/200x250/A0AEC0/ffffff?text=No+Image';
+  };
+
+  useEffect(() => {
+    setCurrentLifeStageImage(getInitialImage(sim));
+  }, [sim]);
+
+  // Define life stages and their corresponding image keys
+  const lifeStages = [
+    { label: 'Baby', key: 'imageBaby', ageString: 'Baby' },
+    { label: 'Toddler', key: 'imageToddler', ageString: 'Toddler' },
+    { label: 'Child', key: 'imageChild', ageString: 'Child' },
+    { label: 'Teen', key: 'imageTeen', ageString: 'Teen' },
+    { label: 'Young Adult', key: 'imageYoungAdult', ageString: 'Young Adult' },
+    { label: 'Adult', key: 'imageAdult', ageString: 'Adult' },
+    { label: 'Elder', key: 'imageElder', ageString: 'Elder' },
+  ];
+
+  // Helper to ensure 'traits' is an array, handling various input formats
+  const allTraits = Array.isArray(sim.traits)
+    ? sim.traits.filter(Boolean)
+    : [
+        sim.traits,
+        sim.trait2,
+        sim.trait3,
+        sim.trait4,
+        sim.trait5,
+        sim.bonusTrait,
+      ].flat().filter(Boolean);
+
+
+  return (
+    <div
+      className="bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+      onClick={() => onExpand(sim, 'sim', allSims, simIndex)} // Pass allSims and simIndex for navigation
+    >
+      <div className="relative">
+        <img
+          src={currentLifeStageImage}
+          alt={`${sim.firstName || ''} ${sim.name || ''}`}
+          className="w-full h-64 object-cover object-center rounded-t-xl"
+          onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/200x250/A0AEC0/ffffff?text=No+Image'; }}
+        />
+        <div className="absolute bottom-0 left-0 bg-gradient-to-t from-black via-black/70 to-transparent p-4 w-full">
+          <h3 className="text-xl font-bold text-white leading-tight">
+            {sim.firstName || 'Unknown'} {sim.name || 'Sim'}
+          </h3>
+          <p className="text-sm text-gray-300">{sim.title || 'N/A'}</p>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-4">
+        {/* Quick Info Badges */}
+        <div className="flex flex-wrap gap-2 text-xs font-semibold">
+          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{sim.age || 'N/A'}</span>
+          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">{sim.gender || 'N/A'}</span>
+          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full">{sim.maritalStatus || 'N/A'}</span>
+          {sim.occultStatus && sim.occultStatus !== 'None' && (
+            <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">{sim.occultStatus}</span>
+          )}
+        </div>
+
+        {/* Short Bio */}
+        <p className="text-sm text-gray-700">
+          {(sim.bio || 'No biography available.').substring(0, 150)}{((sim.bio || '').length > 150) ? '...' : ''}
+        </p>
+
+        {/* Life Stage Buttons */}
+        <div className="border-t border-gray-200 pt-4 mt-4">
+          <h4 className="font-semibold text-gray-800 text-sm mb-2">View by Age:</h4>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {lifeStages.map((stage) => {
+              const imageSrc = sim[stage.key];
+              // Render button only if imageSrc exists for that stage
+              return imageSrc ? (
+                <button
+                  key={stage.key}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent card from expanding when clicking age button
+                    setCurrentLifeStageImage(imageSrc);
+                  }}
+                  className={`p-1 rounded-full overflow-hidden shadow-md transition-all duration-200 ease-in-out
+                    ${currentLifeStageImage === imageSrc ? 'ring-2 ring-blue-500 transform scale-110' : 'hover:scale-105'}`
+                  }
+                  title={stage.label}
+                >
+                  <img
+                    src={imageSrc}
+                    alt={stage.label}
+                    className="w-10 h-10 rounded-full object-cover"
+                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/40x40/E2E8F0/ffffff?text=' + stage.label.substring(0,1); }}
+                  />
+                </button>
+              ) : null; // Do not render button if no image for that stage
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+// --- Family Biographies Section ---
+const FamilyBiographies = ({ filteredFamilyData, onExpand }) => { // Accept filteredFamilyData prop
+  // Transform raw data to match component's expected structure
+  const families = filteredFamilyData.map((data, index) => ({
+    id: `family-${index}`, // Generate a unique ID
+    name: data.householdName,
+    description: data.biography || 'No biography available for this family yet.', // Default text if empty
+    funds: data.funds || 0, // Default to 0 if no funds specified
+    // For now, members will be generic. In a real app, you'd link this to Sim data.
+    members: [], // Placeholder for members (could be added manually or from another CSV later)
+    image: data.imgFamilyBio || `https://placehold.co/400x200/A0AEC0/ffffff?text=${encodeURIComponent(data.householdName)}+Family`,
+  }));
+
+  return (
+    <section className="bg-white p-6 rounded-xl shadow-lg">
+      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Family Biographies</h2>
+      <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
+        Discover the histories and dynamics of the prominent families living in your Sims neighborhood. Click on a family card for more details!
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {families.map((family, index) => (
+          <div
+            key={family.id}
+            className="bg-gray-50 border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer"
+            onClick={() => onExpand(family, 'family', families, index)} // Pass family data, type, all families, and index to expand
+          >
+            <img
+              src={family.image}
+              alt={`${family.name} banner`}
+              className="w-full h-40 object-cover object-center rounded-t-xl"
+              onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x200/A0AEC0/ffffff?text=Family+Image'; }}
+            />
+            <div className="p-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{family.name}</h3>
+              <p className="text-sm text-gray-700 mb-3">{family.description.substring(0, 100)}{family.description.length > 100 ? '...' : ''}</p>
+              <div className="text-sm text-gray-600 mb-3">
+                <span className="font-semibold">Funds:</span> §{family.funds.toLocaleString()} {/* Format funds */}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// --- Neighborhood News Section ---
+const NeighborhoodNews = ({ newsData, onExpand }) => { // Accept newsData prop
+  // Use newsData directly, or fallback to mock if empty
+  const articlesToDisplay = newsData && newsData.length > 0 ? newsData : getMockNewsData();
+
+
+  return (
+    <section className="bg-white p-6 rounded-xl shadow-lg">
+      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Neighborhood News</h2>
+      <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
+        Stay updated with the latest happenings, gossip, and bizarre events from across your Sims neighborhood!
+      </p>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {articlesToDisplay.map((article, index) => {
+          // Use parsed content and image from article object directly
+          const displayContent = article.content || 'No content available.';
+          const displayImage = article.image || 'https://placehold.co/600x300/A0AEC0/ffffff?text=News+Image';
+
+          return (
+            <div
+              key={article.id}
+              className="bg-gray-50 border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300 cursor-pointer"
+              onClick={() => onExpand(article, 'news', articlesToDisplay, index)} // Pass article data, type, all articles, and index to expand
+            >
+              <img
+                src={displayImage}
+                alt={article.title}
+                className="w-full h-48 object-cover rounded-t-xl"
+                onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x300/A0AEC0/ffffff?text=News+Image'; }}
+              />
+              <div className="p-4">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{article.title}</h3>
+                <p className="text-sm text-gray-500 mb-2">{article.date}</p>
+                <p className="text-gray-700 text-sm">{displayContent.substring(0, 100)}{displayContent.length > 100 ? '...' : ''}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+};
+
+// --- Population Stats Section ---
+// Now accepts simsData as a prop
+const PopulationStats = ({ simsData, alivePopulationCount }) => { // Accept alivePopulationCount prop
+  // Use the simsData directly for rendering the table
+  const dataToDisplay = simsData && simsData.length > 0 ? simsData : getMockSimsData(); // Fallback to mock data if fetched is empty or null
+
+  return (
+    <section className="bg-white p-6 rounded-xl shadow-lg">
+      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Population: {alivePopulationCount}</h2>
+      <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
+        A detailed look at each Sim in your neighborhood who is currently alive, including their household, age, gender, aspirations, and status.
+      </p>
+
+      <div className="overflow-x-auto rounded-lg shadow-md">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Household
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Age
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Gender
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Aspiration
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {dataToDisplay.map((sim, index) => ( // Use dataToDisplay here
+              <tr key={sim.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {sim.fullName || `${sim.firstName || 'N/A'} ${sim.name || 'N/A'}`} {/* Use fullName here */}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  {sim.household || 'N/A'} {/* Assuming 'household' field exists in CSV data */}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  {sim.age || 'N/A'}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  {sim.gender || 'N/A'}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  {sim.aspirationSims4 || sim.aspiration || 'N/A'} {/* Prioritize Sims4 aspiration */}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  {sim.status || 'N/A'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+};
+
+// --- Notes Section ---
+const NotesSection = () => {
+  const creatorNotes = [
+    {
+      id: 'cn-1',
+      title: 'Current Storylines in Progress',
+      content: 'Focusing on the Bella Goth abduction storyline this cycle. Also, planning a major career event for Cassandra Goth. Need to introduce a new rival for Mortimer in the science field.',
+    },
+    {
+      id: 'cn-2',
+      title: 'Future Generations Planning',
+      content: 'Considering a new generation of Caliente twins. How will the Pleasants react to their children growing up?',
+    },
+  ];
+
+  const characterNotes = [
+    {
+      id: 'char-1',
+      sim: 'Bella Goth',
+      content: 'Found a strange device in Mortimer\'s study. What is he really working on? Feeling a strong urge to travel somewhere new...',
+    },
+    {
+      id: 'char-2',
+      sim: 'Mortimer Goth',
+      content: 'My latest experiment requires more rare earth elements. The local supplier is running low. Perhaps a trip to Sixam is in order.',
+    },
+    {
+      id: 'char-3',
+      sim: 'Cassandra Goth',
+      content: 'My music isn\'t appreciated enough here. Maybe a move to Oasis Springs would inspire me. Geoffrey Landgraab keeps sending me anonymous flowers... weird.',
+    },
+  ];
+
+  return (
+    <section className="bg-white p-6 rounded-xl shadow-lg">
+      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Neighborhood Notes</h2>
+      <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
+        Keep track of creator-specific thoughts, plans, and in-character notes for your Sims neighborhood.
+      </p>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Creator Notes */}
+        <div>
+          <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Creator Notes</h3>
+          <div className="space-y-4">
+            {creatorNotes.map((note) => (
+              <div key={note.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
+                <h4 className="font-bold text-gray-900 mb-1">{note.title}</h4>
+                <p className="text-sm text-gray-700">{note.content}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Character Notes */}
+        <div>
+          <h3 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">In-Character Notes</h3>
+          <div className="space-y-4">
+            {characterNotes.map((note) => (
+              <div key={note.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
+                <h4 className="font-bold text-gray-900 mb-1">From: {note.sim}</h4>
+                <p className="text-sm text-gray-700 italic">"{note.content}"</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default App;
