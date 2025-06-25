@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sims Story Tracker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .min-h-\[calc\(100vh-80px\)\] {
+            min-height: calc(100vh - 80px); /* Adjust based on Navbar height */
+        }
+        /* Modal specific styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-100 font-sans antialiased text-gray-900">
+
+    <!-- Navigation Bar -->
+    <nav class="flex items-center justify-between p-4 bg-gray-800 text-white shadow-lg rounded-b-lg">
+        <div class="flex items-center space-x-6">
+            <h1 id="app-title" class="text-3xl font-bold cursor-pointer hover:text-gray-300 transition-colors">
+                Sims Story Tracker
+            </h1>
+            <button id="population-menu-btn" class="px-4 py-2 bg-gray-700 rounded-full text-white text-sm font-semibold hover:bg-gray-600 transition-colors shadow">
+                Population Menu
+            </button>
+        </div>
+        <div class="relative w-1/3">
+            <input type="text" id="search-input" placeholder="Search..."
+                class="w-full p-3 rounded-full bg-gray-700 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all pl-10">
+            <!-- Search icon -->
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="min-h-[calc(100vh-80px)] bg-gray-100 p-6 flex flex-col items-center"></main>
+
+    <!-- Biography Modal -->
+    <div id="biography-modal-overlay" class="modal-overlay">
+        <div id="biography-modal-content" class="modal-content">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 transition-colors">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            <div id="modal-biography-details" class="flex flex-col md:flex-row items-start md:items-center justify-center gap-8 w-full max-w-4xl p-6 bg-white rounded-xl shadow-lg">
+                <!-- Sim details will be injected here -->
+            </div>
+            <div class="mt-6 text-center">
+                 <button id="back-to-population-from-modal-btn" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-105 flex items-center space-x-2 mx-auto">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span>Back to Population Menu</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global state variables
+        let currentPage = 'menu';
+        let storiesData = [];
+        let selectedStory = null;
+        let selectedSim = null; // New global variable for the selected Sim
+        let searchQuery = '';
+        let biographiesData = [];
+        let detailedStoriesContent = [];
+        let userId = null;
+        let isAuthReady = false;
+        let isLoading = true;
+        let error = null;
+        let filteredStories = [];
+        let filteredBiographies = [];
+
+        // DOM Elements
+        const mainContentEl = document.getElementById('main-content');
+        const appTitleEl = document.getElementById('app-title');
+        const populationMenuBtn = document.getElementById('population-menu-btn');
+        const searchInputEl = document.getElementById('search-input');
+        const biographyModalOverlay = document.getElementById('biography-modal-overlay');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const modalBiographyDetails = document.getElementById('modal-biography-details');
+        const backToPopulationFromModalBtn = document.getElementById('back-to-population-from-modal-btn');
+
+        // Firebase Initialization
+        let app, db, auth;
+
+        // Hardcoded fallback data for Biographies in case fetching from Google Sheets fails
+        const fallbackBiographiesData = [
+            { "Household": "Goth", "Name_First_Last_Combo": "Bella Goth", "Image_Toddler": "", "Image_Child": "", "Image_Teen": "", "Image_YoungAdult": "", "Image_Adult": "https://placehold.co/100x100/A0D6B4/3E7B5C?text=Bella", "Image_Elder": "", "Title": "", "Bio": "A mysterious and elegant socialite, known for her disappearance.", "Notes": "", "Status": "Alive", "Occult Status": "Human", "Career": "Unemployed", "Gender": "Female", "Age": "Adult", "Astrology": "", "Marital Status": "Married", "Skin Color": "Light", "Hair Color": "Black", "Fitness": "", "Eye Color": "Brown", "Partners": "Mortimer Goth", "Parent 1": "", "Parent 2": "", "Siblings": "", "Children": "Cassandra Goth", "Lifetime Wish": "", "Trait 1": "", "Trait 2": "", "Trait 3": "", "Trait 4": "", "Trait 5": "", "Favorite Food": "", "Favorite Music": "", "Favorite Color": "", "Skill": "" },
+            { "Household": "Goth", "Name_First_Last_Combo": "Mortimer Goth", "Image_Toddler": "", "Image_Child": "", "Image_Teen": "", "Image_YoungAdult": "", "Image_Adult": "https://placehold.co/100x100/F0C7C7/A84A4A?text=Mortimer", "Image_Elder": "", "Title": "Dr.", "Bio": "The patriarch of the Goth family, a scientist and a devoted father.", "Notes": "", "Status": "Alive", "Occult Status": "Human", "Career": "Scientist", "Gender": "Male", "Age": "Adult", "Astrology": "", "Marital Status": "Married", "Skin Color": "Light", "Hair Color": "Black", "Fitness": "", "Eye Color": "Blue", "Partners": "Bella Goth", "Parent 1": "", "Parent 2": "", "Siblings": "", "Children": "Cassandra Goth", "Lifetime Wish": "", "Trait 1": "", "Trait 2": "", "Trait 3": "", "Trait 4": "", "Trait 5": "", "Favorite Food": "", "Favorite Music": "", "Favorite Color": "", "Skill": "" },
+            { "Household": "Goth", "Name_First_Last_Combo": "Cassandra Goth", "Image_Toddler": "", "Image_Child": "", "Image_Teen": "https://placehold.co/100x100/D0B3E1/7C5B99?text=Cassandra", "Image_YoungAdult": "", "Image_Adult": "", "Image_Elder": "", "Title": "", "Bio": "Mortimer and Bella's daughter, often shy and artistic.", "Notes": "", "Status": "Alive", "Occult Status": "Human", "Career": "Student", "Gender": "Female", "Age": "Teen", "Astrology": "", "Marital Status": "Single", "Skin Color": "Light", "Hair Color": "Black", "Fitness": "", "Eye Color": "Brown", "Partners": "", "Parent 1": "Mortimer Goth", "Parent 2": "Bella Goth", "Siblings": "", "Children": "", "Lifetime Wish": "", "Trait 1": "", "Trait 2": "", "Trait 3": "", "Trait 4": "", "Trait 5": "", "Favorite Food": "", "Favorite Music": "", "Favorite Color": "", "Skill": "" },
+            { "Household": "Lothario", "Name_First_Last_Combo": "Don Lothario", "Image_Toddler": "", "Image_Child": "", "Image_Teen": "", "Image_YoungAdult": "https://placehold.co/100x100/B2EBF2/00BCD4?text=Don", "Image_Adult": "", "Image_Elder": "", "Title": "", "Bio": "A notorious ladies' man, always looking for a good time.", "Notes": "", "Status": "Alive", "Occult Status": "Human", "Career": "Criminal", "Gender": "Male", "Age": "Young Adult", "Astrology": "", "Marital Status": "Single", "Skin Color": "Tan", "Hair Color": "Brown", "Fitness": "", "Eye Color": "Blue", "Partners": "", "Parent 1": "", "Parent 2": "", "Siblings": "", "Children": "", "Lifetime Wish": "", "Trait 1": "", "Trait 2": "", "Trait 3": "", "Trait 4": "", "Trait 5": "", "Favorite Food": "", "Favorite Music": "", "Favorite Color": "", "Skill": "" },
+            { "Household": "Caliente", "Name_First_Last_Combo": "Nina Caliente", "Image_Toddler": "", "Image_Child": "", "Image_Teen": "", "Image_YoungAdult": "https://placehold.co/100x100/FFCCBC/FF5722?text=Nina", "Image_Adult": "", "Image_Elder": "", "Title": "", "Bio": "One of the fiery Caliente sisters, with a passion for romance.", "Notes": "", "Status": "Alive", "Occult Status": "Human", "Career": "Service", "Gender": "Female", "Age": "Young Adult", "Astrology": "", "Marital Status": "Single", "Skin Color": "Tan", "Hair Color": "Red", "Fitness": "", "Eye Color": "Green", "Partners": "", "Parent 1": "", "Parent 2": "", "Siblings": "Dina Caliente", "Children": "", "Lifetime Wish": "", "Trait 1": "", "Trait 2": "", "Trait 3": "", "Trait 4": "", "Trait 5": "", "Favorite Food": "", "Favorite Music": "", "Favorite Color": "", "Skill": "" },
+            { "Household": "Caliente", "Name_First_Last_Combo": "Dina Caliente", "Image_Toddler": "", "Image_Child": "", "Image_Teen": "", "Image_YoungAdult": "https://placehold.co/100x100/FFE0B2/FF9800?text=Dina", "Image_Adult": "", "Image_Elder": "", "Title": "", "Bio": "Nina's sister, equally passionate but perhaps more focused on wealth.", "Notes": "", "Status": "Alive", "Occult Status": "Human", "Career": "Criminal", "Gender": "Female", "Age": "Young Adult", "Astrology": "", "Marital Status": "Single", "Skin Color": "Tan", "Hair Color": "Blonde", "Fitness": "", "Eye Color": "Brown", "Partners": "", "Parent 1": "", "Parent 2": "", "Siblings": "Nina Caliente", "Children": "", "Lifetime Wish": "", "Trait 1": "", "Trait 2": "", "Trait 3": "", "Trait 4": "", "Trait 5": "", "Favorite Food": "", "Favorite Music": "", "Favorite Color": "", "Skill": "" },
+            { "Household": "Crumplebottom", "Name_First_Last_Combo": "Agnes Crumplebottom", "Image_Toddler": "", "Image_Child": "", "Image_Teen": "", "Image_YoungAdult": "", "Image_Adult": "", "Image_Elder": "https://placehold.co/100x100/E6EE9C/827717?text=Agnes", "Title": "", "Bio": "A grumpy, widowed Sim known for her disdain for romance.", "Notes": "", "Status": "Alive", "Occult Status": "Human", "Career": "Retired", "Gender": "Female", "Age": "Elder", "Astrology": "", "Marital Status": "Widowed", "Skin Color": "Light", "Hair Color": "Grey", "Fitness": "", "Eye Color": "Blue", "Partners": "", "Parent 1": "", "Parent 2": "", "Siblings": "Mimsy Crumplebottom", "Children": "", "Lifetime Wish": "", "Trait 1": "", "Trait 2": "", "Trait 3": "", "Trait 4": "", "Trait 5": "", "Favorite Food": "", "Favorite Music": "", "Favorite Color": "", "Skill": "" },
+            { "Household": "Crumplebottom", "Name_First_Last_Combo": "Mimsy Crumplebottom", "Image_Toddler": "", "Image_Child": "", "Image_Teen": "", "Image_YoungAdult": "", "Image_Adult": "", "Image_Elder": "https://placehold.co/100x100/CFD8DC/546E7A?text=Mimsy", "Title": "", "Bio": "Agnes's deceased sister, often mentioned by Agnes.", "Notes": "", "Status": "Deceased", "Occult Status": "Ghost", "Career": "Unknown", "Gender": "Female", "Age": "Elder", "Astrology": "", "Marital Status": "Single", "Skin Color": "Light", "Hair Color": "Grey", "Fitness": "", "Eye Color": "Brown", "Partners": "", "Parent 1": "", "Parent 2": "", "Siblings": "Agnes Crumplebottom", "Children": "", "Lifetime Wish": "", "Trait 1": "", "Trait 2": "", "Trait 3": "", "Trait 4": "", "Trait 5": "", "Favorite Food": "", "Favorite Music": "", "Favorite Color": "", "Skill": "" }
+        ];
+
+        // Firebase configuration and authentication setup
+        const initializeFirebase = async () => {
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            let parsedFirebaseConfig = {};
+            try {
+                parsedFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            } catch (e) {
+                console.error("Error parsing __firebase_config:", e);
+            }
+            const firebaseConfig = parsedFirebaseConfig;
+            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+            if (Object.keys(firebaseConfig).length > 0) {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                    } else {
+                        try {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                                userId = auth.currentUser?.uid;
+                            } else {
+                                const anonymousUserCredential = await signInAnonymously(auth);
+                                userId = anonymousUserCredential.user.uid;
+                            }
+                        } catch (authError) {
+                            console.error("Firebase authentication error:", authError);
+                            error = "Authentication failed. Some features might not work.";
+                            userId = crypto.randomUUID();
+                        }
+                    }
+                    isAuthReady = true;
+                    await fetchAllData();
+                    // Removed renderContent() from here, it's now called after filterData in fetchAllData's finally block
+                });
+            } else {
+                console.warn("Firebase Config not found. Running without Firebase authentication/Firestore.");
+                isAuthReady = true;
+                userId = crypto.randomUUID();
+                await fetchAllData();
+                // Removed renderContent() from here, it's now called after filterData in fetchAllData's finally block
+            }
+        };
+
+        const parseCSV = (csvText) => {
+            const lines = csvText.trim().split('\n');
+            if (lines.length === 0) return [];
+
+            const rawHeaders = lines[0].split(',');
+            const headers = rawHeaders.map(header => header.trim());
+
+            const data = [];
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim() === '') continue;
+                const values = lines[i].split(',').map(value => value.trim());
+                const entry = {};
+                headers.forEach((header, index) => {
+                    entry[header] = values[index] || '';
+                });
+                data.push(entry);
+            }
+            return data;
+        };
+
+        const fetchAllData = async () => {
+            isLoading = true;
+            error = null;
+            renderContent(); // Initial render to show loading state
+
+            try {
+                const baseDocId = '2PACX-1vTnsKV_T2HneO1wXBQZPJruqNSlD0jJmJuf0P8v1L2yZQU4vvJ8vtN4ZqJz0del2HhpzFOo1pTZ8uIb';
+                const cacheBuster = `_t=${Date.now()}`; // Unique timestamp for cache busting
+
+                // Appending cacheBuster to both URLs to ensure fresh data
+                const storiesAndDetailedContentUrl = `https://docs.google.com/spreadsheets/d/e/${baseDocId}/pub?gid=1540825772&single=true&output=csv&${cacheBuster}`;
+                console.log("Attempting to fetch Neighborhood Stories from:", storiesAndDetailedContentUrl);
+                const storiesResponse = await fetch(storiesAndDetailedContentUrl);
+                if (!storiesResponse.ok) {
+                    throw new Error(`HTTP error! Status: ${storiesResponse.status}. Could not fetch Neighborhood Stories CSV from ${storiesAndDetailedContentUrl}.`);
+                }
+                const storiesCsvText = await storiesResponse.text();
+                storiesData = parseCSV(storiesCsvText);
+                console.log("Neighborhood Stories data fetched successfully. Count:", storiesData.length);
+
+                console.log("Attempting to fetch detailed content from:", storiesAndDetailedContentUrl);
+                const detailedContentResponse = await fetch(storiesAndDetailedContentUrl); // Corrected URL here
+                if (!detailedContentResponse.ok) {
+                    console.warn(`Could not fetch detailed story content: HTTP error! Status: ${detailedContentResponse.status}. From ${storiesAndDetailedContentUrl}.`);
+                    detailedStoriesContent = [];
+                } else {
+                    const detailedContentCsvText = await detailedContentResponse.text();
+                    detailedStoriesContent = parseCSV(detailedContentCsvText);
+                    console.log("Detailed content data fetched successfully. Count:", detailedStoriesContent.length);
+                }
+
+                // Appending cacheBuster to both URLs to ensure fresh data
+                const biographiesUrl = `https://docs.google.com/spreadsheets/d/e/${baseDocId}/pub?gid=522782907&single=true&output=csv&${cacheBuster}`;
+                console.log("Attempting to fetch biographies from:", biographiesUrl);
+                const biographiesResponse = await fetch(biographiesUrl);
+                if (!biographiesResponse.ok) {
+                    console.error(`Failed to fetch Biographies CSV from ${biographiesUrl}. Status: ${biographiesResponse.status}. Falling back to hardcoded data.`);
+                    biographiesData = [...fallbackBiographiesData];
+                    error = `Could not load some external data (Biographies). Using fallback data. Please ensure your Google Sheet for Biographies (Population tab) is published to the web and the URL/GID is correct.`;
+                } else {
+                    const biographiesCsvText = await biographiesResponse.text();
+                    biographiesData = parseCSV(biographiesCsvText);
+                    console.log("Biographies data fetched successfully. Count:", biographiesData.length);
+                }
+
+
+            } catch (err) {
+                console.error("Error fetching data:", err);
+                if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+                    error = `Network Error: The application could not connect to the Google Sheet. This might be due to a firewall, network restriction, or a browser setting (e.g., CORS). Please check your internet connection and browser console for more details.`;
+                } else {
+                    error = `Failed to load data: ${err.message}. Please ensure your Google Sheets are published to the web as CSV, and that the URLs (including the 'gid' for each tab) are correct. For each sheet, go to 'File > Share > Publish to web' and select 'Comma-separated values (.csv)', then copy the exact URL provided.`;
+                }
+                biographiesData = [...fallbackBiographiesData];
+            } finally {
+                isLoading = false;
+                // NEW LOGS: Confirm biographiesData before filterData is explicitly called
+                console.log("biographiesData length BEFORE calling filterData in finally block:", biographiesData.length);
+                console.log("biographiesData content BEFORE calling filterData in finally block (first 5 entries):", JSON.stringify(biographiesData.slice(0, 5)));
+                filterData(); // Ensure filterData runs to populate filteredBiographies
+                renderContent(); // Render only after data is fetched and filtered
+            }
+        };
+
+        const filterData = () => {
+            console.log("filterData called. Current page:", currentPage); // Added current page log
+            console.log("filterData called. Current searchQuery:", searchQuery);
+            console.log("biographiesData length at start of filterData:", biographiesData.length);
+            // Log the actual content of biographiesData to be sure
+            console.log("biographiesData content at start of filterData (first 5 entries):", JSON.stringify(biographiesData.slice(0, 5)));
+
+            const lowerCaseQuery = searchQuery.toLowerCase();
+            if (currentPage === 'menu') {
+                if (searchQuery === '') {
+                    filteredStories = [...storiesData];
+                } else {
+                    filteredStories = storiesData.filter(story =>
+                        story.Headline.toLowerCase().includes(lowerCaseQuery) ||
+                        (story.Order && story.Order.toLowerCase().includes(lowerCaseQuery)) ||
+                        (story.Content && story.Content.toLowerCase().includes(lowerCaseQuery))
+                    );
+                }
+            } else if (currentPage === 'population') {
+                if (searchQuery === '') {
+                    // This is the line we suspect is not working as expected, if filteredBiographies ends up 0
+                    filteredBiographies = [...biographiesData];
+                    console.log("  (Population branch) searchQuery is empty. filteredBiographies set from biographiesData.");
+                    console.log("  (Population branch) filteredBiographies content at assignment (first 5 entries):", JSON.stringify(filteredBiographies.slice(0, 5)));
+                } else {
+                    filteredBiographies = biographiesData.filter(sim =>
+                        (sim['Name_First_Last_Combo'] && sim['Name_First_Last_Combo'].toLowerCase().includes(lowerCaseQuery)) ||
+                        (sim.Household && sim.Household.toLowerCase().includes(lowerCaseQuery)) ||
+                        (sim.Gender && sim.Gender.toLowerCase().includes(lowerCaseQuery)) ||
+                        (sim.Age && sim.Age.toLowerCase().includes(lowerCaseQuery)) ||
+                        (sim.Status && sim.Status.toLowerCase().includes(lowerCaseQuery)) ||
+                        (sim.Bio && sim.Bio.toLowerCase().includes(lowerCaseQuery))
+                    );
+                    console.log("  (Population branch) searchQuery is NOT empty. filteredBiographies filtered.");
+                }
+            }
+            console.log("filteredBiographies length at end of filterData:", filteredBiographies.length);
+            // Removed renderContent() from here. It's now called explicitly after filterData.
+        };
+
+        const renderMenuPage = () => {
+            let html = `
+                <h2 class="text-4xl font-bold text-gray-900 mb-8 mt-4">Neighborhood Stories</h2>
+                <div class="w-full max-w-4xl bg-white shadow-xl rounded-lg overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-purple-700 text-white">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tl-lg">
+                                    Order
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                    Thumbnail
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tr-lg">
+                                    Headline
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+            `;
+
+            if (filteredStories.length > 0) {
+                filteredStories.forEach((story, index) => {
+                    html += `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                ${story.Order}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <img class="h-12 w-12 rounded-lg object-cover shadow-md"
+                                    src="${story['Default Thumbnail'] || `https://placehold.co/100x100/FEE2E2/B91C1C?text=No+Thumb`}"
+                                    alt="Thumbnail for ${story.Headline}"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/100x100/FEE2E2/B91C1C?text=Error';"
+                                />
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-lg font-medium text-blue-600 hover:text-blue-800 cursor-pointer transition-colors"
+                                data-story-index="${storiesData.indexOf(story)}">
+                                ${story.Headline}
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                html += `
+                    <tr>
+                        <td colspan="3" class="px-6 py-4 text-center text-gray-700">
+                            ${searchQuery ? 'No stories found matching your search. Try a different query!' : 'No stories available.'}
+                        </td>
+                    </tr>
+                `;
+            }
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            if (userId) {
+                html += `
+                    <div class="mt-8 p-4 bg-blue-100 text-blue-800 rounded-lg shadow-inner text-sm">
+                        <p>Your User ID (for potential data persistence): <span class="font-mono break-all">${userId}</span></p>
+                    </div>
+                `;
+            }
+            mainContentEl.innerHTML = html;
+
+            mainContentEl.querySelectorAll('[data-story-index]').forEach(item => {
+                item.addEventListener('click', (event) => {
+                    console.log("Story headline clicked. Navigating to story page.");
+                    const index = event.target.dataset.storyIndex;
+                    selectedStory = storiesData[index];
+                    currentPage = 'story';
+                    renderContent();
+                });
+            });
+        };
+
+        const renderStoryPage = () => {
+            if (!selectedStory) {
+                mainContentEl.innerHTML = `
+                    <div class="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] text-gray-700 p-6">
+                        <p class="text-xl mb-4">No story selected. Please go back to the menu.</p>
+                        <button id="back-to-stories-btn" class="px-6 py-3 bg-purple-600 text-white font-semibold rounded-full shadow-lg hover:bg-purple-700 transition-transform transform hover:scale-105 flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                            <span>Back to Stories</span>
+                        </button>
+                    </div>
+                `;
+                document.getElementById('back-to-stories-btn').addEventListener('click', () => {
+                    currentPage = 'menu';
+                    renderContent();
+                });
+                return;
+            }
+
+            const imageKeys = ['img_story1', 'img_story2', 'img_story_3', 'img_story_4', 'img_story_5'];
+            const validImages = imageKeys.map(key => selectedStory[key]).filter(url => url);
+
+            const currentDetailedContent = detailedStoriesContent.find(
+                content => content.Order === selectedStory.Order
+            );
+
+            console.log("Selected Story Order:", selectedStory.Order);
+            console.log("Found Detailed Content Object:", currentDetailedContent);
+            console.log("Story Content Field (currentDetailedContent.Content):", currentDetailedContent ? currentDetailedContent.Content : "N/A - currentDetailedContent is null/undefined");
+
+
+            let carouselHtml = '';
+            if (validImages.length > 0) {
+                carouselHtml = `
+                    <div class="relative w-full max-w-2xl h-96 bg-gray-200 rounded-xl overflow-hidden shadow-2xl flex items-center justify-center">
+                        <img id="story-image"
+                            src="${validImages[0]}"
+                            alt="Story image for ${selectedStory.Headline}"
+                            class="object-contain w-full h-full transition-opacity duration-300 ease-in-out"
+                            onerror="this.onerror=null; this.src='https://placehold.co/800x450/BDBDBD/424242?text=Image+Error';"
+                        />
+                        ${validImages.length > 1 ? `
+                            <button id="prev-image-btn" class="absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity+75 transition-all focus:outline-none focus:ring-2 focus:ring-white" aria-label="Previous image">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <button id="next-image-btn" class="absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-75 transition-all focus:outline-none focus:ring-2 focus:ring-white" aria-label="Next image">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+                            <div id="image-dots" class="absolute bottom-4 flex space-x-2">
+                                ${validImages.map((_, index) => `
+                                    <span class="block w-3 h-3 rounded-full ${index === 0 ? 'bg-white' : 'bg-gray-400'} cursor-pointer" data-img-index="${index}"></span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                carouselHtml = `
+                    <div class="text-xl text-gray-700 mt-8 p-6 bg-yellow-100 border border-yellow-300 rounded-lg shadow-sm">
+                        No images available for this story.
+                    </div>
+                `;
+            }
+
+            mainContentEl.innerHTML = `
+                <button id="back-to-stories-btn" class="self-start mb-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-105 flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span>Back to Stories</span>
+                </button>
+
+                <h2 class="text-5xl font-extrabold text-gray-900 mb-8 text-center leading-tight">
+                    ${selectedStory.Headline}
+                </h2>
+                ${carouselHtml}
+                <div class="mt-8 text-gray-700 text-lg leading-relaxed max-w-2xl text-center">
+                    <p>
+                        ${currentDetailedContent && currentDetailedContent.Content ? currentDetailedContent.Content : `No detailed narrative available for this story. (Add a 'Content' column to your linked Google Sheet for more extensive text.)`}
+                    </p>
+                </div>
+            `;
+
+            document.getElementById('back-to-stories-btn').addEventListener('click', () => {
+                currentPage = 'menu';
+                renderContent();
+            });
+
+            if (validImages.length > 1) {
+                let currentImageIndex = 0;
+                const storyImageEl = document.getElementById('story-image');
+                const prevBtn = document.getElementById('prev-image-btn');
+                const nextBtn = document.getElementById('next-image-btn');
+                const imageDotsContainer = document.getElementById('image-dots');
+
+                const updateCarousel = () => {
+                    storyImageEl.src = validImages[currentImageIndex];
+                    if (imageDotsContainer) {
+                        imageDotsContainer.querySelectorAll('span').forEach((dot, idx) => {
+                            dot.classList.toggle('bg-white', idx === currentImageIndex);
+                            dot.classList.toggle('bg-gray-400', idx !== currentImageIndex);
+                        });
+                    }
+                };
+
+                prevBtn.addEventListener('click', () => {
+                    currentImageIndex = (currentImageIndex === 0) ? validImages.length - 1 : currentImageIndex - 1;
+                    updateCarousel();
+                });
+                nextBtn.addEventListener('click', () => {
+                    currentImageIndex = (currentImageIndex === validImages.length - 1) ? 0 : currentImageIndex + 1;
+                    updateCarousel();
+                });
+                if (imageDotsContainer) {
+                    imageDotsContainer.querySelectorAll('span').forEach(dot => {
+                        dot.addEventListener('click', (event) => {
+                            currentImageIndex = parseInt(event.target.dataset.imgIndex, 10);
+                            updateCarousel();
+                        });
+                    });
+                }
+            }
+        };
+
+        const renderPopulationPage = () => {
+            console.log("Rendering Population Page. biographiesData length:", biographiesData.length);
+            console.log("Rendering Population Page. filteredBiographies length:", filteredBiographies.length);
+            let html = `
+                <h2 class="text-4xl font-bold text-gray-900 mb-8">Population Menu</h2>
+                <div class="w-full max-w-5xl bg-white shadow-xl rounded-lg overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-blue-700 text-white">
+                            <tr>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                    Name
+                                </th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                    Household
+                                </th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                    Gender
+                                </th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                    Age
+                                </th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tr-lg">
+                                    Status
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+            `;
+
+            if (filteredBiographies.length > 0) {
+                filteredBiographies.forEach((sim, index) => {
+                    html += `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-blue-600 hover:text-blue-800 cursor-pointer transition-colors"
+                                data-sim-index="${biographiesData.indexOf(sim)}">
+                                ${sim['Name_First_Last_Combo']}
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
+                                ${sim.Household}
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
+                                ${sim.Gender}
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
+                                ${sim.Age}
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
+                                ${sim.Status}
+                            </td>
+                        </tr>
+                    `;
+                });
+            } else {
+                html += `
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-700">
+                            ${searchQuery ? 'No Sims found matching your search. Try a different query!' : 'No Sim biographies available. Please check the Google Sheet publishing settings and console for fetch errors.'}
+                        </td>
+                    </tr>
+                `;
+            }
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+                <button id="back-to-stories-btn" class="mt-8 px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-105 flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span>Back to Stories</span>
+                </button>
+            `;
+            mainContentEl.innerHTML = html;
+
+            mainContentEl.querySelectorAll('[data-sim-index]').forEach(item => {
+                item.addEventListener('click', (event) => {
+                    console.log("Sim name clicked. Opening biography modal.");
+                    const index = event.target.dataset.simIndex;
+                    selectedSim = biographiesData[index];
+                    openBiographyModal(); // Call modal function instead of changing page
+                });
+            });
+
+            document.getElementById('back-to-stories-btn').addEventListener('click', () => {
+                currentPage = 'menu';
+                renderContent();
+            });
+        };
+
+        // Function to open the biography modal
+        const openBiographyModal = () => {
+            if (!selectedSim) {
+                console.error("No Sim selected for biography modal.");
+                return;
+            }
+
+            // Map Age from data to corresponding Image_ key
+            const ageToImageKeyMap = {
+                "Toddler": "Image_Toddler",
+                "Child": "Image_Child",
+                "Teen": "Image_Teen",
+                "Young Adult": "Image_YoungAdult",
+                "Adult": "Image_Adult",
+                "Elder": "Image_Elder"
+            };
+
+            const simImageKeys = [
+                'Image_Toddler', 'Image_Child', 'Image_Teen',
+                'Image_YoungAdult', 'Image_Adult', 'Image_Elder'
+            ];
+
+            // Get all available image URLs with their corresponding age labels
+            const availableImages = simImageKeys
+                .map(key => ({
+                    ageLabel: key.replace('Image_', '').replace('YoungAdult', 'Young Adult'), // Format label for display
+                    url: selectedSim[key]
+                }))
+                .filter(img => img.url);
+
+            // Determine the initial image URL
+            let initialImageUrl = '';
+            const simCurrentAgeImageKey = ageToImageKeyMap[selectedSim.Age];
+            const simCurrentAgeImageUrl = selectedSim[simCurrentAgeImageKey];
+
+            if (simCurrentAgeImageUrl) {
+                initialImageUrl = simCurrentAgeImageUrl;
+            } else if (availableImages.length > 0) {
+                // Fallback to the first available image if current age image is not found
+                initialImageUrl = availableImages[0].url;
+            } else {
+                // Fallback to a generic placeholder if no images are available
+                initialImageUrl = `https://placehold.co/300x300/BDBDBD/424242?text=No+Image`;
+            }
+
+            // Generate buttons for image selection
+            let ageImageButtonsHtml = '';
+            if (availableImages.length > 0) { // Generate buttons even if only one image, still allows re-selection
+                ageImageButtonsHtml = `
+                    <div id="sim-age-image-buttons" class="flex flex-wrap justify-center gap-2 mt-4 mb-4">
+                        ${availableImages.map((img) => `
+                            <button class="age-image-btn px-4 py-2 rounded-full text-sm font-semibold transition-colors shadow-md
+                                ${img.url === initialImageUrl ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'} "
+                                data-img-url="${img.url}">
+                                ${img.ageLabel}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            const biographyFields = [
+                { label: 'Household', key: 'Household' },
+                { label: 'Gender', key: 'Gender' },
+                { label: 'Age', key: 'Age' },
+                { label: 'Status', key: 'Status' },
+                { label: 'Occult Status', key: 'Occult Status' },
+                { label: 'Career', key: 'Career' },
+                { label: 'Title', key: 'Title' },
+                { label: 'Astrology', key: 'Astrology' },
+                { label: 'Marital Status', key: 'Marital Status' },
+                { label: 'Skin Color', key: 'Skin Color' },
+                { label: 'Hair Color', key: 'Hair Color' },
+                { label: 'Fitness', key: 'Fitness' },
+                { label: 'Eye Color', key: 'Eye Color' },
+                { label: 'Partners', key: 'Partners' },
+                { label: 'Parent 1', key: 'Parent 1' },
+                { label: 'Parent 2', key: 'Parent 2' },
+                { label: 'Siblings', key: 'Siblings' },
+                { label: 'Children', key: 'Children' },
+                { label: 'Lifetime Wish', key: 'Lifetime Wish' },
+                { label: 'Trait 1', key: 'Trait 1' },
+                { label: 'Trait 2', key: 'Trait 2' },
+                { label: 'Trait 3', key: 'Trait 3' },
+                { label: 'Trait 4', key: 'Trait 4' },
+                { label: 'Trait 5', key: 'Trait 5' },
+                { label: 'Favorite Food', key: 'Favorite Food' },
+                { label: 'Favorite Music', key: 'Favorite Music' },
+                { label: 'Favorite Color', key: 'Favorite Color' },
+                { label: 'Skill', key: 'Skill' },
+            ];
+
+            let detailsHtml = '';
+            biographyFields.forEach(field => {
+                const value = selectedSim[field.key];
+                // Only display fields that have a value
+                if (value && value.trim() !== '') {
+                    detailsHtml += `
+                        <div class="flex items-baseline space-x-2">
+                            <span class="font-semibold text-gray-800 text-sm">${field.label}:</span>
+                            <span class="text-gray-700 text-base">${value}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            // The main structure of the biography card
+            modalBiographyDetails.innerHTML = `
+                <div class="flex flex-col items-center w-full max-w-lg bg-white rounded-2xl shadow-xl p-8 transform transition-transform duration-300 hover:scale-105">
+                    <h2 class="text-4xl font-extrabold text-gray-900 mb-6 text-center leading-tight">
+                        ${selectedSim['Name_First_Last_Combo']}
+                    </h2>
+                    <div class="relative w-64 h-64 rounded-xl overflow-hidden shadow-lg flex items-center justify-center mb-6 border-4 border-indigo-200">
+                        <img id="sim-image-modal"
+                            src="${initialImageUrl}"
+                            alt="Image of ${selectedSim['Name_First_Last_Combo']}"
+                            class="object-cover w-full h-full transition-opacity duration-300 ease-in-out"
+                            onerror="this.onerror=null; this.src='https://placehold.co/300x300/BDBDBD/424242?text=Image+Error';"
+                        />
+                    </div>
+                    ${ageImageButtonsHtml}
+                    <div class="flex-1 w-full text-center">
+                        <p class="text-gray-700 text-lg leading-relaxed mb-6">${selectedSim.Bio || 'No biography content available.'}</p>
+                        <div class="space-y-3 text-left w-full">
+                            ${detailsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            biographyModalOverlay.classList.add('active'); // Show the modal
+
+            // Add event listeners for age image buttons
+            const simImageModalEl = document.getElementById('sim-image-modal');
+            modalBiographyDetails.querySelectorAll('.age-image-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const newImageUrl = event.target.dataset.imgUrl;
+                    simImageModalEl.src = newImageUrl;
+
+                    // Update active button styling
+                    modalBiographyDetails.querySelectorAll('.age-image-btn').forEach(btn => {
+                        btn.classList.remove('bg-indigo-600', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                    });
+                    event.target.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                    event.target.classList.add('bg-indigo-600', 'text-white');
+                });
+            });
+        };
+
+        // Function to close the biography modal
+        const closeBiographyModal = () => {
+            biographyModalOverlay.classList.remove('active'); // Hide the modal
+        };
+
+        // Event listeners for modal close buttons
+        closeModalBtn.addEventListener('click', closeBiographyModal);
+        backToPopulationFromModalBtn.addEventListener('click', closeBiographyModal); // Re-use for back-to-population functionality in modal
+
+        // New: Close modal when clicking outside of it
+        biographyModalOverlay.addEventListener('click', (event) => {
+            // Check if the click occurred directly on the overlay, not its children
+            if (event.target === biographyModalOverlay) {
+                closeBiographyModal();
+            }
+        });
+
+
+        // Main render function based on currentPage state
+        const renderContent = () => {
+            console.log("renderContent called. Current page:", currentPage);
+            mainContentEl.className = "min-h-[calc(100vh-80px)] p-6 flex flex-col items-center " + (isLoading || error ? 'justify-center' : '');
+
+            // Ensure modal is hidden when rendering main content pages
+            closeBiographyModal();
+
+            if (isLoading) {
+                mainContentEl.innerHTML = `
+                    <div class="flex items-center justify-center text-gray-700 text-2xl animate-pulse">
+                        Loading Sims Data...
+                    </div>
+                `;
+                return;
+            }
+
+            if (error) {
+                mainContentEl.innerHTML = `
+                    <div class="flex flex-col items-center justify-center text-red-700 text-xl p-8 bg-red-100 border border-red-400 rounded-lg shadow-md mx-auto max-w-lg text-center">
+                        <p>${error}</p>
+                        <p class="mt-4 text-sm text-red-600">
+                            If you are getting a 'Network Error', please check your internet connection, try in an incognito browser window, or ensure there are no local firewall/antivirus settings blocking access to Google Sheets. Also, confirm the Google Sheet URLs themselves open directly in a browser without errors.
+                            For other errors (like '404 Not Found'), it typically means the Google Sheet is not publicly accessible as a CSV at the provided URL. Please re-check the 'Publish to web' settings for the specific tab (including the correct 'gid').
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            switch (currentPage) {
+                case 'menu':
+                    renderMenuPage();
+                    break;
+                case 'story':
+                    renderStoryPage();
+                    break;
+                case 'population':
+                    renderPopulationPage();
+                    break;
+                // 'biography' case is now handled by the modal, no longer a separate page route
+                default:
+                    mainContentEl.innerHTML = `
+                        <div class="flex items-center justify-center text-red-700">
+                            Error: Page not found.
+                        </div>
+                    `;
+                    break;
+            }
+        };
+
+        // Event Listeners for Navbar
+        appTitleEl.addEventListener('click', () => {
+            currentPage = 'menu';
+            searchQuery = ''; // Clear search when navigating back to menu
+            searchInputEl.value = ''; // Clear input field
+            filterData(); // Ensure filtered data is updated
+            renderContent();
+        });
+
+        populationMenuBtn.addEventListener('click', () => {
+            currentPage = 'population';
+            searchQuery = ''; // Clear search when navigating to population
+            searchInputEl.value = ''; // Clear input field
+            filterData(); // Ensure filtered data is updated
+            renderContent();
+        });
+
+        searchInputEl.addEventListener('input', (event) => {
+            searchQuery = event.target.value;
+            filterData(); // Filter and re-render on search input
+            renderContent(); // Render after filterData completes
+        });
+
+        // Initialize on DOM content loaded
+        document.addEventListener('DOMContentLoaded', initializeFirebase);
+    </script>
+</body>
+</html>
